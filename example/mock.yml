@@ -1,0 +1,8 @@
+name: Hello World
+routes:
+  - request: GET /hello
+    responses:
+      - body: |
+          {
+            "answer": "Hello World"
+          }

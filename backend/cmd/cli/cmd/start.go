@@ -17,13 +17,11 @@ var filenames []string
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Start a mock server",
+	Long: `
+smocky start --filename mock.yml
+smocky start --filename mock1.yml --filename mock2.yml
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		stopSignalChanel := make(chan os.Signal, 1)
 		signal.Notify(
@@ -63,6 +61,6 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(startCmd)
-	startCmd.Flags().StringArrayVarP(&filenames, "filename", "f", []string{}, "file name")
+	startCmd.Flags().StringArrayVarP(&filenames, "filename", "f", []string{}, "mock files")
 	_ = startCmd.MarkFlagRequired("filename")
 }

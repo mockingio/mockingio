@@ -1,10 +1,6 @@
 vendor
-<<<<<<< HEAD
-.idea
-=======
 .idea
 backend/vendor
-.idea
 tasks.md
 _build
->>>>>>> 0127160 (working so far)
+smocky
