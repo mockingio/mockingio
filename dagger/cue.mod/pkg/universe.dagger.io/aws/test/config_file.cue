@@ -11,7 +11,7 @@ dagger.#Plan & {
 	client: {
 		filesystem: ".": read: {
 			contents: dagger.#FS
-			include: ["mock"]
+			include: ["config"]
 		}
 		commands: sops: {
 			name: "sops"

@@ -10,7 +10,7 @@ dagger.#Plan & {
 
 	actions: test: image: {
 
-		// Test: change image mock with docker.#Set
+		// Test: change image config with docker.#Set
 		set: {
 			image: output: docker.#Image & {
 				rootfs: dagger.#Scratch
@@ -42,7 +42,7 @@ dagger.#Plan & {
 			}
 		}
 
-		// Test: image mock behavior is correct
+		// Test: image config behavior is correct
 		config: {
 			build: core.#Dockerfile & {
 				source: dagger.#Scratch

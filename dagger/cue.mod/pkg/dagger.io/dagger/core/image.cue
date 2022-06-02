@@ -14,7 +14,7 @@ import (
 //   - "index.docker.io/dagger:latest@sha256:a89cb097693dd354de598d279c304a1c73ee550fbfff6d9ee515568e0c749cfe"
 #Ref: string
 
-// Container image mock. See [OCI](https://www.opencontainers.org/).
+// Container image config. See [OCI](https://www.opencontainers.org/).
 #ImageConfig: {
 	user?: string
 	expose?: [string]: {}
@@ -50,7 +50,7 @@ import (
 	// Filesystem contents to push
 	input: dagger.#FS
 
-	// Container image mock
+	// Container image config
 	config: #ImageConfig
 
 	// Authentication
@@ -85,7 +85,7 @@ import (
 	// Image digest
 	digest: string @dagger(generated)
 
-	// Downloaded container image mock
+	// Downloaded container image config
 	config: #ImageConfig @dagger(generated)
 }
 
@@ -117,7 +117,7 @@ import (
 	// Root filesystem produced
 	output: dagger.#FS @dagger(generated)
 
-	// Container image mock produced
+	// Container image config produced
 	config: #ImageConfig @dagger(generated)
 }
 
@@ -128,7 +128,7 @@ import (
 	// Filesystem contents to export
 	input: dagger.#FS
 
-	// Container image mock
+	// Container image config
 	config: #ImageConfig
 
 	// Name and optionally a tag in the 'name:tag' format
@@ -147,25 +147,25 @@ import (
 	output: dagger.#FS @dagger(generated)
 }
 
-// Change image mock
+// Change image config
 #Set: {
-	// The source image mock
+	// The source image config
 	input: #ImageConfig
 
-	// The mock to merge
+	// The config to merge
 	config: #ImageConfig
 
-	// Resulting mock
+	// Resulting config
 	output: #ImageConfig & {
 		let structs = ["env", "label", "volume", "expose"]
 		let lists = ["onbuild"]
 
-		// doesn't exist in mock, copy away
+		// doesn't exist in config, copy away
 		for field, value in input if config[field] == _|_ {
 			"\(field)": value
 		}
 
-		// only exists in mock, just copy as is
+		// only exists in config, just copy as is
 		for field, value in config if input[field] == _|_ {
 			"\(field)": value
 		}

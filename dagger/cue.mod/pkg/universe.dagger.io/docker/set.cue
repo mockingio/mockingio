@@ -4,20 +4,20 @@ import (
 	"dagger.io/dagger/core"
 )
 
-// Change image mock
+// Change image config
 #Set: {
 	// The source image
 	input: #Image
 
-	// The image mock to change
+	// The image config to change
 	config: core.#ImageConfig
 
 	_set: core.#Set & {
 		"input":  input.config
-		"mock": config
+		"config": config
 	}
 
-	// Resulting image with the mock changes
+	// Resulting image with the config changes
 	output: #Image & {
 		rootfs: input.rootfs
 		config: _set.output

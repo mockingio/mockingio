@@ -8,7 +8,7 @@ fi
 
 # Using Pulumi SaaS
 # We need to check for an existing stack with the name
-# If it exists, refresh the mock
+# If it exists, refresh the config
 # If it doesn't, create the stack
 if test -v PULUMI_ACCESS_TOKEN; then
   if (pulumi stack ls | grep -e "^${STACK_NAME}"); then

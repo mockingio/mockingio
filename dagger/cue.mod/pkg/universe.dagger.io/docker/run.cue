@@ -69,7 +69,7 @@ import (
 	// Examples: "root", "0", "1002"
 	user?: string
 
-	// Add defaults to image mock
+	// Add defaults to image config
 	// This ensures these values are present
 	_defaults: core.#Set & {
 		"input": {
@@ -81,7 +81,7 @@ import (
 		config: input.config
 	}
 
-	// Override with user mock
+	// Override with user config
 	_config: core.#Set & {
 		input: _defaults.output
 		config: {
@@ -149,6 +149,22 @@ import (
 			}
 			for path, output in _directories {
 				directories: "\(path)": output.contents
+			}
+
+			secrets: [path=string]: dagger.#Secret
+			_secrets: {
+				for path, _ in secrets {
+					"\(path)": {
+						contents: dagger.#Secret & _read.output
+						_read:    core.#NewSecret & {
+							input:  _exec.output
+							"path": path
+						}
+					}
+				}
+			}
+			for path, output in _secrets {
+				secrets: "\(path)": output.contents
 			}
 		}
 	}

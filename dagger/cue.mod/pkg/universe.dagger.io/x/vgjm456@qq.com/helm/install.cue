@@ -45,8 +45,8 @@ import (
 			NAME:          name
 			GENERATE_NAME: _generateName
 		}
-		mounts: "/root/.kube/mock": {
-			dest:     "/root/.kube/mock"
+		mounts: "/root/.kube/config": {
+			dest:     "/root/.kube/config"
 			type:     "secret"
 			contents: kubeconfig
 		}

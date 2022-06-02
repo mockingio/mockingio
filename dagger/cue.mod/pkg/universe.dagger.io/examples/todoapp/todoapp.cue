@@ -64,7 +64,7 @@ dagger.#Plan & {
 						_nodeModulesMount
 					}
 					script: contents: #"""
-						yarn mock set cache-folder /cache/yarn
+						yarn config set cache-folder /cache/yarn
 						yarn install
 						"""#
 				},

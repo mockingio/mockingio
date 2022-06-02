@@ -10,7 +10,7 @@ import (
 	// Root filesystem of the image.
 	rootfs: dagger.#FS
 
-	// Image mock
+	// Image config
 	config: core.#ImageConfig
 }
 
