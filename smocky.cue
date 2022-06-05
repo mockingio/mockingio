@@ -8,15 +8,19 @@ import (
 )
 
 dagger.#Plan & {
-    client: filesystem: "./../backend": read: contents: dagger.#FS
+    client: filesystem: "./backend": read: contents: dagger.#FS
+    client: filesystem: ".": read: contents: dagger.#FS
+    client: filesystem: "./bin": write: contents: actions.build."go".output
 
     actions: {
-				_source: client.filesystem."./../backend".read.contents
+				_source: client.filesystem."./backend".read.contents
+				_root_source: client.filesystem["."].read.contents
+
 				_image: docker.#Pull & {
 					source: "golangci/golangci-lint:v1.45"
 				}
         server_test: go.#Test & {
-            source:  client.filesystem."./../backend".read.contents
+            source:  client.filesystem."./backend".read.contents
             package: "./..."
             env: CGO_ENABLED: "0"
         }
@@ -35,20 +39,12 @@ dagger.#Plan & {
 
         build: {
         	"go": go.#Build & {
-							source: client.filesystem."./../backend".read.contents
+							source: client.filesystem."./backend".read.contents
 							env: {
 								CGO_ENABLED: "0"
 							}
-							package: "./cmd/cli"
-							container:
-									command:
-										flags:
-											"-o": "./output/smocker"
+							package: "./cmd/smocky"
 							env: HACK: "\(server_test.success)"
-					}
-					docker: core.#Dockerfile & {
-						source: _source
-						dockerfile: path: "Dockerfile"
 					}
         }
     }

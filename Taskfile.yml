@@ -10,7 +10,6 @@ tasks:
     cmds:
       - dagger do server_lint --log-format=plain
   build:
-    dir: dagger
     cmds:
       - dagger do build --log-format=plain
   start:
