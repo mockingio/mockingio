@@ -33,11 +33,23 @@ dagger.#Plan & {
 					}
 				}
 
-        build: go.#Build & {
-					source: client.filesystem."./../backend".read.contents
-					env: CGO_ENABLED: "0"
-					package: "./cmd/cli"
-					env: HACK: "\(server_test.success)"
+        build: {
+        	"go": go.#Build & {
+							source: client.filesystem."./../backend".read.contents
+							env: {
+								CGO_ENABLED: "0"
+							}
+							package: "./cmd/cli"
+							container:
+									command:
+										flags:
+											"-o": "./output/smocker"
+							env: HACK: "\(server_test.success)"
+					}
+					docker: core.#Dockerfile & {
+						source: _source
+						dockerfile: path: "Dockerfile"
+					}
         }
     }
 
