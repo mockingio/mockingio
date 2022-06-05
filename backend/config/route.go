@@ -14,11 +14,9 @@ const (
 )
 
 type Route struct {
-	Request         string       `yaml:"request" json:"request"`
-	ResponseMode    responseMode `yaml:"response_mode,omitempty" json:"response_mode,omitempty"`
-	Responses       []Response   `yaml:"responses" json:"responses"`
-	requestCount    int          // number of times this route has been called
-	nextResponseIdx int
+	Request      string       `yaml:"request" json:"request"`
+	ResponseMode responseMode `yaml:"response_mode,omitempty" json:"response_mode,omitempty"`
+	Responses    []Response   `yaml:"responses" json:"responses"`
 }
 
 func (r Route) RequestParts() (string, string) {

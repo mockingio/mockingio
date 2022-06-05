@@ -110,7 +110,7 @@ func getValueFromBody(_ *cfg.Route, request *http.Request, modifier string, _ *s
 			return "", errors.Wrapf(err, "unable to parse json query: %v", modifier)
 		}
 
-		return v.(string), nil
+		return v.(string), nil // nolint
 	}
 	return "", nil
 }

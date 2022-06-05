@@ -14,7 +14,6 @@ import (
 type Mock struct {
 	cfg     *config.Config
 	session *session.Session
-	storage storage
 }
 
 func NewFromYaml(file string) (*Mock, error) {
