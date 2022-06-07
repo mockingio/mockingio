@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/smockyio/smocky/backend/cmd/smocky/cmd"
+	"github.com/smockyio/smocky/backend/cmd/smocky"
 )
 
 func main() {
-	cmd.Execute()
+	smocky.Execute()
 }
