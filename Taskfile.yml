@@ -8,6 +8,7 @@ tasks:
     cmds:
       - dagger do server_lint --log-format=plain
   build:
+    deps: [ lint, test ]
     cmds:
       - dagger do build --log-format=plain
   start:
