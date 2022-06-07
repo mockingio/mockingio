@@ -3,5 +3,5 @@ vendor
 backend/vendor
 tasks.md
 _build
-smocky
+/smocky
 dagger-debug
