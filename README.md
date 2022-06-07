@@ -1,5 +1,10 @@
 # smocky
 
+## Installation
+```go
+go install github.com/smockyio/smocky
+```
+
 ## Usage
 
 ### CLI
