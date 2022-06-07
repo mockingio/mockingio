@@ -2,7 +2,7 @@
 
 ## Installation
 ```go
-go install github.com/smockyio/smocky
+go install github.com/smockyio/smocky@latest
 ```
 
 ## Usage
