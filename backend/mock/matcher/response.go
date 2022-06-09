@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	cfg "github.com/smockyio/smocky/backend/config"
+	cfg "github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/session"
 )
 

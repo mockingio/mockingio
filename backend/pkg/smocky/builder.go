@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smockyio/smocky/backend/config"
 	"github.com/smockyio/smocky/backend/mock"
+	"github.com/smockyio/smocky/backend/mock/config"
 )
 
 const (

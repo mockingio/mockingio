@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
-	. "github.com/smockyio/smocky/backend/config"
+	. "github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/test"
 )
 

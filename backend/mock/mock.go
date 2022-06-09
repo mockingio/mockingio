@@ -6,7 +6,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/smockyio/smocky/backend/config"
+	"github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/mock/matcher"
 	"github.com/smockyio/smocky/backend/session"
 )

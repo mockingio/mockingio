@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/smockyio/smocky/backend/config"
+	. "github.com/smockyio/smocky/backend/mock/config"
 )
 
 func TestResponse_Validate(t *testing.T) {

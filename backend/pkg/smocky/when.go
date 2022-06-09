@@ -4,7 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smockyio/smocky/backend/config"
+	"github.com/smockyio/smocky/backend/mock/config"
 )
 
 type When struct {

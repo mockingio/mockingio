@@ -45,6 +45,7 @@ dagger.#Plan & {
 							}
 							package: "./cmd/smocky"
 							env: HACK: "\(server_test.success)"
+							ldflags: "-X ''"
 					}
         }
     }
