@@ -1,4 +1,4 @@
-package smocky
+package cli
 
 import (
 	"fmt"
