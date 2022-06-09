@@ -1,30 +1,20 @@
 version: '3'
 
 tasks:
-  server-test:
-    cmds:
-      - dagger do server_test --log-format=plain
-  server-lint:
-    cmds:
-      - dagger do server_lint --log-format=plain
   build:
     deps: [ lint, test ]
     cmds:
       - dagger do build --log-format=plain
   start:
-    dir: backend
     cmds:
-      - go run cmd/smocky/main.go start --filename ./config/fixtures/mock.yml
+      - go run main.go start --filename ./example/mock.yml
   tidy:
-    dir: backend
     cmds:
       - go mod tidy && go mod vendor && go mod download
   lint:
-    dir: backend
     cmds:
-      - golangci-lint run ./...
+      - dagger do lint --log-format=plain
   test:
-    dir: backend
     cmds:
-      - go test -v ./...
+      - dagger do test --log-format=plain
 

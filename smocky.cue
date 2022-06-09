@@ -3,49 +3,41 @@ package main
 import (
     "dagger.io/dagger"
 
-		"universe.dagger.io/docker"
+		"github.com/smockyio/dagger/ci/golangci"
+
     "universe.dagger.io/go"
 )
 
 dagger.#Plan & {
-    client: filesystem: "./backend": read: contents: dagger.#FS
     client: filesystem: ".": read: contents: dagger.#FS
-    client: filesystem: "./bin": write: contents: actions.build."go".output
 
     actions: {
-				_source: client.filesystem."./backend".read.contents
+				_source: client.filesystem.".".read.contents
 				_root_source: client.filesystem["."].read.contents
 
-				_image: docker.#Pull & {
-					source: "golangci/golangci-lint:v1.45"
+				test: {
+					unit: go.#Test & {
+						source:  _source
+						package: "./..."
+						command: flags: "-race": true
+					}
 				}
-        server_test: go.#Test & {
-            source:  client.filesystem."./backend".read.contents
-            package: "./..."
-            env: CGO_ENABLED: "0"
-        }
 
-        server_lint: go.#Container & {
-					source: _source
-					input: _image.output
-					command: {
-						name: "golangci-lint"
-						flags: {
-							run:         true
-							"-v":        true
-						}
+				lint: {
+						go: golangci.#Lint & {
+						source:  _source
+						version: "1.45"
 					}
 				}
 
         build: {
         	"go": go.#Build & {
-							source: client.filesystem."./backend".read.contents
+							source: client.filesystem.".".read.contents
 							env: {
 								CGO_ENABLED: "0"
 							}
-							package: "./cmd/smocky"
-							env: HACK: "\(server_test.success)"
-							ldflags: "-X ''"
+							package: "."
+							env: HACK: "\(test.unit.success)"
 					}
         }
     }
