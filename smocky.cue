@@ -2,18 +2,19 @@ package main
 
 import (
     "dagger.io/dagger"
-
-		"github.com/smockyio/dagger/ci/golangci"
+		"dagger.io/dagger/core"
 
     "universe.dagger.io/go"
+
+		"github.com/smockyio/dagger/ci/golangci"
 )
 
 dagger.#Plan & {
     client: filesystem: ".": read: contents: dagger.#FS
+		client: filesystem: "./bin": write: contents: actions.build."go".output
 
     actions: {
 				_source: client.filesystem.".".read.contents
-				_root_source: client.filesystem["."].read.contents
 
 				test: {
 					unit: go.#Test & {
@@ -37,7 +38,15 @@ dagger.#Plan & {
 								CGO_ENABLED: "0"
 							}
 							package: "."
-							env: HACK: "\(test.unit.success)"
+							os: *client.platform.os | "linux"
+							arch: client.platform.arch
+							ldflags: "-s -w -X github.com/smockyio/smocky/backend/cmd/cli.buildVersion=1.0.1"
+							env: depends_unit: "\(test.unit.exit)"
+					}
+
+					docker: core.#Dockerfile & {
+						source: _source
+						dockerfile: path: "Dockerfile"
 					}
         }
     }

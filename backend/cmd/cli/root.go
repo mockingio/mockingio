@@ -7,6 +7,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	buildVersion string
+	buildDate    string
+	buildCommit  string
+)
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "smocky",
@@ -18,7 +24,12 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Println("Version 1.2.1")
+		fmt.Printf(
+			"Version: %v, Commit: %v, Build Date: %v\n",
+			buildVersion,
+			buildDate,
+			buildCommit,
+		)
 	},
 }
 
