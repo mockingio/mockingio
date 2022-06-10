@@ -1,9 +1,18 @@
-name: dagger
-
-on: push
+name: CI
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*.*.*' # semver, will override latest
+      - '*-preview' # preview, won't override latest
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: # Allow manual trigger
 jobs:
   deploy:
-    runs-on: [ self-hosted, Linux, ARM64 ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
