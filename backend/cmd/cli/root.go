@@ -3,14 +3,14 @@ package cli
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 )
 
 var (
-	buildVersion string
-	buildDate    string
-	buildCommit  string
+	buildVersion  string
+	buildRevision string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -25,10 +25,10 @@ var rootCmd = &cobra.Command{
 		}
 
 		fmt.Printf(
-			"Version: %v, Commit: %v, Build Date: %v\n",
+			"Version: %v, Revision: %v, Build Date: %v\n",
 			buildVersion,
-			buildDate,
-			buildCommit,
+			buildRevision,
+			time.Now().UTC().Format(time.RFC3339),
 		)
 	},
 }
