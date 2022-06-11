@@ -3,14 +3,10 @@ package cli
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/spf13/cobra"
-)
 
-var (
-	buildVersion  string
-	buildRevision string
+	"github.com/smockyio/smocky/backend/version"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -24,19 +20,14 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf(
-			"Version: %v, Revision: %v, Build Date: %v\n",
-			buildVersion,
-			buildRevision,
-			time.Now().UTC().Format(time.RFC3339),
-		)
+		fmt.Println(version.Long())
 	},
 }
 
-var version bool
+var flagVersion bool
 
 func init() {
-	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "show version")
+	rootCmd.Flags().BoolVarP(&flagVersion, "version", "v", false, "show version")
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
