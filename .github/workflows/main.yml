@@ -9,7 +9,15 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: "major|minor|patch"
+        default: "patch"
+        required: true
+      release_version:
+        description: "Optional release version, e.g. 0.0.1"
+        required: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -30,10 +38,16 @@ jobs:
       - name: "Create next release tag"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEMVER_BUMP: ${{ github.event.inputs.release_type }}
         run: |
-          previous_release_version="$(gh api /repos/:owner/:repo/releases --jq '.[0].tag_name')"
-          echo "PREVIOUS RELEASE VERSION: $previous_release_version"
-          next_release_version="v$(./semver bump ${SEMVER_BUMP:=patch}  $previous_release_version)"
+          if [[ -n "${{ github.event.inputs.release_version }}" ]]
+          then
+            next_release_version="v${{ github.event.inputs.release_version }}"
+          else
+            previous_release_version="$(gh api /repos/:owner/:repo/releases --jq '.[0].tag_name')"
+            echo "PREVIOUS RELEASE VERSION: $previous_release_version"
+            next_release_version="v$(./semver bump ${SEMVER_BUMP:=patch}  $previous_release_version)"
+          fi
           echo "NEXT RELEASE VERSION: $next_release_version"
           gh api -X POST /repos/:owner/:repo/git/refs \
             --field ref="refs/tags/$next_release_version" \
