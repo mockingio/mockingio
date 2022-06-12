@@ -28,6 +28,8 @@ jobs:
           cmds: |
             do build
       - name: "Create next release tag"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           previous_release_version="$(gh api /repos/:owner/:repo/releases --jq '.[0].tag_name')"
           echo "PREVIOUS RELEASE VERSION: $previous_release_version"
