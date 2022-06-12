@@ -39,3 +39,15 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+brews:
+  - tap:
+      owner: tuongaz
+      name: Tuong Le
+    commit_author:
+      name: tuongaz
+      email: tuongaz@gmail.com
+    homepage: "https://github.com/tuongaz/smocky"
+    description: "Smocky is a mocking tool"
+    test: |
+      system "#{bin}/smocky --version"
