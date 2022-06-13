@@ -1,8 +1,18 @@
 # smocky
 
 ## Installation
+
+### Go install
+
 ```go
 go install github.com/smockyio/smocky@latest
+```
+
+### Homebrew
+
+```shell
+brew tap tuongaz/smocky-tap
+brew install tuongaz/smocky
 ```
 
 ## Usage
