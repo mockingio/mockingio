@@ -1,6 +1,7 @@
 # smocky
 
 [![CI](https://github.com/tuongaz/smocky/actions/workflows/main.yml/badge.svg)](https://github.com/tuongaz/smocky/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/tuongaz/smocky/branch/main/graph/badge.svg?token=0AXGI7UR85)](https://codecov.io/gh/tuongaz/smocky)
 [![Docker Repository](https://img.shields.io/docker/pulls/tuongaz/smocky)](https://hub.docker.com/r/tuongaz/smocky)
 [![Github Release](https://img.shields.io/github/v/release/tuongaz/smocky)](https://github.com/tuongaz/smocky/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tuongaz/smocky)](https://goreportcard.com/report/github.com/tuongaz/smocky)
