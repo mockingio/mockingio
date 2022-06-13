@@ -43,7 +43,7 @@ changelog:
 brews:
   - tap:
       owner: tuongaz
-      name: homebrew-smocky-tap
+      name: smocky-tap
     commit_author:
       name: tuongaz
       email: tuongaz@gmail.com
