@@ -60,6 +60,5 @@ dockers:
       - "tuongaz/{{.ProjectName}}:latest"
       - "tuongaz/{{.ProjectName}}:{{ .Tag }}"
       - "tuongaz/{{.ProjectName}}:v{{ .Major }}"
-      - "gcr.io/tuongaz/{{.ProjectName}}:latest"
     build_flag_templates:
       - "--platform=linux/arm64"
