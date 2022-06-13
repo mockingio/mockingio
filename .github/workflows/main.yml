@@ -61,6 +61,10 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.18
+      - name: Run coverage # later will be moved into dagger
+        run: go test -race -coverprofile=coverage.out -covermode=atomic
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
