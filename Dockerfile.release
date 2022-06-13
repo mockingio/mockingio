@@ -1,0 +1,3 @@
+FROM scratch
+ENTRYPOINT ["/smocky"]
+COPY smocky /

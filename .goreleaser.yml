@@ -51,3 +51,15 @@ brews:
     description: "Smocky is a mocking tool"
     test: |
       system "#{bin}/smocky --version"
+
+dockers:
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile.release
+    image_templates:
+      - "tuongaz/{{.ProjectName}}:latest"
+      - "tuongaz/{{.ProjectName}}:{{ .Tag }}"
+      - "tuongaz/{{.ProjectName}}:v{{ .Major }}"
+      - "gcr.io/tuongaz/{{.ProjectName}}:latest"
+    build_flag_templates:
+      - "--platform=linux/arm64"
