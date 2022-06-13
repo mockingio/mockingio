@@ -12,7 +12,7 @@ go install github.com/smockyio/smocky@latest
 
 ```shell
 brew tap tuongaz/smocky-tap
-brew install tuongaz/smocky
+brew install tuongaz/smocky-tap/smocky
 ```
 
 ## Usage
