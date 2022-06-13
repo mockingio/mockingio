@@ -7,3 +7,4 @@ _build
 dagger-debug
 bin
 dist/
+coverage.out
