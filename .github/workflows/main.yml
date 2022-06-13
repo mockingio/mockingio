@@ -1,4 +1,5 @@
 name: CI
+concurrency: release
 on:
   push:
     branches:
