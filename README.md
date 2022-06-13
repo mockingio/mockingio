@@ -15,6 +15,14 @@ brew tap tuongaz/smocky-tap
 brew install tuongaz/smocky-tap/smocky
 ```
 
+### Docker hub
+
+```shell
+docker pull tuongaz/smocky
+
+docker run -ti tuongaz/smocky --version
+```
+
 ## Usage
 
 ### CLI
