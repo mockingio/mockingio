@@ -1,8 +1,8 @@
 # smocky
 
 [![CI](https://github.com/tuongaz/smocky/actions/workflows/main.yml/badge.svg)](https://github.com/tuongaz/smocky/actions/workflows/main.yml)
-[![Docker Repository](https://img.shields.io/badge/tuongaz%2Fsmocky-blue?logo=docker)](https://hub.docker.com/r/tuongaz/smocky)
-[![Github Release](https://img.shields.io/github/v/release/tuongaz/smocky.svg?logo=github)](https://github.com/tuongaz/smocky/releases/latest)
+[![Docker Repository](https://img.shields.io/docker/pulls/tuongaz/smocky)](https://hub.docker.com/r/tuongaz/smocky)
+[![Github Release](https://img.shields.io/github/v/release/tuongaz/smocky)](https://github.com/tuongaz/smocky/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tuongaz/smocky)](https://goreportcard.com/report/github.com/tuongaz/smocky)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
