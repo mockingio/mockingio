@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -14,6 +15,11 @@ import (
 
 var filenames []string
 
+type output struct {
+	URLS  []string `json:"urls"`
+	Admin string   `json:"admin"`
+}
+
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
@@ -21,6 +27,7 @@ var startCmd = &cobra.Command{
 	Long: `
 smocky start --filename mock.yml
 smocky start --filename mock1.yml --filename mock2.yml
+smocky start --filename mock.yml --output-json
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		stopSignalChanel := make(chan os.Signal, 1)
@@ -34,6 +41,7 @@ smocky start --filename mock1.yml --filename mock2.yml
 
 		var shutdownServers []func()
 
+		out := output{}
 		for _, filename := range filenames {
 			serv := server.New()
 			url, shutdownServer, err := serv.StartFromFile(context.Background(), filename)
@@ -47,8 +55,11 @@ smocky start --filename mock1.yml --filename mock2.yml
 			}
 			shutdownServers = append(shutdownServers, shutdownServer)
 
-			fmt.Printf("serving server from: %v\n", url)
+			out.URLS = append(out.URLS, url)
 		}
+
+		data, _ := json.Marshal(out)
+		fmt.Println(string(data))
 
 		<-stopSignalChanel
 		for _, shutdown := range shutdownServers {
