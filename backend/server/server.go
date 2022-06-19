@@ -6,9 +6,12 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 
 	"github.com/smockyio/smocky/backend/mock"
+	"github.com/smockyio/smocky/backend/mock/config"
+	"github.com/smockyio/smocky/backend/persistent/memory"
 )
 
 type Result struct {
@@ -22,18 +25,23 @@ func New() *Server {
 }
 
 func (s *Server) StartFromFile(ctx context.Context, file string) (string, func(), error) {
-	m, err := mock.NewFromYaml(file)
+	cfg, err := config.FromYamlFile(file)
+	if err != nil {
+		return "", nil, err
+	}
+	id := uuid.NewString()
+
+	mem := memory.New()
+	_ = mem.Set(id, cfg)
+
+	m, err := mock.New(id, mem)
 	if err != nil {
 		return "", nil, err
 	}
 
-	return s.StartFromMock(ctx, m)
-}
-
-func (s *Server) StartFromMock(ctx context.Context, m *mock.Mock) (string, func(), error) {
 	srv := s.buildHTTPServer(m)
 
-	listener, err := net.Listen("tcp", ":"+m.Port())
+	listener, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
 		return "", nil, err
 	}

@@ -12,32 +12,27 @@ import (
 )
 
 type Mock struct {
-	cfg     *config.Config
-	session *session.Session
+	id          string
+	mockFetcher mockFetcher
+	session     *session.Session
 }
 
-func NewFromYaml(file string) (*Mock, error) {
-	cfg, err := config.FromYamlFile(file)
-	if err != nil {
-		return nil, err
-	}
-
-	return New(cfg)
-}
-
-func New(cfg *config.Config) (*Mock, error) {
+func New(id string, mockFetcher mockFetcher) (*Mock, error) {
 	return &Mock{
-		cfg:     cfg,
-		session: session.New(),
+		id:          id,
+		mockFetcher: mockFetcher,
+		session:     session.New(),
 	}, nil
 }
 
-func (m *Mock) Port() string {
-	return m.cfg.Port
-}
-
 func (m *Mock) Match(req *http.Request) *config.Response {
-	for _, route := range m.cfg.Routes {
+	cfg, err := m.mockFetcher.Get(m.id)
+	if err != nil {
+		log.WithError(err).Error("loading mock")
+		return nil
+	}
+
+	for _, route := range cfg.Routes {
 		log.Debugf("Matching route: %v", route.Request)
 		response, err := matcher.NewRouteMatcher(route, m.session, req).Match()
 		if err != nil {
@@ -77,4 +72,8 @@ func (m *Mock) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(response.Status)
 	_, _ = w.Write([]byte(response.Body))
+}
+
+type mockFetcher interface {
+	Get(id string) (*config.Config, error)
 }

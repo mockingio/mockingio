@@ -8,6 +8,9 @@ tasks:
   start:
     cmds:
       - go run main.go start --filename ./example/mock.yml
+  start-with-admin:
+    cmds:
+      - go run main.go start --filename ./example/mock.yml --admin
   tidy:
     cmds:
       - go mod tidy && go mod vendor && go mod download

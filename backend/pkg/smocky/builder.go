@@ -1,12 +1,14 @@
 package smocky
 
 import (
+	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/smockyio/smocky/backend/mock"
 	"github.com/smockyio/smocky/backend/mock/config"
+	"github.com/smockyio/smocky/backend/persistent/memory"
 )
 
 const (
@@ -42,8 +44,12 @@ func (b *Builder) Start(t *testing.T) *httptest.Server {
 	if err := b.config.Validate(); err != nil {
 		t.Errorf("invalid config: %v", err)
 	}
+	id := uuid.NewString()
 
-	m, err := mock.New(b.config)
+	mem := memory.New()
+	_ = mem.Set(id, b.config)
+
+	m, err := mock.New(id, mem)
 	if err != nil {
 		t.Errorf("fail to create mock: %v", err)
 	}
