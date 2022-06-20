@@ -11,17 +11,21 @@ import (
 
 	"github.com/smockyio/smocky/backend/mock"
 	"github.com/smockyio/smocky/backend/mock/config"
-	"github.com/smockyio/smocky/backend/persistent/memory"
+	"github.com/smockyio/smocky/backend/persistent"
 )
 
 type Result struct {
 	Error error
 }
 
-type Server struct{}
+type Server struct {
+	persistent persistent.Persistent
+}
 
-func New() *Server {
-	return &Server{}
+func New(persistent persistent.Persistent) *Server {
+	return &Server{
+		persistent: persistent,
+	}
 }
 
 func (s *Server) StartFromFile(ctx context.Context, file string) (string, func(), error) {
@@ -31,10 +35,9 @@ func (s *Server) StartFromFile(ctx context.Context, file string) (string, func()
 	}
 	id := uuid.NewString()
 
-	mem := memory.New()
-	_ = mem.SetConfig(ctx, id, cfg)
+	_ = s.persistent.SetConfig(ctx, id, cfg)
 
-	m, err := mock.New(id, uuid.NewString(), mem)
+	m, err := mock.New(id, uuid.NewString(), s.persistent)
 	if err != nil {
 		return "", nil, err
 	}

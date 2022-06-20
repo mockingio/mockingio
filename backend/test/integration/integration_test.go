@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"github.com/smockyio/smocky/backend/persistent/memory"
 	"io"
 	"net/http"
 	"strings"
@@ -70,7 +71,7 @@ func TestIntegration(t *testing.T) {
 }
 
 func mustStartServer(t *testing.T) (string, func()) {
-	address, done, err := server.New().StartFromFile(context.Background(), "mock.yml")
+	address, done, err := server.New(memory.New()).StartFromFile(context.Background(), "mock.yml")
 	if err != nil {
 		t.Log(err)
 		t.Fail()

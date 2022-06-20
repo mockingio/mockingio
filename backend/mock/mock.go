@@ -1,7 +1,6 @@
 package mock
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -9,15 +8,16 @@ import (
 
 	"github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/mock/matcher"
+	"github.com/smockyio/smocky/backend/persistent"
 )
 
 type Mock struct {
 	configID   string
 	sessionID  string
-	persistent persistent
+	persistent persistent.Persistent
 }
 
-func New(configID, sessionID string, persistent persistent) (*Mock, error) {
+func New(configID, sessionID string, persistent persistent.Persistent) (*Mock, error) {
 	return &Mock{
 		configID:   configID,
 		sessionID:  sessionID,
@@ -76,11 +76,4 @@ func (m *Mock) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(response.Status)
 	_, _ = w.Write([]byte(response.Body))
-}
-
-type persistent interface {
-	GetConfig(ctx context.Context, id string) (*config.Config, error)
-	Set(_ context.Context, key string, value any) error
-	GetInt(ctx context.Context, key string) (int, error)
-	Increase(_ context.Context, key string) (int, error)
 }

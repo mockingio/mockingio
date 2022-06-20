@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/smockyio/smocky/backend/persistent/memory"
 	"os"
 	"os/signal"
 	"syscall"
@@ -45,8 +46,10 @@ smocky start --filename mock.yml --output-json
 
 		out := output{}
 		ctx := context.Background()
+		database := memory.New()
+
 		for _, filename := range filenames {
-			serv := server.New()
+			serv := server.New(database)
 			url, shutdownServer, err := serv.StartFromFile(ctx, filename)
 
 			if err != nil {
