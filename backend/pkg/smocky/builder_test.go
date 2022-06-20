@@ -25,6 +25,36 @@ func TestBuilder_MatchedRoute(t *testing.T) {
 		assertHTTPGETRequest(t, url(srv, "/hello"), 200, "world")
 	})
 
+	t.Run("simple post", func(t *testing.T) {
+		srv := New().
+			Post("/hello").
+			Response(http.StatusOK, "world").
+			Start(t)
+		defer srv.Close()
+
+		assertHTTPPOSTRequest(t, url(srv, "/hello"), "", 200, "world")
+	})
+
+	t.Run("simple put", func(t *testing.T) {
+		srv := New().
+			Put("/hello").
+			Response(http.StatusOK, "world").
+			Start(t)
+		defer srv.Close()
+
+		assertHTTPPUTRequest(t, url(srv, "/hello"), "", 200, "world")
+	})
+
+	t.Run("simple put", func(t *testing.T) {
+		srv := New().
+			Delete("/hello").
+			Response(http.StatusOK, "world").
+			Start(t)
+		defer srv.Close()
+
+		assertHTTPDELETETRequest(t, url(srv, "/hello"), "", 200, "world")
+	})
+
 	t.Run("simple get with builder", func(t *testing.T) {
 		builder := New()
 		builder.Get("/hello").
@@ -63,6 +93,7 @@ func TestBuilder_MatchedRoute(t *testing.T) {
 			Response(http.StatusOK, "world").
 			When(Cookie, "name", Equal, "Jack").
 			Or(Header, "name", Regex, "non exist value").
+			Or(Header, "age", Equal, "18").
 			Start(t)
 
 		assertHTTPGETRequest(t, url(srv, "/hello"), 200, "world")
@@ -180,6 +211,52 @@ func assertHTTPGETRequest(t *testing.T, url string, expectedStatusCode int, expe
 
 func assertHTTPPOSTRequest(t *testing.T, url, payload string, expectedStatusCode int, expectedResponseBody string) {
 	req, err := http.NewRequest("POST", url, strings.NewReader(payload))
+	require.NoError(t, err)
+
+	req.Header.Set("x-type", "x-men")
+	req.AddCookie(&http.Cookie{
+		Name:  "name",
+		Value: "Jack",
+	})
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedStatusCode, resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedResponseBody, string(body))
+}
+
+func assertHTTPPUTRequest(t *testing.T, url, payload string, expectedStatusCode int, expectedResponseBody string) {
+	req, err := http.NewRequest("PUT", url, strings.NewReader(payload))
+	require.NoError(t, err)
+
+	req.Header.Set("x-type", "x-men")
+	req.AddCookie(&http.Cookie{
+		Name:  "name",
+		Value: "Jack",
+	})
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedStatusCode, resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	assert.Equal(t, expectedResponseBody, string(body))
+}
+
+func assertHTTPDELETETRequest(t *testing.T, url, payload string, expectedStatusCode int, expectedResponseBody string) {
+	req, err := http.NewRequest("DELETE", url, strings.NewReader(payload))
 	require.NoError(t, err)
 
 	req.Header.Set("x-type", "x-men")

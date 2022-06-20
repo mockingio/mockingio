@@ -65,3 +65,23 @@ func TestMemory_SetGetActiveSession(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "123456", v)
 }
+
+func TestMemory_GetConfigs(t *testing.T) {
+	cfg1 := &config.Config{
+		Port: "1234",
+		ID:   "*id1*",
+	}
+
+	cfg2 := &config.Config{
+		Port: "1234",
+		ID:   "*id2*",
+	}
+
+	m := New()
+	_ = m.SetConfig(context.Background(), cfg1)
+	_ = m.SetConfig(context.Background(), cfg2)
+
+	configs, err := m.GetConfigs(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 2, len(configs))
+}
