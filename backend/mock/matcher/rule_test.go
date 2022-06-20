@@ -1,6 +1,7 @@
 package matcher_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,16 +12,24 @@ import (
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/mock/matcher"
-	"github.com/smockyio/smocky/backend/session"
+	"github.com/smockyio/smocky/backend/persistent/memory"
 )
 
 func TestRuleMatcher_Match(t *testing.T) {
-	sess := session.New()
-	sess.Set("POST", "/api/person/detail", "request_number", 2)
+	sess := memory.New()
+	sessionID := "123456"
+
+	req := matcher.Request{
+		HTTPRequest: newHTTPRequest(),
+		SessionID:   sessionID,
+		Session:     sess,
+	}
+
+	_ = sess.Set(context.Background(), req.CountID(), 2)
 
 	tests := []struct {
 		name    string
-		session *session.Session
+		session *memory.Memory
 		route   *cfg.Route
 		request *http.Request
 		rule    *cfg.Rule
@@ -87,7 +96,11 @@ func TestRuleMatcher_Match(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matched, err := matcher.NewRuleMatcher(tt.route, tt.rule, tt.request, tt.session).Match()
+			matched, err := matcher.NewRuleMatcher(tt.route, tt.rule, matcher.Request{
+				HTTPRequest: tt.request,
+				Session:     tt.session,
+				SessionID:   sessionID,
+			}).Match()
 			if tt.error {
 				require.Error(t, err)
 			} else {
@@ -99,8 +112,16 @@ func TestRuleMatcher_Match(t *testing.T) {
 }
 
 func TestRuleMatcher_GetTargetValue(t *testing.T) {
-	sess := session.New()
-	sess.Set("POST", "/api/person/detail", "request_number", 2)
+	sess := memory.New()
+	sessionID := "123456"
+
+	req := matcher.Request{
+		HTTPRequest: newHTTPRequest(),
+		SessionID:   sessionID,
+		Session:     sess,
+	}
+
+	_ = sess.Set(context.Background(), req.CountID(), 2)
 
 	var route = &cfg.Route{
 		Request: "GET /api/:object/:action",
@@ -129,7 +150,11 @@ func TestRuleMatcher_GetTargetValue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Target: %v, Modifier: %v", tt.rule.Target, tt.rule.Modifier), func(t *testing.T) {
-			actual, err := matcher.NewRuleMatcher(route, tt.rule, tt.request, sess).GetTargetValue()
+			actual, err := matcher.NewRuleMatcher(route, tt.rule, matcher.Request{
+				HTTPRequest: tt.request,
+				Session:     sess,
+				SessionID:   sessionID,
+			}).GetTargetValue()
 
 			require.NoError(t, err)
 			assert.Equal(t, tt.expectedValue, actual)

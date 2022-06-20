@@ -1,6 +1,7 @@
 package smocky
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"net/http"
 	"net/http/httptest"
@@ -47,9 +48,9 @@ func (b *Builder) Start(t *testing.T) *httptest.Server {
 	id := uuid.NewString()
 
 	mem := memory.New()
-	_ = mem.Set(id, b.config)
+	_ = mem.SetConfig(context.Background(), id, b.config)
 
-	m, err := mock.New(id, mem)
+	m, err := mock.New(id, "id", mem)
 	if err != nil {
 		t.Errorf("fail to create mock: %v", err)
 	}

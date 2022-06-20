@@ -100,7 +100,9 @@ func TestResponseMatcher_Match(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			isMatched, err := matcher.NewResponseMatcher(nil, tt.response, newRequest(), nil).Match()
+			isMatched, err := matcher.NewResponseMatcher(nil, tt.response, matcher.Request{
+				HTTPRequest: newRequest(),
+			}).Match()
 			require.NoError(t, err)
 			assert.Equal(t, tt.isMatched, isMatched)
 		})

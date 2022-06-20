@@ -1,28 +1,27 @@
 package matcher
 
 import (
-	"net/http"
-
 	"github.com/pkg/errors"
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
-	"github.com/smockyio/smocky/backend/session"
 )
 
-func NewResponseMatcher(route *cfg.Route, response *cfg.Response, httpRequest *http.Request, sess *session.Session) *ResponseMatcher {
+func NewResponseMatcher(
+	route *cfg.Route,
+	response *cfg.Response,
+	req Request,
+) *ResponseMatcher {
 	return &ResponseMatcher{
-		route:       route,
-		response:    response,
-		httpRequest: httpRequest,
-		session:     sess,
+		route:    route,
+		response: response,
+		req:      req,
 	}
 }
 
 type ResponseMatcher struct {
-	route       *cfg.Route
-	response    *cfg.Response
-	httpRequest *http.Request
-	session     *session.Session
+	route    *cfg.Route
+	response *cfg.Response
+	req      Request
 }
 
 func (r *ResponseMatcher) Match() (bool, error) {
@@ -36,7 +35,7 @@ func (r *ResponseMatcher) Match() (bool, error) {
 	}
 
 	for _, rule := range r.response.Rules {
-		matched, err := NewRuleMatcher(r.route, &rule, r.httpRequest, r.session).Match() // matcher. rule.Match(route, request)
+		matched, err := NewRuleMatcher(r.route, &rule, r.req).Match() // matcher. rule.Match(route, request)
 		if err != nil {
 			return false, errors.Wrap(err, "matching rule")
 		}

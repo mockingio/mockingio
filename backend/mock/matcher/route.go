@@ -2,7 +2,6 @@ package matcher
 
 import (
 	"math/rand"
-	"net/http"
 	"strings"
 	"time"
 
@@ -10,28 +9,26 @@ import (
 	"github.com/pkg/errors"
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
-	sess "github.com/smockyio/smocky/backend/session"
 )
 
 type RouteMatcher struct {
-	route       *cfg.Route
-	session     *sess.Session
-	httpRequest *http.Request
+	route *cfg.Route
+	req   Request
 }
 
-func NewRouteMatcher(route *cfg.Route, session *sess.Session, req *http.Request) *RouteMatcher {
+func NewRouteMatcher(route *cfg.Route, req Request) *RouteMatcher {
 	return &RouteMatcher{
-		route:       route,
-		session:     session,
-		httpRequest: req,
+		route: route,
+		req:   req,
 	}
 }
 
 func (r *RouteMatcher) Match() (*cfg.Response, error) {
-	request := r.httpRequest
 	method, path := r.route.RequestParts()
+	httpRequest := r.req.HTTPRequest
+	session := r.req.Session
 
-	if !strings.EqualFold(method, request.Method) {
+	if !strings.EqualFold(method, httpRequest.Method) {
 		return nil, nil
 	}
 
@@ -42,55 +39,73 @@ func (r *RouteMatcher) Match() (*cfg.Response, error) {
 		}
 	}
 
-	if !wildcard.Match(strings.Join(parts, "/"), request.URL.Path) {
+	if !wildcard.Match(strings.Join(parts, "/"), httpRequest.URL.Path) {
 		return nil, nil
 	}
 
-	r.session.IncreaseRequestNumber(r.httpRequest)
+	_, err := session.Increase(
+		httpRequest.Context(),
+		r.req.CountID(),
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "increase request times")
+	}
 
-	responses, err := r.findMatches(request)
+	responses, err := r.findMatches()
 	if err != nil {
 		return nil, errors.Wrap(err, "matching route")
 	}
 
-	return r.pickResponse(responses), nil
+	return r.pickResponse(responses)
 }
 
-func (r *RouteMatcher) pickResponse(responses []*cfg.Response) *cfg.Response {
+func (r *RouteMatcher) pickResponse(responses []*cfg.Response) (*cfg.Response, error) {
 	if len(responses) == 0 {
-		return nil
+		return nil, nil
 	}
+	session := r.req.Session
+	sequenceID := r.req.SequenceID()
+	ctx := r.req.HTTPRequest.Context()
 
 	switch r.route.ResponseMode {
 	case cfg.ResponseSequentially:
-		idx := r.session.NextResponseIndex(r.httpRequest)
-		if idx+1 == len(responses) {
-			r.session.SetNextResponseIndex(r.httpRequest, 0)
-		} else {
-			r.session.SetNextResponseIndex(r.httpRequest, idx+1)
+		idx, err := session.GetInt(ctx, sequenceID)
+		if err != nil {
+			return nil, err
 		}
-		return responses[idx]
+
+		if idx+1 == len(responses) {
+			if err := session.Set(ctx, sequenceID, 0); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := session.Set(ctx, sequenceID, idx+1); err != nil {
+				return nil, err
+			}
+		}
+
+		return responses[idx], nil
 	case cfg.ResponseRandomly:
 		rand.Seed(time.Now().UnixNano())
-		return responses[rand.Intn(len(responses))]
+		return responses[rand.Intn(len(responses))], nil
 	case cfg.DefaultResponse:
 		fallthrough
 	default:
 		for _, response := range responses {
 			if response.IsDefault {
-				return response
+				return response, nil
 			}
 		}
-		return responses[0] // No default setup, pick first one
+		return responses[0], nil // No default setup, pick first one
 	}
 }
 
-func (r *RouteMatcher) findMatches(request *http.Request) ([]*cfg.Response, error) {
+func (r *RouteMatcher) findMatches() ([]*cfg.Response, error) {
 	var responses []*cfg.Response
 
 	for _, response := range r.route.Responses {
 		response := response
-		matched, err := NewResponseMatcher(r.route, &response, request, r.session).Match()
+		matched, err := NewResponseMatcher(r.route, &response, r.req).Match()
 		if err != nil {
 			return nil, err
 		}

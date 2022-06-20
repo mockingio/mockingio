@@ -10,7 +10,7 @@ import (
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/mock/matcher"
-	"github.com/smockyio/smocky/backend/session"
+	"github.com/smockyio/smocky/backend/persistent/memory"
 )
 
 func TestRouteMatcher_Match(t *testing.T) {
@@ -169,7 +169,10 @@ func TestRouteMatcher_Match(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := matcher.NewRouteMatcher(tt.route, session.New(), tt.httpReq).Match()
+			result, err := matcher.NewRouteMatcher(tt.route, matcher.Request{
+				HTTPRequest: tt.httpReq,
+				Session:     memory.New(),
+			}).Match()
 			assert.Equal(t, tt.expectedResponse, result)
 			assert.Equal(t, tt.expectedError, err != nil)
 		})
@@ -226,7 +229,10 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 			}},
 		}
 
-		m := matcher.NewRouteMatcher(route, session.New(), request)
+		m := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: request,
+			Session:     memory.New(),
+		})
 		res, _ := m.Match()
 		assert.Nil(t, res)
 	})
@@ -237,7 +243,10 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 			Responses: []cfg.Response{response1, response2, response3},
 		}
 
-		result, err := matcher.NewRouteMatcher(route, session.New(), request).Match()
+		result, err := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: request,
+			Session:     memory.New(),
+		}).Match()
 
 		require.NoError(t, err)
 		assert.Equal(t, &response1, result)
@@ -261,28 +270,41 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 			Responses: []cfg.Response{response1, response2, defaultResponse, response3},
 		}
 
-		result, err := matcher.NewRouteMatcher(route, session.New(), request).Match()
+		result, err := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: request,
+			Session:     memory.New(),
+		}).Match()
 		require.NoError(t, err)
 		assert.Equal(t, &defaultResponse, result)
 	})
 
 	t.Run("sequential strategy setup", func(t *testing.T) {
-		sess := session.New()
+		sess := memory.New()
+
 		route := &cfg.Route{
 			Request:      "GET /how/are/you",
 			ResponseMode: cfg.ResponseSequentially,
 			Responses:    []cfg.Response{response1, response2, response3},
 		}
 
-		result1, err := matcher.NewRouteMatcher(route, sess, request).Match()
+		result1, err := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: request,
+			Session:     sess,
+		}).Match()
 		require.NoError(t, err)
 		assert.Equal(t, &response1, result1)
 
-		result2, err := matcher.NewRouteMatcher(route, sess, request).Match()
+		result2, err := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: request,
+			Session:     sess,
+		}).Match()
 		require.NoError(t, err)
 		assert.Equal(t, &response2, result2)
 
-		result3, err := matcher.NewRouteMatcher(route, sess, request).Match()
+		result3, err := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: request,
+			Session:     sess,
+		}).Match()
 		require.NoError(t, err)
 		assert.Equal(t, &response3, result3)
 	})

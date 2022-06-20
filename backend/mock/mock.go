@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -8,25 +9,24 @@ import (
 
 	"github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/mock/matcher"
-	"github.com/smockyio/smocky/backend/session"
 )
 
 type Mock struct {
-	id          string
-	mockFetcher mockFetcher
-	session     *session.Session
+	configID   string
+	sessionID  string
+	persistent persistent
 }
 
-func New(id string, mockFetcher mockFetcher) (*Mock, error) {
+func New(configID, sessionID string, persistent persistent) (*Mock, error) {
 	return &Mock{
-		id:          id,
-		mockFetcher: mockFetcher,
-		session:     session.New(),
+		configID:   configID,
+		sessionID:  sessionID,
+		persistent: persistent,
 	}, nil
 }
 
 func (m *Mock) Match(req *http.Request) *config.Response {
-	cfg, err := m.mockFetcher.Get(m.id)
+	cfg, err := m.persistent.GetConfig(req.Context(), m.configID)
 	if err != nil {
 		log.WithError(err).Error("loading mock")
 		return nil
@@ -34,7 +34,11 @@ func (m *Mock) Match(req *http.Request) *config.Response {
 
 	for _, route := range cfg.Routes {
 		log.Debugf("Matching route: %v", route.Request)
-		response, err := matcher.NewRouteMatcher(route, m.session, req).Match()
+		response, err := matcher.NewRouteMatcher(route, matcher.Request{
+			HTTPRequest: req,
+			SessionID:   m.sessionID,
+			Session:     m.persistent,
+		}).Match()
 		if err != nil {
 			log.WithError(err).Error("error while matching route")
 			continue
@@ -74,6 +78,9 @@ func (m *Mock) Handler(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte(response.Body))
 }
 
-type mockFetcher interface {
-	Get(id string) (*config.Config, error)
+type persistent interface {
+	GetConfig(ctx context.Context, id string) (*config.Config, error)
+	Set(_ context.Context, key string, value any) error
+	GetInt(ctx context.Context, key string) (int, error)
+	Increase(_ context.Context, key string) (int, error)
 }

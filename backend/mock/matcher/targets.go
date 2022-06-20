@@ -3,7 +3,6 @@ package matcher
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"strconv"
 	"strings"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
-	"github.com/smockyio/smocky/backend/session"
 )
 
 var targets = map[cfg.Target]getTargetValueFn{
@@ -23,15 +21,14 @@ var targets = map[cfg.Target]getTargetValueFn{
 	cfg.Body:          getValueFromBody,
 }
 
-type getTargetValueFn func(route *cfg.Route, request *http.Request, modifier string, session *session.Session) (string, error)
+type getTargetValueFn func(route *cfg.Route, modifier string, req Request) (string, error)
 
-func getValueFromHeader(_ *cfg.Route, request *http.Request, modifier string, _ *session.Session) (string, error) {
-
-	return request.Header.Get(modifier), nil
+func getValueFromHeader(_ *cfg.Route, modifier string, req Request) (string, error) {
+	return req.HTTPRequest.Header.Get(modifier), nil
 }
 
-func getValueFromCookie(_ *cfg.Route, request *http.Request, modifier string, _ *session.Session) (string, error) {
-	cookies := request.Cookies()
+func getValueFromCookie(_ *cfg.Route, modifier string, req Request) (string, error) {
+	cookies := req.HTTPRequest.Cookies()
 	for _, c := range cookies {
 		if c.Name == modifier {
 			return c.Value, nil
@@ -40,18 +37,22 @@ func getValueFromCookie(_ *cfg.Route, request *http.Request, modifier string, _ 
 	return "", nil
 }
 
-func getValueFromQueryString(_ *cfg.Route, request *http.Request, modifier string, _ *session.Session) (string, error) {
-	return request.URL.Query().Get(modifier), nil
+func getValueFromQueryString(_ *cfg.Route, modifier string, req Request) (string, error) {
+	return req.HTTPRequest.URL.Query().Get(modifier), nil
 }
 
-func getRequestNumber(_ *cfg.Route, request *http.Request, _ string, session *session.Session) (string, error) {
-	return strconv.Itoa(session.GetRequestNumber(request)), nil
+func getRequestNumber(_ *cfg.Route, _ string, req Request) (string, error) {
+	value, err := req.Session.GetInt(req.HTTPRequest.Context(), req.CountID())
+	if err != nil {
+		return "", err
+	}
+	return strconv.Itoa(value), nil
 }
 
-func getValueFromRouteParam(route *cfg.Route, request *http.Request, modifier string, _ *session.Session) (string, error) {
+func getValueFromRouteParam(route *cfg.Route, modifier string, req Request) (string, error) {
 	_, path := route.RequestParts()
 	templateParts := strings.Split(path, "/")
-	actualParts := strings.Split(request.URL.Path, "/")
+	actualParts := strings.Split(req.HTTPRequest.URL.Path, "/")
 	if len(templateParts) != len(actualParts) {
 		return "", nil
 	}
@@ -67,12 +68,13 @@ func getValueFromRouteParam(route *cfg.Route, request *http.Request, modifier st
 	return "", nil
 }
 
-func getValueFromBody(_ *cfg.Route, request *http.Request, modifier string, _ *session.Session) (string, error) {
-	if request.Body == nil {
+func getValueFromBody(_ *cfg.Route, modifier string, req Request) (string, error) {
+	httpRequest := req.HTTPRequest
+	if httpRequest.Body == nil {
 		return "", nil
 	}
 
-	value, err := ioutil.ReadAll(request.Body)
+	value, err := ioutil.ReadAll(httpRequest.Body)
 	if err != nil {
 		return "", errors.Wrap(err, "read request body")
 	}

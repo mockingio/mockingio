@@ -1,29 +1,25 @@
 package matcher
 
 import (
-	"net/http"
 	"regexp"
 
 	"github.com/pkg/errors"
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
-	"github.com/smockyio/smocky/backend/session"
 )
 
-func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, httpRequest *http.Request, session *session.Session) *RuleMatcher {
+func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Request) *RuleMatcher {
 	return &RuleMatcher{
-		route:       route,
-		rule:        rule,
-		httpRequest: httpRequest,
-		session:     session,
+		route: route,
+		rule:  rule,
+		req:   req,
 	}
 }
 
 type RuleMatcher struct {
-	route       *cfg.Route
-	rule        *cfg.Rule
-	session     *session.Session
-	httpRequest *http.Request
+	route *cfg.Route
+	rule  *cfg.Rule
+	req   Request
 }
 
 func (r *RuleMatcher) Match() (bool, error) {
@@ -50,7 +46,7 @@ func (r *RuleMatcher) Match() (bool, error) {
 
 func (r *RuleMatcher) GetTargetValue() (string, error) {
 	if targetFn, ok := targets[r.rule.Target]; ok {
-		return targetFn(r.route, r.httpRequest, r.rule.Modifier, r.session)
+		return targetFn(r.route, r.rule.Modifier, r.req)
 	}
 
 	return "", nil

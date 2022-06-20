@@ -32,9 +32,9 @@ func (s *Server) StartFromFile(ctx context.Context, file string) (string, func()
 	id := uuid.NewString()
 
 	mem := memory.New()
-	_ = mem.Set(id, cfg)
+	_ = mem.SetConfig(ctx, id, cfg)
 
-	m, err := mock.New(id, mem)
+	m, err := mock.New(id, uuid.NewString(), mem)
 	if err != nil {
 		return "", nil, err
 	}
