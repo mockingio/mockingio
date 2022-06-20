@@ -8,7 +8,7 @@ import (
 	cfg "github.com/smockyio/smocky/backend/mock/config"
 )
 
-func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Request) *RuleMatcher {
+func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Context) *RuleMatcher {
 	return &RuleMatcher{
 		route: route,
 		rule:  rule,
@@ -19,7 +19,7 @@ func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Request) *RuleMatcher 
 type RuleMatcher struct {
 	route *cfg.Route
 	rule  *cfg.Rule
-	req   Request
+	req   Context
 }
 
 func (r *RuleMatcher) Match() (bool, error) {

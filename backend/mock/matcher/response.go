@@ -9,7 +9,7 @@ import (
 func NewResponseMatcher(
 	route *cfg.Route,
 	response *cfg.Response,
-	req Request,
+	req Context,
 ) *ResponseMatcher {
 	return &ResponseMatcher{
 		route:    route,
@@ -21,7 +21,7 @@ func NewResponseMatcher(
 type ResponseMatcher struct {
 	route    *cfg.Route
 	response *cfg.Response
-	req      Request
+	req      Context
 }
 
 func (r *ResponseMatcher) Match() (bool, error) {

@@ -12,36 +12,34 @@ import (
 )
 
 type Mock struct {
-	configID   string
-	persistent persistent.Persistent
+	configID string
 }
 
-func New(configID string, persistent persistent.Persistent) (*Mock, error) {
+func New(configID string) (*Mock, error) {
 	return &Mock{
-		configID:   configID,
-		persistent: persistent,
+		configID: configID,
 	}, nil
 }
 
 func (m *Mock) Match(req *http.Request) *config.Response {
 	ctx := req.Context()
-	cfg, err := m.persistent.GetConfig(ctx, m.configID)
+	db := persistent.GetDefault()
+	cfg, err := db.GetConfig(ctx, m.configID)
 	if err != nil {
 		log.WithError(err).Error("loading mock")
 		return nil
 	}
 
-	sessionID, err := m.persistent.GetActiveSession(ctx, m.configID)
+	sessionID, err := db.GetActiveSession(ctx, m.configID)
 	if err != nil {
 		log.WithError(err).WithField("config_id", m.configID).Error("get active session")
 	}
 
 	for _, route := range cfg.Routes {
 		log.Debugf("Matching route: %v", route.Request)
-		response, err := matcher.NewRouteMatcher(route, matcher.Request{
+		response, err := matcher.NewRouteMatcher(route, matcher.Context{
 			HTTPRequest: req,
 			SessionID:   sessionID,
-			Session:     m.persistent,
 		}).Match()
 		if err != nil {
 			log.WithError(err).Error("error while matching route")

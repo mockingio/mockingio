@@ -1,6 +1,7 @@
 package matcher
 
 import (
+	"github.com/smockyio/smocky/backend/persistent"
 	"math/rand"
 	"strings"
 	"time"
@@ -13,10 +14,10 @@ import (
 
 type RouteMatcher struct {
 	route *cfg.Route
-	req   Request
+	req   Context
 }
 
-func NewRouteMatcher(route *cfg.Route, req Request) *RouteMatcher {
+func NewRouteMatcher(route *cfg.Route, req Context) *RouteMatcher {
 	return &RouteMatcher{
 		route: route,
 		req:   req,
@@ -26,7 +27,7 @@ func NewRouteMatcher(route *cfg.Route, req Request) *RouteMatcher {
 func (r *RouteMatcher) Match() (*cfg.Response, error) {
 	method, path := r.route.RequestParts()
 	httpRequest := r.req.HTTPRequest
-	session := r.req.Session
+	db := persistent.GetDefault()
 
 	if !strings.EqualFold(method, httpRequest.Method) {
 		return nil, nil
@@ -43,7 +44,7 @@ func (r *RouteMatcher) Match() (*cfg.Response, error) {
 		return nil, nil
 	}
 
-	_, err := session.Increase(
+	_, err := db.Increment(
 		httpRequest.Context(),
 		r.req.CountID(),
 	)
@@ -63,23 +64,23 @@ func (r *RouteMatcher) pickResponse(responses []*cfg.Response) (*cfg.Response, e
 	if len(responses) == 0 {
 		return nil, nil
 	}
-	session := r.req.Session
+	db := persistent.GetDefault()
 	sequenceID := r.req.SequenceID()
 	ctx := r.req.HTTPRequest.Context()
 
 	switch r.route.ResponseMode {
 	case cfg.ResponseSequentially:
-		idx, err := session.GetInt(ctx, sequenceID)
+		idx, err := db.GetInt(ctx, sequenceID)
 		if err != nil {
 			return nil, err
 		}
 
 		if idx+1 == len(responses) {
-			if err := session.Set(ctx, sequenceID, 0); err != nil {
+			if err := db.Set(ctx, sequenceID, 0); err != nil {
 				return nil, err
 			}
 		} else {
-			if err := session.Set(ctx, sequenceID, idx+1); err != nil {
+			if err := db.Set(ctx, sequenceID, idx+1); err != nil {
 				return nil, err
 			}
 		}

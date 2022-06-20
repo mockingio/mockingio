@@ -19,13 +19,10 @@ type Result struct {
 }
 
 type Server struct {
-	persistent persistent.Persistent
 }
 
-func New(persistent persistent.Persistent) *Server {
-	return &Server{
-		persistent: persistent,
-	}
+func New() *Server {
+	return &Server{}
 }
 
 func (s *Server) StartFromFile(ctx context.Context, file string) (string, func(), error) {
@@ -34,15 +31,18 @@ func (s *Server) StartFromFile(ctx context.Context, file string) (string, func()
 		return "", nil, err
 	}
 	mockID := uuid.NewString()
+	cfg.ID = mockID
+
 	sessionID := uuid.NewString()
 
-	if err := s.persistent.SetActiveSession(ctx, mockID, sessionID); err != nil {
+	db := persistent.GetDefault()
+	if err := db.SetActiveSession(ctx, mockID, sessionID); err != nil {
 		return "", nil, err
 	}
 
-	_ = s.persistent.SetConfig(ctx, mockID, cfg)
+	_ = db.SetConfig(ctx, cfg)
 
-	m, err := mock.New(mockID, s.persistent)
+	m, err := mock.New(mockID)
 	if err != nil {
 		return "", nil, err
 	}

@@ -12,24 +12,24 @@ import (
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
 	"github.com/smockyio/smocky/backend/mock/matcher"
+	"github.com/smockyio/smocky/backend/persistent"
 	"github.com/smockyio/smocky/backend/persistent/memory"
 )
 
 func TestRuleMatcher_Match(t *testing.T) {
-	sess := memory.New()
 	sessionID := "123456"
 
-	req := matcher.Request{
+	req := matcher.Context{
 		HTTPRequest: newHTTPRequest(),
 		SessionID:   sessionID,
-		Session:     sess,
 	}
 
-	_ = sess.Set(context.Background(), req.CountID(), 2)
+	mem := memory.New()
+	persistent.New(mem)
+	_ = mem.Set(context.Background(), req.CountID(), 2)
 
 	tests := []struct {
 		name    string
-		session *memory.Memory
 		route   *cfg.Route
 		request *http.Request
 		rule    *cfg.Rule
@@ -38,7 +38,6 @@ func TestRuleMatcher_Match(t *testing.T) {
 	}{
 		{
 			"operator = Equal, found match",
-			nil,
 			&cfg.Route{},
 			newHTTPRequest(),
 			&cfg.Rule{Target: cfg.Header, Modifier: "Authorization", Value: "Bearer 123", Operator: cfg.Equal},
@@ -47,7 +46,6 @@ func TestRuleMatcher_Match(t *testing.T) {
 		},
 		{
 			"operator = Regex, found match",
-			nil,
 			&cfg.Route{},
 			newHTTPRequest(),
 			&cfg.Rule{Target: cfg.Body, Modifier: ".address.street", Value: "^[0-9]+.*", Operator: cfg.Regex},
@@ -56,7 +54,6 @@ func TestRuleMatcher_Match(t *testing.T) {
 		},
 		{
 			"operator = Regex, found not match",
-			nil,
 			&cfg.Route{},
 			newHTTPRequest(),
 			&cfg.Rule{Target: cfg.Body, Modifier: ".address.street", Value: "^[a-z]+.*", Operator: cfg.Regex},
@@ -65,7 +62,6 @@ func TestRuleMatcher_Match(t *testing.T) {
 		},
 		{
 			"operator = Regex, invalid Regex",
-			nil,
 			&cfg.Route{},
 			newHTTPRequest(),
 			&cfg.Rule{Target: cfg.Body, Modifier: ".address.street", Value: "^[a-z+.*", Operator: cfg.Regex},
@@ -74,7 +70,6 @@ func TestRuleMatcher_Match(t *testing.T) {
 		},
 		{
 			"test Equal, found not match",
-			nil,
 			&cfg.Route{},
 			newHTTPRequest(),
 			&cfg.Rule{Target: cfg.Header, Modifier: "Authorization", Value: "Bearer 1231", Operator: cfg.Equal},
@@ -83,7 +78,6 @@ func TestRuleMatcher_Match(t *testing.T) {
 		},
 		{
 			"test number request, found match",
-			sess,
 			&cfg.Route{
 				Request: "",
 			},
@@ -96,9 +90,8 @@ func TestRuleMatcher_Match(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			matched, err := matcher.NewRuleMatcher(tt.route, tt.rule, matcher.Request{
+			matched, err := matcher.NewRuleMatcher(tt.route, tt.rule, matcher.Context{
 				HTTPRequest: tt.request,
-				Session:     tt.session,
 				SessionID:   sessionID,
 			}).Match()
 			if tt.error {
@@ -115,10 +108,9 @@ func TestRuleMatcher_GetTargetValue(t *testing.T) {
 	sess := memory.New()
 	sessionID := "123456"
 
-	req := matcher.Request{
+	req := matcher.Context{
 		HTTPRequest: newHTTPRequest(),
 		SessionID:   sessionID,
-		Session:     sess,
 	}
 
 	_ = sess.Set(context.Background(), req.CountID(), 2)
@@ -150,9 +142,8 @@ func TestRuleMatcher_GetTargetValue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Target: %v, Modifier: %v", tt.rule.Target, tt.rule.Modifier), func(t *testing.T) {
-			actual, err := matcher.NewRuleMatcher(route, tt.rule, matcher.Request{
+			actual, err := matcher.NewRuleMatcher(route, tt.rule, matcher.Context{
 				HTTPRequest: tt.request,
-				Session:     sess,
 				SessionID:   sessionID,
 			}).GetTargetValue()
 

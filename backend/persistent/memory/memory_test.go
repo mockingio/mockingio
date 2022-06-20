@@ -14,11 +14,12 @@ import (
 func TestMemory_GetSetConfig(t *testing.T) {
 	cfg := &config.Config{
 		Port: "1234",
+		ID:   "*id*",
 	}
 
 	m := New()
 
-	err := m.SetConfig(context.Background(), "*id*", cfg)
+	err := m.SetConfig(context.Background(), cfg)
 	require.NoError(t, err)
 
 	value, err := m.GetConfig(context.Background(), "*id*")
@@ -45,7 +46,7 @@ func TestMemory_Increase(t *testing.T) {
 	err := m.Set(context.Background(), "*id*", 200)
 	require.NoError(t, err)
 
-	val, err := m.Increase(context.Background(), "*id*")
+	val, err := m.Increment(context.Background(), "*id*")
 	require.NoError(t, err)
 	assert.Equal(t, 201, val)
 

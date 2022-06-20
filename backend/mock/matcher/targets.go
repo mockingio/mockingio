@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	cfg "github.com/smockyio/smocky/backend/mock/config"
+	"github.com/smockyio/smocky/backend/persistent"
 )
 
 var targets = map[cfg.Target]getTargetValueFn{
@@ -21,13 +22,13 @@ var targets = map[cfg.Target]getTargetValueFn{
 	cfg.Body:          getValueFromBody,
 }
 
-type getTargetValueFn func(route *cfg.Route, modifier string, req Request) (string, error)
+type getTargetValueFn func(route *cfg.Route, modifier string, req Context) (string, error)
 
-func getValueFromHeader(_ *cfg.Route, modifier string, req Request) (string, error) {
+func getValueFromHeader(_ *cfg.Route, modifier string, req Context) (string, error) {
 	return req.HTTPRequest.Header.Get(modifier), nil
 }
 
-func getValueFromCookie(_ *cfg.Route, modifier string, req Request) (string, error) {
+func getValueFromCookie(_ *cfg.Route, modifier string, req Context) (string, error) {
 	cookies := req.HTTPRequest.Cookies()
 	for _, c := range cookies {
 		if c.Name == modifier {
@@ -37,19 +38,20 @@ func getValueFromCookie(_ *cfg.Route, modifier string, req Request) (string, err
 	return "", nil
 }
 
-func getValueFromQueryString(_ *cfg.Route, modifier string, req Request) (string, error) {
+func getValueFromQueryString(_ *cfg.Route, modifier string, req Context) (string, error) {
 	return req.HTTPRequest.URL.Query().Get(modifier), nil
 }
 
-func getRequestNumber(_ *cfg.Route, _ string, req Request) (string, error) {
-	value, err := req.Session.GetInt(req.HTTPRequest.Context(), req.CountID())
+func getRequestNumber(_ *cfg.Route, _ string, req Context) (string, error) {
+	db := persistent.GetDefault()
+	value, err := db.GetInt(req.HTTPRequest.Context(), req.CountID())
 	if err != nil {
 		return "", err
 	}
 	return strconv.Itoa(value), nil
 }
 
-func getValueFromRouteParam(route *cfg.Route, modifier string, req Request) (string, error) {
+func getValueFromRouteParam(route *cfg.Route, modifier string, req Context) (string, error) {
 	_, path := route.RequestParts()
 	templateParts := strings.Split(path, "/")
 	actualParts := strings.Split(req.HTTPRequest.URL.Path, "/")
@@ -68,7 +70,7 @@ func getValueFromRouteParam(route *cfg.Route, modifier string, req Request) (str
 	return "", nil
 }
 
-func getValueFromBody(_ *cfg.Route, modifier string, req Request) (string, error) {
+func getValueFromBody(_ *cfg.Route, modifier string, req Context) (string, error) {
 	httpRequest := req.HTTPRequest
 	if httpRequest.Body == nil {
 		return "", nil

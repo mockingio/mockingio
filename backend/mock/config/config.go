@@ -10,6 +10,7 @@ import (
 )
 
 type Config struct {
+	ID     string   `yaml:"id,omitempty" json:"id,omitempty"`
 	Name   string   `yaml:"name,omitempty" json:"name,omitempty"`
 	Port   string   `yaml:"port,omitempty" json:"port,omitempty"`
 	Routes []*Route `yaml:"routes,omitempty" json:"routes,omitempty"`

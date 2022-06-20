@@ -6,21 +6,23 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 
 	"github.com/spf13/cobra"
 
+	"github.com/smockyio/smocky/backend/persistent"
 	"github.com/smockyio/smocky/backend/persistent/memory"
 	"github.com/smockyio/smocky/backend/server"
 )
 
 var filenames []string
-var adminPort int32 = 2601
+var adminPort = 2601
 var enableAdmin = false
 
 type output struct {
-	URLS  []string `json:"urls"`
-	Admin string   `json:"admin"`
+	URLS  []string `json:"urls,omitempty"`
+	Admin string   `json:"admin,omitempty"`
 }
 
 // startCmd represents the start command
@@ -46,10 +48,12 @@ smocky start --filename mock.yml --output-json
 
 		out := output{}
 		ctx := context.Background()
-		database := memory.New()
+
+		// initialise database
+		persistent.New(memory.New())
 
 		for _, filename := range filenames {
-			serv := server.New(database)
+			serv := server.New()
 			url, shutdownServer, err := serv.StartFromFile(ctx, filename)
 
 			if err != nil {
@@ -63,7 +67,7 @@ smocky start --filename mock.yml --output-json
 
 		if enableAdmin {
 			admin := server.NewAdminServer()
-			adminURL, shutdownServer, err := admin.Start(ctx, adminPort)
+			adminURL, shutdownServer, err := admin.Start(ctx, strconv.Itoa(adminPort))
 			if err != nil {
 				fmt.Printf("Failed to start admin server. Error: %v\n", err)
 				quit(shutdownServers)
@@ -94,7 +98,7 @@ func quit(shutdowns []func()) {
 func init() {
 	rootCmd.AddCommand(startCmd)
 	startCmd.Flags().StringArrayVarP(&filenames, "filename", "f", []string{}, "location of the mock file")
-	startCmd.Flags().Int32Var(&adminPort, "admin-port", 2601, "port for admin API server")
+	startCmd.Flags().IntVar(&adminPort, "admin-port", 2601, "port for admin API server")
 	startCmd.Flags().BoolVar(&enableAdmin, "admin", false, "start with admin")
 	_ = startCmd.MarkFlagRequired("filename")
 }
