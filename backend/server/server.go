@@ -33,11 +33,16 @@ func (s *Server) StartFromFile(ctx context.Context, file string) (string, func()
 	if err != nil {
 		return "", nil, err
 	}
-	id := uuid.NewString()
+	mockID := uuid.NewString()
+	sessionID := uuid.NewString()
 
-	_ = s.persistent.SetConfig(ctx, id, cfg)
+	if err := s.persistent.SetActiveSession(ctx, mockID, sessionID); err != nil {
+		return "", nil, err
+	}
 
-	m, err := mock.New(id, uuid.NewString(), s.persistent)
+	_ = s.persistent.SetConfig(ctx, mockID, cfg)
+
+	m, err := mock.New(mockID, s.persistent)
 	if err != nil {
 		return "", nil, err
 	}

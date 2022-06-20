@@ -53,3 +53,14 @@ func TestMemory_Increase(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 201, i)
 }
+
+func TestMemory_SetGetActiveSession(t *testing.T) {
+	m := New()
+
+	err := m.SetActiveSession(context.Background(), "mockid", "123456")
+	require.NoError(t, err)
+
+	v, err := m.GetActiveSession(context.Background(), "mockid")
+	require.NoError(t, err)
+	assert.Equal(t, "123456", v)
+}

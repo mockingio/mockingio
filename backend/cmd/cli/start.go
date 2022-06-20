@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/smockyio/smocky/backend/persistent/memory"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/spf13/cobra"
 
+	"github.com/smockyio/smocky/backend/persistent/memory"
 	"github.com/smockyio/smocky/backend/server"
 )
 

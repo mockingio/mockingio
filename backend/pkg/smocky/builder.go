@@ -49,8 +49,9 @@ func (b *Builder) Start(t *testing.T) *httptest.Server {
 
 	mem := memory.New()
 	_ = mem.SetConfig(context.Background(), id, b.config)
+	_ = mem.SetActiveSession(context.Background(), id, "session-id")
 
-	m, err := mock.New(id, "id", mem)
+	m, err := mock.New(id, mem)
 	if err != nil {
 		t.Errorf("fail to create mock: %v", err)
 	}

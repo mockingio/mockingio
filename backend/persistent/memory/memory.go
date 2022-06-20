@@ -95,3 +95,24 @@ func (m *Memory) Increase(_ context.Context, key string) (int, error) {
 
 	return val, nil
 }
+
+func (m *Memory) SetActiveSession(ctx context.Context, configID string, sessionID string) error {
+	return m.Set(ctx, toActiveSessionKey(configID), sessionID)
+}
+
+func (m *Memory) GetActiveSession(ctx context.Context, configID string) (string, error) {
+	value, err := m.Get(ctx, toActiveSessionKey(configID))
+	if err != nil {
+		return "", err
+	}
+
+	if v, ok := value.(string); ok {
+		return v, nil
+	}
+
+	return "", errors.New("unable to convert to string value")
+}
+
+func toActiveSessionKey(configID string) string {
+	return fmt.Sprintf("%s-active-session", configID)
+}
