@@ -11,9 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/smockyio/smocky/backend/persistent"
-	"github.com/smockyio/smocky/backend/persistent/memory"
 	"github.com/smockyio/smocky/backend/server"
+	"github.com/smockyio/smocky/engine/persistent"
+	"github.com/smockyio/smocky/engine/persistent/memory"
 )
 
 var filenames []string
