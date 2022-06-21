@@ -66,7 +66,7 @@ dagger.#Plan & {
 							package: "."
 							os: *client.platform.os | "linux"
 							arch: client.platform.arch
-							ldflags: "-s -w -X github.com/smockyio/smocky/backend/version.Revision=\(version.output)"
+							ldflags: "-s -w -X github.com/smockyio/smocky/cmd/version.Revision=\(version.output)"
 							env: depends_unit: "\(test.unit.exit)"
 					}
 

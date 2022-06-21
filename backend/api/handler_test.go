@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/smockyio/smocky/backend/server/api"
+	"github.com/smockyio/smocky/backend/api"
 	"github.com/smockyio/smocky/engine/mock"
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"

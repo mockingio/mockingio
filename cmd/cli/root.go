@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/smockyio/smocky/backend/version"
+	"github.com/smockyio/smocky/cmd/version"
 )
 
 // rootCmd represents the base command when called without any subcommands

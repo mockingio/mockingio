@@ -9,8 +9,8 @@ builds:
     binary: smocky
     ldflags:
       - -s -w
-      - -X github.com/smockyio/smocky/backend/version.Version={{.Version}}
-      - -X github.com/smockyio/smocky/backend/version.Revision={{.ShortCommit}}
+      - -X github.com/smockyio/smocky/cmd/version.Version={{.Version}}
+      - -X github.com/smockyio/smocky/cmd/version.Revision={{.ShortCommit}}
     goos:
       - linux
       - windows

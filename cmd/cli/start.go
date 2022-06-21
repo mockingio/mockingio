@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/smockyio/smocky/backend/server"
+	"github.com/smockyio/smocky/backend"
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"
 )
@@ -53,7 +53,7 @@ smocky start --filename mock.yml --output-json
 		persistent.New(memory.New())
 
 		for _, filename := range filenames {
-			serv := server.New()
+			serv := backend.New()
 			url, shutdownServer, err := serv.StartFromFile(ctx, filename)
 
 			if err != nil {
@@ -66,7 +66,7 @@ smocky start --filename mock.yml --output-json
 		}
 
 		if enableAdmin {
-			admin := server.NewAdminServer()
+			admin := backend.NewAdminServer()
 			adminURL, shutdownServer, err := admin.Start(ctx, strconv.Itoa(adminPort))
 			if err != nil {
 				fmt.Printf("Failed to start admin server. Error: %v\n", err)

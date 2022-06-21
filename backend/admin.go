@@ -1,4 +1,4 @@
-package server
+package backend
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/smockyio/smocky/backend/server/api"
+	"github.com/smockyio/smocky/backend/api"
 )
 
 type AdminServer struct {
