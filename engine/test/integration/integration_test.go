@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/smockyio/smocky/backend"
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"
+	"github.com/smockyio/smocky/server"
 )
 
 func TestIntegration(t *testing.T) {

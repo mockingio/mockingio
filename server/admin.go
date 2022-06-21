@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/smockyio/smocky/backend/api"
+	"github.com/smockyio/smocky/server/api"
 )
 
 type AdminServer struct {

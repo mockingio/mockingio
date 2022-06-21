@@ -1,6 +1,6 @@
 vendor
 .idea
-backend/vendor
+server/vendor
 tasks.md
 _build
 /smocky
