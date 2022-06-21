@@ -14,6 +14,7 @@ import (
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"
 	"github.com/smockyio/smocky/server"
+	"github.com/smockyio/smocky/server/api"
 )
 
 var filenames []string
@@ -66,8 +67,8 @@ smocky start --filename mock.yml --output-json
 		}
 
 		if enableAdmin {
-			admin := backend.NewAdminServer()
-			adminURL, shutdownServer, err := admin.Start(ctx, strconv.Itoa(adminPort))
+			apiServ := api.NewServer()
+			adminURL, shutdownServer, err := apiServ.Start(ctx, strconv.Itoa(adminPort))
 			if err != nil {
 				fmt.Printf("Failed to start admin server. Error: %v\n", err)
 				quit(shutdownServers)

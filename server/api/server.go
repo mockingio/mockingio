@@ -1,4 +1,4 @@
-package backend
+package api
 
 import (
 	"context"
@@ -6,20 +6,18 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/smockyio/smocky/server/api"
 )
 
-type AdminServer struct {
+type Server struct {
 }
 
-func NewAdminServer() *AdminServer {
-	return &AdminServer{}
+func NewServer() *Server {
+	return &Server{}
 }
 
-func (a *AdminServer) Start(ctx context.Context, port string) (string, func(), error) {
+func (a *Server) Start(ctx context.Context, port string) (string, func(), error) {
 	r := mux.NewRouter()
-	r.PathPrefix("/mocks").HandlerFunc(api.GetMocksHandler).Methods(http.MethodGet)
+	r.PathPrefix("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet)
 
 	addr := "0.0.0.0:" + port
 	srv := &http.Server{
