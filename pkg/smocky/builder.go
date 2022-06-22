@@ -51,7 +51,7 @@ func (b *Builder) Start(t *testing.T) *httptest.Server {
 
 	mem := memory.New()
 	persistent.New(mem)
-	_ = mem.SetConfig(context.Background(), b.config)
+	_ = mem.SetMock(context.Background(), b.config)
 	_ = mem.SetActiveSession(context.Background(), id, "session-id")
 
 	m := engine.New(id)

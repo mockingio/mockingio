@@ -18,6 +18,7 @@ func NewServer() *Server {
 func (a *Server) Start(ctx context.Context, port string) (string, func(), error) {
 	r := mux.NewRouter()
 	r.PathPrefix("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet)
+	r.PathPrefix("/mocks").HandlerFunc(CreateMockHandler).Methods(http.MethodPost)
 
 	addr := "0.0.0.0:" + port
 	srv := &http.Server{

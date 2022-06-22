@@ -20,9 +20,9 @@ func GetDefault() Persistent {
 }
 
 type Persistent interface {
-	SetConfig(ctx context.Context, cfg *mock.Mock) error
-	GetConfig(ctx context.Context, id string) (*mock.Mock, error)
-	GetConfigs(ctx context.Context) ([]*mock.Mock, error)
+	SetMock(ctx context.Context, cfg *mock.Mock) error
+	GetMock(ctx context.Context, id string) (*mock.Mock, error)
+	GetMocks(ctx context.Context) ([]*mock.Mock, error)
 
 	Set(ctx context.Context, key string, value any) error
 	Get(ctx context.Context, key string) (any, error)

@@ -19,10 +19,10 @@ func TestMemory_GetSetConfig(t *testing.T) {
 
 	m := New()
 
-	err := m.SetConfig(context.Background(), cfg)
+	err := m.SetMock(context.Background(), cfg)
 	require.NoError(t, err)
 
-	value, err := m.GetConfig(context.Background(), "*id*")
+	value, err := m.GetMock(context.Background(), "*id*")
 
 	require.NoError(t, err)
 	assert.Equal(t, value, cfg)
@@ -78,10 +78,10 @@ func TestMemory_GetConfigs(t *testing.T) {
 	}
 
 	m := New()
-	_ = m.SetConfig(context.Background(), cfg1)
-	_ = m.SetConfig(context.Background(), cfg2)
+	_ = m.SetMock(context.Background(), cfg1)
+	_ = m.SetMock(context.Background(), cfg2)
 
-	configs, err := m.GetConfigs(context.Background())
+	configs, err := m.GetMocks(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, 2, len(configs))
 }

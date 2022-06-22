@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
@@ -14,6 +15,12 @@ type Mock struct {
 	Name   string   `yaml:"name,omitempty" json:"name,omitempty"`
 	Port   string   `yaml:"port,omitempty" json:"port,omitempty"`
 	Routes []*Route `yaml:"routes,omitempty" json:"routes,omitempty"`
+}
+
+func New() *Mock {
+	return &Mock{
+		ID: uuid.NewString(),
+	}
 }
 
 func FromYamlFile(file string) (*Mock, error) {
@@ -30,6 +37,9 @@ func FromYaml(text string) (*Mock, error) {
 	cfg := &Mock{}
 	if err := decoder.Decode(cfg); err != nil {
 		return nil, errors.Wrap(err, "decode yaml to mock")
+	}
+	if cfg.ID == "" {
+		cfg.ID = uuid.NewString()
 	}
 
 	return cfg, nil

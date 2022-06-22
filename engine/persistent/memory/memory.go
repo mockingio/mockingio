@@ -40,7 +40,7 @@ func (m *Memory) Set(_ context.Context, key string, value any) error {
 	return nil
 }
 
-func (m *Memory) SetConfig(ctx context.Context, cfg *mock.Mock) error {
+func (m *Memory) SetMock(ctx context.Context, cfg *mock.Mock) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -48,7 +48,7 @@ func (m *Memory) SetConfig(ctx context.Context, cfg *mock.Mock) error {
 	return nil
 }
 
-func (m *Memory) GetConfig(ctx context.Context, id string) (*mock.Mock, error) {
+func (m *Memory) GetMock(ctx context.Context, id string) (*mock.Mock, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -60,7 +60,7 @@ func (m *Memory) GetConfig(ctx context.Context, id string) (*mock.Mock, error) {
 	return cfg, nil
 }
 
-func (m *Memory) GetConfigs(ctx context.Context) ([]*mock.Mock, error) {
+func (m *Memory) GetMocks(ctx context.Context) ([]*mock.Mock, error) {
 	var configs []*mock.Mock
 	for _, cfg := range m.configs {
 		configs = append(configs, cfg)

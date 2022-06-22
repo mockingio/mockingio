@@ -19,7 +19,7 @@ func Test_GetMocksHandler(t *testing.T) {
 	db := memory.New()
 	persistent.New(db)
 
-	_ = db.SetConfig(context.Background(), &mock.Mock{
+	_ = db.SetMock(context.Background(), &mock.Mock{
 		ID: "123",
 	})
 
@@ -36,4 +36,22 @@ func Test_GetMocksHandler(t *testing.T) {
 	assert.NoError(t, err)
 	assert.JSONEq(t, `[{"id":"123"}]`, string(data))
 	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func Test_CreateMockHandler(t *testing.T) {
+	db := memory.New()
+	persistent.New(db)
+
+	req := httptest.NewRequest(http.MethodPost, "/mocks", nil)
+	w := httptest.NewRecorder()
+	api.CreateMockHandler(w, req)
+
+	res := w.Result()
+	defer func() {
+		_ = res.Body.Close()
+	}()
+
+	_, err := ioutil.ReadAll(res.Body)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, res.StatusCode)
 }

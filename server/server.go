@@ -28,22 +28,21 @@ func New() *Server {
 func (s *Server) StartFromFile(ctx context.Context, file string) (string, func(), error) {
 	db := persistent.GetDefault()
 
-	cfg, err := mock.FromYamlFile(file)
+	// TODO: check the file extension, support loading mock from JSON
+	loadedMock, err := mock.FromYamlFile(file)
 	if err != nil {
 		return "", nil, err
 	}
-	cfg.ID = uuid.NewString()
-	_ = db.SetConfig(ctx, cfg)
+	_ = db.SetMock(ctx, loadedMock)
 
-	if err := db.SetActiveSession(ctx, cfg.ID, uuid.NewString()); err != nil {
+	if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
 		return "", nil, err
 	}
 
-	m := engine.New(cfg.ID)
+	eng := engine.New(loadedMock.ID)
+	srv := s.buildHTTPServer(eng)
 
-	srv := s.buildHTTPServer(m)
-
-	listener, err := net.Listen("tcp", ":"+cfg.Port)
+	listener, err := net.Listen("tcp", ":"+loadedMock.Port)
 	if err != nil {
 		return "", nil, err
 	}

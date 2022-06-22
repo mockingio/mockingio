@@ -24,7 +24,7 @@ func New(mockID string) *Engine {
 func (m *Engine) Match(req *http.Request) *mock.Response {
 	ctx := req.Context()
 	db := persistent.GetDefault()
-	cfg, err := db.GetConfig(ctx, m.mockID)
+	cfg, err := db.GetMock(ctx, m.mockID)
 	if err != nil {
 		log.WithError(err).Error("loading mock")
 		return nil
