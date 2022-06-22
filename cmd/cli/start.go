@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/smockyio/smocky/engine/mock"
 	"os"
 	"os/signal"
 	"strconv"
@@ -52,10 +54,24 @@ smocky start --filename mock.yml --output-json
 
 		// initialise database
 		persistent.New(memory.New())
+		db := persistent.GetDefault()
 
 		for _, filename := range filenames {
+			// TODO: check the file extension, support loading mock from JSON
+			loadedMock, err := mock.FromYamlFile(filename)
+			if err != nil {
+				panic(err)
+			}
+
+			if err := db.SetMock(ctx, loadedMock); err != nil {
+				panic(err)
+			}
+
+			if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
+				panic(err)
+			}
 			serv := backend.New()
-			url, shutdownServer, err := serv.StartFromFile(ctx, filename)
+			url, shutdownServer, err := serv.Start(ctx, loadedMock.ID)
 
 			if err != nil {
 				fmt.Printf("Failed to start server with file %v. Error: %v\n", filename, err)

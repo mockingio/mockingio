@@ -3,15 +3,13 @@ package backend
 import (
 	"context"
 	"fmt"
+	"github.com/smockyio/smocky/engine/persistent"
 	"net"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 
 	"github.com/smockyio/smocky/engine"
-	"github.com/smockyio/smocky/engine/mock"
-	"github.com/smockyio/smocky/engine/persistent"
 )
 
 type Result struct {
@@ -25,24 +23,17 @@ func New() *Server {
 	return &Server{}
 }
 
-func (s *Server) StartFromFile(ctx context.Context, file string) (string, func(), error) {
+func (s *Server) Start(ctx context.Context, mockID string) (string, func(), error) {
 	db := persistent.GetDefault()
-
-	// TODO: check the file extension, support loading mock from JSON
-	loadedMock, err := mock.FromYamlFile(file)
+	mo, err := db.GetMock(ctx, mockID)
 	if err != nil {
-		return "", nil, err
-	}
-	_ = db.SetMock(ctx, loadedMock)
-
-	if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
-		return "", nil, err
+		return "", func() {}, err
 	}
 
-	eng := engine.New(loadedMock.ID)
+	eng := engine.New(mo.ID)
 	srv := s.buildHTTPServer(eng)
 
-	listener, err := net.Listen("tcp", ":"+loadedMock.Port)
+	listener, err := net.Listen("tcp", ":"+mo.Port)
 	if err != nil {
 		return "", nil, err
 	}

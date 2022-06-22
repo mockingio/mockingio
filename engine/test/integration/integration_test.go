@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"github.com/smockyio/smocky/engine/mock"
 	"io"
 	"net/http"
 	"strings"
@@ -72,8 +73,21 @@ func TestIntegration(t *testing.T) {
 }
 
 func mustStartServer(t *testing.T) (string, func()) {
-	persistent.New(memory.New())
-	address, done, err := backend.New().StartFromFile(context.Background(), "mock.yml")
+	mem := memory.New()
+	persistent.New(mem)
+
+	loadedMock, err := mock.FromYamlFile("mock.yml")
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	if err := mem.SetMock(context.Background(), loadedMock); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	address, done, err := backend.New().Start(context.Background(), loadedMock.ID)
 	if err != nil {
 		t.Log(err)
 		t.Fail()
