@@ -12,11 +12,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
+	"github.com/smockyio/smocky/api"
 	"github.com/smockyio/smocky/engine/mock"
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"
 	"github.com/smockyio/smocky/server"
-	"github.com/smockyio/smocky/server/api"
 )
 
 var filenames []string
