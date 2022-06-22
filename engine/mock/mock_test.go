@@ -16,7 +16,7 @@ import (
 
 func TestConfig(t *testing.T) {
 	t.Run("Load config from YAML file", func(t *testing.T) {
-		cfg, err := FromYamlFile("fixtures/mock.yml")
+		cfg, err := FromFile("fixtures/mock.yml")
 
 		assert.True(t, cfg.Validate() == nil)
 
@@ -30,7 +30,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("Load config from JSON file", func(t *testing.T) {
-		cfg, err := FromYamlFile("fixtures/mock.json")
+		cfg, err := FromFile("fixtures/mock.json")
 
 		assert.True(t, cfg.Validate() == nil)
 
@@ -45,7 +45,7 @@ func TestConfig(t *testing.T) {
 	})
 
 	t.Run("error loading config from YAML file", func(t *testing.T) {
-		cfg, err := FromYamlFile("")
+		cfg, err := FromFile("")
 		assert.Error(t, err)
 		assert.Nil(t, cfg)
 	})

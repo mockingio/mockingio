@@ -3,7 +3,6 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/smockyio/smocky/engine/mock"
 	"io"
 	"net/http"
 	"strings"
@@ -12,15 +11,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/smockyio/smocky/engine/mock"
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"
 	"github.com/smockyio/smocky/server"
 )
 
 func TestIntegration(t *testing.T) {
-	endpoint, stop := mustStartServer(t)
+	endpoint := mustStartServer(t)
 	t.Logf("server: %v", endpoint)
-	defer stop()
 
 	url := func(path string) string {
 		return fmt.Sprintf("%v%v", endpoint, path)
@@ -72,11 +71,11 @@ func TestIntegration(t *testing.T) {
 	})
 }
 
-func mustStartServer(t *testing.T) (string, func()) {
+func mustStartServer(t *testing.T) string {
 	mem := memory.New()
 	persistent.New(mem)
 
-	loadedMock, err := mock.FromYamlFile("mock.yml")
+	loadedMock, err := mock.FromFile("mock.yml")
 	if err != nil {
 		t.Log(err)
 		t.Fail()
@@ -87,13 +86,13 @@ func mustStartServer(t *testing.T) (string, func()) {
 		t.Fail()
 	}
 
-	address, done, err := backend.New().Start(context.Background(), loadedMock.ID)
+	url, err := server.Start(context.Background(), loadedMock)
 	if err != nil {
 		t.Log(err)
 		t.Fail()
 	}
 
-	return address, done
+	return url
 }
 
 func assertHTTPPOSTRequest(t *testing.T, url string, requestBody string, expectedStatusCode int, expectedResponseBody string) {

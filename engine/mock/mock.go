@@ -23,7 +23,8 @@ func New() *Mock {
 	}
 }
 
-func FromYamlFile(file string) (*Mock, error) {
+func FromFile(file string) (*Mock, error) {
+	// TODO: check the file extension, support loading mock from JSON
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, errors.Wrap(err, "read mock file")

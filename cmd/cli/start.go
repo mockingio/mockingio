@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/smockyio/smocky/engine/mock"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
 
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 
+	"github.com/smockyio/smocky/engine/mock"
 	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/engine/persistent/memory"
 	"github.com/smockyio/smocky/server"
@@ -47,18 +47,13 @@ smocky start --filename mock.yml --output-json
 			syscall.SIGQUIT,
 		)
 
-		var shutdownServers []func()
-
-		out := output{}
 		ctx := context.Background()
 
-		// initialise database
-		persistent.New(memory.New())
-		db := persistent.GetDefault()
+		db := memory.New()
+		persistent.New(db)
 
 		for _, filename := range filenames {
-			// TODO: check the file extension, support loading mock from JSON
-			loadedMock, err := mock.FromYamlFile(filename)
+			loadedMock, err := mock.FromFile(filename)
 			if err != nil {
 				panic(err)
 			}
@@ -70,16 +65,15 @@ smocky start --filename mock.yml --output-json
 			if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
 				panic(err)
 			}
-			serv := backend.New()
-			url, shutdownServer, err := serv.Start(ctx, loadedMock.ID)
 
-			if err != nil {
+			if _, err := server.Start(ctx, loadedMock); err != nil {
 				fmt.Printf("Failed to start server with file %v. Error: %v\n", filename, err)
-				quit(shutdownServers)
+				quit()
 			}
-			shutdownServers = append(shutdownServers, shutdownServer)
+		}
 
-			out.URLS = append(out.URLS, url)
+		out := output{
+			URLS: server.GetServerURLs(),
 		}
 
 		if enableAdmin {
@@ -87,9 +81,9 @@ smocky start --filename mock.yml --output-json
 			adminURL, shutdownServer, err := apiServ.Start(ctx, strconv.Itoa(adminPort))
 			if err != nil {
 				fmt.Printf("Failed to start admin server. Error: %v\n", err)
-				quit(shutdownServers)
+				shutdownServer()
+				quit()
 			}
-			shutdownServers = append(shutdownServers, shutdownServer)
 			out.Admin = adminURL
 		}
 
@@ -97,18 +91,13 @@ smocky start --filename mock.yml --output-json
 		fmt.Println(string(data))
 
 		<-stopSignalChanel
-		for _, shutdown := range shutdownServers {
-			shutdown()
-		}
-
+		server.RemoveAllServers()
 		fmt.Println("servers stopped")
 	},
 }
 
-func quit(shutdowns []func()) {
-	for _, shutdown := range shutdowns {
-		shutdown()
-	}
+func quit() {
+	server.RemoveAllServers()
 	os.Exit(1)
 }
 
