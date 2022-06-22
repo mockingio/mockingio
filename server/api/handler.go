@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/smockyio/smocky/engine/mock"
-	"github.com/smockyio/smocky/server"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/smockyio/smocky/engine/mock"
 	"github.com/smockyio/smocky/engine/persistent"
+	"github.com/smockyio/smocky/server"
 )
 
 func GetMocksHandler(w http.ResponseWriter, r *http.Request) {
@@ -40,4 +41,18 @@ func CreateMockHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, http.StatusCreated, map[string]any{"id": mo.ID, "url": url})
+}
+
+func PauseMockServerHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["mock_id"]
+	server.PauseServer(id)
+	response(w, http.StatusOK, map[string]any{"id": id, "state": "paused"})
+}
+
+func ResumeMockServerHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["mock_id"]
+	server.ResumeServer(id)
+	response(w, http.StatusOK, map[string]any{"id": id, "state": "running"})
 }

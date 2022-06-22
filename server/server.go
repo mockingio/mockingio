@@ -12,11 +12,11 @@ import (
 	"github.com/smockyio/smocky/engine/mock"
 )
 
-type Result struct {
-	Error error
-}
-
-type Server struct {
+type Controller struct {
+	Pause    func()
+	Resume   func()
+	Shutdown func()
+	URL      string
 }
 
 func Start(ctx context.Context, mo *mock.Mock) (string, error) {
@@ -40,17 +40,22 @@ func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 	}()
 
 	serverURL := fmt.Sprintf("http://0.0.0.0:%v", listener.Addr().(*net.TCPAddr).Port)
-	addServer(mo.ID, serverURL, func() {
-		fmt.Printf("shutting down server: %v\n", serverURL)
-		done <- true
+	addServer(mo.ID, &Controller{
+		Pause:  eng.Pause,
+		Resume: eng.Resume,
+		Shutdown: func() {
+			fmt.Printf("shutting down server: %v\n", serverURL)
+			done <- true
+		},
+		URL: serverURL,
 	})
 
 	return serverURL, nil
 }
 
-func buildHTTPServer(m *engine.Engine) *http.Server {
+func buildHTTPServer(e *engine.Engine) *http.Server {
 	r := mux.NewRouter()
-	r.PathPrefix("/").HandlerFunc(m.Handler)
+	r.PathPrefix("/").HandlerFunc(e.Handler)
 
 	return &http.Server{Handler: r}
 }

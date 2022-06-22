@@ -12,7 +12,8 @@ import (
 )
 
 type Engine struct {
-	mockID string
+	mockID   string
+	isPaused bool
 }
 
 func New(mockID string) *Engine {
@@ -21,21 +22,29 @@ func New(mockID string) *Engine {
 	}
 }
 
-func (m *Engine) Match(req *http.Request) *mock.Response {
+func (eng *Engine) Resume() {
+	eng.isPaused = false
+}
+
+func (eng *Engine) Pause() {
+	eng.isPaused = true
+}
+
+func (eng *Engine) Match(req *http.Request) *mock.Response {
 	ctx := req.Context()
 	db := persistent.GetDefault()
-	cfg, err := db.GetMock(ctx, m.mockID)
+	mok, err := db.GetMock(ctx, eng.mockID)
 	if err != nil {
 		log.WithError(err).Error("loading mock")
 		return nil
 	}
 
-	sessionID, err := db.GetActiveSession(ctx, m.mockID)
+	sessionID, err := db.GetActiveSession(ctx, eng.mockID)
 	if err != nil {
-		log.WithError(err).WithField("config_id", m.mockID).Error("get active session")
+		log.WithError(err).WithField("config_id", eng.mockID).Error("get active session")
 	}
 
-	for _, route := range cfg.Routes {
+	for _, route := range mok.Routes {
 		log.Debugf("Matching route: %v", route.Request)
 		response, err := matcher.NewRouteMatcher(route, matcher.Context{
 			HTTPRequest: req,
@@ -61,8 +70,13 @@ func (m *Engine) Match(req *http.Request) *mock.Response {
 	return nil
 }
 
-func (m *Engine) Handler(w http.ResponseWriter, r *http.Request) {
-	response := m.Match(r)
+func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
+	if eng.isPaused {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
+
+	response := eng.Match(r)
 	if response == nil {
 		// TODO: no matched? What will be the response?
 		w.WriteHeader(http.StatusNotFound)
@@ -76,6 +90,7 @@ func (m *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 	if response.Status == 0 {
 		response.Status = 200
 	}
+
 	w.WriteHeader(response.Status)
 	_, _ = w.Write([]byte(response.Body))
 }
