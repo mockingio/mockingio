@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+
+}
+
+.method {
+    width: 40px;
+    display: inline-block;
+}
+
+.method-get {
+    color: theme('colors.blue.500');
+}
+
+.method-post {
+    color: theme('colors.green.500');
+}
+
+.method-put {
+    color: theme('colors.yellow.500');
+}
+
+.method-delete {
+    color: theme('colors.red.500');
+}
