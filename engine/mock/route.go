@@ -15,6 +15,7 @@ const (
 
 type Route struct {
 	Request      string       `yaml:"request" json:"request"`
+	Description  string       `yaml:"description" json:"description"`
 	ResponseMode responseMode `yaml:"response_mode,omitempty" json:"response_mode,omitempty"`
 	Responses    []Response   `yaml:"responses" json:"responses"`
 }

@@ -20,7 +20,7 @@ import { PlayIcon } from '@heroicons/vue/solid';
 export default {
     props: {
         name: { type: String, required: true },
-        description: { type: String, required: true }
+        description: { type: String, required: false }
     }
 };
 </script>

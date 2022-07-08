@@ -1,6 +1,13 @@
 name: Hello World
 routes:
   - request: GET /hello
+    description: "hello world here"
+    responses:
+      - body: |
+          {
+            "answer": "Hello World"
+          }
+  - request: POST /hello
     responses:
       - body: |
           {
