@@ -1,13 +1,13 @@
-name: Hello World
+name: Example mock 2
 routes:
-  - request: GET /hello
+  - request: GET /hello/world
     description: "hello world here"
     responses:
       - body: |
           {
             "answer": "Hello World"
           }
-  - request: POST /hello
+  - request: POST /hello/world
     responses:
       - body: |
           {

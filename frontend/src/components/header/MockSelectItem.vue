@@ -1,26 +1,26 @@
 <template>
-    <a href="#">
-        <div>
-            <p class="text-base flex items-center font-medium text-gray-900 dark:text-slate-400">
-                <PlayIcon class="text-green-500 h-4 w-4 mr-2" />
-                <span>{{ name }}</span>
-            </p>
-            <p class="mt-1 text-sm text-gray-500 dark:text-slate-400 dark:text-slate-600">
-                {{ description }}
-            </p>
-        </div>
-    </a>
+  <router-link :to="{name: 'mockview', params: {id}}">
+    <div>
+      <p class="text-base flex items-center font-medium text-gray-900 dark:text-slate-400">
+        <PlayIcon class="text-green-500 h-4 w-4 mr-2"/>
+        <span>{{ name }}</span>
+      </p>
+      <p class="mt-1 text-sm text-gray-500 dark:text-slate-400 dark:text-slate-600">
+        {{ description }}
+      </p>
+    </div>
+  </router-link>
 </template>
 
 <script setup lang="ts">
-import { PlayIcon } from '@heroicons/vue/solid';
-</script>
+import {PlayIcon} from '@heroicons/vue/solid';</script>
 
 <script lang="ts">
 export default {
-    props: {
-        name: { type: String, required: true },
-        description: { type: String, required: false }
-    }
+  props: {
+    id: {type: String, required: true},
+    name: {type: String, required: true},
+    description: {type: String, required: false}
+  }
 };
 </script>
