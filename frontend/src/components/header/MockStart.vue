@@ -6,9 +6,15 @@
 </template>
 
 <script setup lang="ts">
-import {PlayIcon, StopIcon} from '@heroicons/vue/solid';
-import {storeToRefs} from "pinia";
-import {useMockStore} from "@/stores";
+import {PlayIcon, StopIcon} from '@heroicons/vue/solid';</script>
 
-const {activeMock} = storeToRefs(useMockStore())
+<script lang="ts">
+import type {Mock} from "@/stores";
+
+export default {
+  props: {
+    mocks: {type: Object as () => Mock[], required: true},
+    activeMock: {type: Object as () => Mock, required: false}
+  }
+};
 </script>

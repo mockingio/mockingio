@@ -1,0 +1,15 @@
+name: Example mock 1
+routes:
+  - request: GET /hi/world
+    description: "hello world here"
+    responses:
+      - body: |
+          {
+            "answer": "Hello World"
+          }
+  - request: POST /hi/world
+    responses:
+      - body: |
+          {
+            "answer": "Hello World"
+          }

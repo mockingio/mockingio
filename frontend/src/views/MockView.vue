@@ -1,5 +1,5 @@
 <template>
-  <Header/>
+  <Header :mocks="mocks" :activeMock="activeMock"/>
   <div class="flex min-h-screen">
     <div class="flex-none w-72 border-r border-gray-200 dark:border-slate-800">
       <Routes/>
@@ -28,4 +28,19 @@
 <script setup lang="ts">
 import Responses from '../components/response/Responses.vue';
 import Routes from '../components/routes/Routes.vue';
-import Header from '../components/header/Header.vue';</script>
+import Header from '../components/header/Header.vue';
+import {useMockStore} from "@/stores";
+import {useRoute} from "vue-router";
+import {watch} from "vue";
+import {storeToRefs} from 'pinia'
+
+const {fetchMocks, setActiveMock} = useMockStore()
+const route = useRoute()
+
+const {mocks, error, activeMock} = storeToRefs(useMockStore())
+
+watch(() => route.params.id, (newId) => {
+  setActiveMock(newId as string)
+})
+fetchMocks(route.params.id as string)
+</script>

@@ -3,8 +3,8 @@
     <div class="h-20 flex border-b border-gray-200 dark:border-slate-800">
       <div class="flex flex-1 items-center">
         <div class="flex w-72">
-          <MockStart class="mx-4" />
-          <MockSelect class="flex-1" />
+          <MockStart :mocks="mocks" :activeMock="activeMock" class="mx-4"/>
+          <MockSelect :mocks="mocks" :activeMock="activeMock" class="flex-1"/>
         </div>
         <div class="flex flex-1 justify-between">
           <div class="ml-5">
@@ -16,11 +16,11 @@
           <div class="mr-5 flex">
             <a href="#">
               <ShareIcon
-                class="text-gray-500 dark:text-slate-400 dark:hover:text-green-500 hover:text-green-500 h-5 w-5 mr-5" />
+                  class="text-gray-500 dark:text-slate-400 dark:hover:text-green-500 hover:text-green-500 h-5 w-5 mr-5"/>
             </a>
             <a href="#">
               <SaveIcon
-                class="text-gray-500 dark:text-slate-400 hover:text-green-500 dark:hover:text-green-500 h-5 w-5" />
+                  class="text-gray-500 dark:text-slate-400 hover:text-green-500 dark:hover:text-green-500 h-5 w-5"/>
             </a>
           </div>
         </div>
@@ -30,8 +30,19 @@
 </template>
 
 <script setup lang="ts">
-import { Disclosure } from '@headlessui/vue';
-import { ShareIcon, SaveIcon } from '@heroicons/vue/outline';
+import {Disclosure} from '@headlessui/vue';
+import {SaveIcon, ShareIcon} from '@heroicons/vue/outline';
 import MockSelect from './MockSelect.vue';
-import MockStart from './MockStart.vue';
+import MockStart from './MockStart.vue';</script>
+
+
+<script lang="ts">
+import type {Mock} from "@/stores";
+
+export default {
+  props: {
+    mocks: {type: Object as () => Mock[], required: true},
+    activeMock: {type: Object as () => Mock, required: false}
+  }
+};
 </script>

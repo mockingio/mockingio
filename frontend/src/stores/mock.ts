@@ -23,10 +23,6 @@ export interface Mock {
     state: MockState
 }
 
-export interface Mocks {
-    [id: string]: Mock
-}
-
 export interface Route {
     request: string
     responses: Response[]
@@ -41,24 +37,23 @@ export const useMockStore = defineStore({
     id: "mocks",
     state: () => ({
         activeId: null as string | null,
-        mocks: {} as Mocks,
+        mocks: [] as Mock[],
         error: null as any,
     }),
     getters: {
         getMockByID(state) {
-            return (id: string): Mock | undefined => state.mocks[id]
+            return (id: string): Mock | undefined => state.mocks.find(m => m.data.id === id)
         },
         activeMock(state): Mock | undefined {
             if (!!state.activeId) {
                 return this.getMockByID(state.activeId)
             }
 
-            const ids = Object.keys(state.mocks)
-            if (ids.length === 0) {
+            if (state.mocks.length === 0) {
                 return undefined
             }
 
-            this.activeId = ids[0]
+            this.activeId = state.mocks[0].data.id
             return this.getMockByID(this.activeId)
         }
     },
@@ -66,18 +61,18 @@ export const useMockStore = defineStore({
         setActiveMock(id: string) {
             this.activeId = id
         },
-        async fetchMocks() {
+        async fetchMocks(selectedMockId: string) {
             try {
                 const {data} = await axios.get<MockData[]>(getUrl("/mocks"))
-                this.mocks = data.reduce((acc, mock) => {
-                    acc[mock.id] = {
-                        data: mock,
-                        state: {
-                            status: Status.STOPPED
-                        }
+                this.mocks = data.map(mock => ({
+                    data: mock,
+                    state: {
+                        status: Status.STOPPED
                     }
-                    return acc
-                }, {} as Mocks)
+                }))
+                if (!!selectedMockId) {
+                    this.setActiveMock(selectedMockId)
+                }
             } catch (error) {
                 this.error = {
                     error,

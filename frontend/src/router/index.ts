@@ -7,7 +7,12 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            name: 'home',
+            name: 'default',
+            component: MockView
+        },
+        {
+            path: '/mocks/:id',
+            name: 'mockview',
             component: MockView
         },
         {

@@ -17,7 +17,8 @@
             <div class="max-h-96 overflow-auto">
               <MockSelectItem v-for="mock in mocks" :key="mock.data.id" :name="mock.data.name"
                               :description="mock.data.description"
-                              class="p-4 flex items-start hover:border-green-500 border-transparent border-l-2">
+                              :id="mock.data.id"
+                              class="p-2 flex items-start hover:border-green-500 border-transparent border-l-2">
               </MockSelectItem>
             </div>
             <div class="mb-2 mr-2 mt-2 flex justify-end">
@@ -36,13 +37,15 @@
 <script setup lang="ts">
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
 import {DotsVerticalIcon} from '@heroicons/vue/solid';
-import MockSelectItem from './MockSelectItem.vue';
+import MockSelectItem from './MockSelectItem.vue';</script>
 
-import {storeToRefs} from 'pinia'
-import {useMockStore} from "@/stores";
+<script lang="ts">
+import type {Mock} from "@/stores";
 
-const {mocks, error, activeMock} = storeToRefs(useMockStore())
-const {fetchMocks} = useMockStore()
-
-fetchMocks()
+export default {
+  props: {
+    mocks: {type: Object as () => Mock[], required: true},
+    activeMock: {type: Object as () => Mock, required: false}
+  }
+};
 </script>
