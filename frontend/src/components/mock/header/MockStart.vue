@@ -13,7 +13,6 @@ import type {Mock} from "@/stores";
 
 export default {
   props: {
-    mocks: {type: Object as () => Mock[], required: true},
     activeMock: {type: Object as () => Mock, required: false}
   }
 };

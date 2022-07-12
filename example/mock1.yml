@@ -1,15 +1,39 @@
 name: Example mock 1
 routes:
-  - request: GET /hi/world
+  - request: GET /products
     description: "hello world here"
     responses:
       - body: |
+          [
+            {
+              "id": "1",
+              "name": "Product 1",
+              "price": "10.00"
+            },
+            {
+              "id": "2",
+              "name": "Product 2",
+              "price": "20.00"
+            }
+          ]
+        headers:
+          Content-Type: application/json
+        rules:
+          - target: header
+            modifier: "secret"
+            value: "test"
+            operator: "equal"
+      - body: |
           {
-            "answer": "Hello World"
+            "error": "Unauthorised"
           }
-  - request: POST /hi/world
+        status: 401
+        headers:
+          Content-Type: application/json
+
+  - request: GET /settings
     responses:
       - body: |
           {
-            "answer": "Hello World"
+            "name": "Hello World"
           }
