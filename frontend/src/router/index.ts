@@ -25,7 +25,11 @@ const router = createRouter({
                 {path: "", component: RoutesView},
                 {
                     path: "routes", name: "routes-view", component: RoutesView, children: [
-                        {path: ":routeId", name: "route-view", component: RoutesView}
+                        {
+                            path: ":routeId",
+                            name: "route-view",
+                            component: RoutesView
+                        }
                     ]
                 },
                 {path: "proxy", name: "route-proxy-view", component: ProxyView},
