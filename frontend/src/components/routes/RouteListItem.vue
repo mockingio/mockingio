@@ -1,13 +1,13 @@
 <template>
-  <a href="#"
-     class="hover:border-green-500 border-transparent border-l-2 flex items-center group block pl-3 pr-1 py-2 border-l-2 text-sm">
+  <router-link active-class="border-green-500" :to="{name: 'route-view', params: {routeId: route.id, id: mock.data.id}}"
+               class="hover:border-green-500 border-transparent border-l-2 flex items-center group block pl-3 pr-1 py-2 border-l-2 text-sm">
     <div class="flex-1">
       <span>
           <span :class="`method method-${method.toLowerCase()} mr-2`">{{ method }}</span>
           <span>{{ path }}</span>
       </span>
       <p class="text-xs text-gray-500 dark:text-slate-400">
-        {{ description }}
+        {{ route.description }}
       </p>
     </div>
     <div>
@@ -34,26 +34,27 @@
         </PopoverPanel>
       </Popover>
     </div>
-  </a>
+  </router-link>
 </template>
 
 <script setup lang="ts">
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
 import {DotsVerticalIcon} from '@heroicons/vue/solid';
 import {computed} from "vue";
+import type {Mock, Route} from "@/stores";
 
 const props = defineProps({
-  request: {type: String, required: true},
-  description: {type: String, required: false},
+  route: {type: Object as () => Route, required: true},
+  mock: {type: Object as () => Mock, required: true},
 })
 
 const method = computed(() => {
-  const [method] = props.request.split(' ')
+  const [method] = props.route.request.split(' ')
   return method
 })
 
 const path = computed(() => {
-  const [_, path] = props.request.split(' ')
+  const [_, path] = props.route.request.split(' ')
   return path
 })
 </script>

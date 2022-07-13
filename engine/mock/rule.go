@@ -22,6 +22,7 @@ const (
 )
 
 type Rule struct {
+	ID       string   `yaml:"id,omitempty" json:"id,omitempty"`
 	Target   Target   `yaml:"target" json:"target"`
 	Modifier string   `yaml:"modifier" json:"modifier,omitempty"`
 	Value    string   `yaml:"value" json:"value"`

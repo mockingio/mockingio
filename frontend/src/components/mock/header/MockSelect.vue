@@ -18,7 +18,7 @@
               <MockSelectItem v-for="mock in mocks" :key="mock.data.id" :name="mock.data.name"
                               :description="mock.data.description"
                               :id="mock.data.id"
-                              class="p-2 flex items-start hover:border-green-500 border-transparent border-l-2">
+              >
               </MockSelectItem>
             </div>
             <div class="mb-2 mr-2 mt-2 flex justify-end">

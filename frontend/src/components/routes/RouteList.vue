@@ -11,17 +11,17 @@
     <PlusIcon class="w-5 h-5 ml-2 text-green-500"/>
   </form>
   <nav class="space-y-1" v-if="activeMock">
-    <Route v-for="route in activeMock.data.routes" :description="route.description" :method="route.method"
-           :key="route.id" :request="route.request"/>
+    <RouteListItem v-for="route in activeMock.data.routes" :route="route" :mock="activeMock"
+                   :key="route.id" :request="route.request"/>
   </nav>
 </template>
 
 <script setup lang="ts">
 import {FilterIcon, PlusIcon} from '@heroicons/vue/outline';
-import Route from './Route.vue';
-import {storeToRefs} from "pinia";
-import {useMockStore} from "@/stores";
+import type {Mock} from "@/stores";
+import RouteListItem from "@/components/routes/RouteListItem.vue";
 
-const {activeMock} = storeToRefs(useMockStore())
-
+defineProps({
+  activeMock: {type: Object as () => Mock, required: true}
+})
 </script>

@@ -3,15 +3,15 @@
     <div class="h-20 flex border-b border-gray-200 dark:border-slate-800">
       <div class="flex flex-1 items-center">
         <div class="flex w-72">
-          <MockStart :mocks="mocks" :activeMock="activeMock" class="mx-4"/>
+          <MockStart :activeMock="activeMock" class="mx-4"/>
           <MockSelect :mocks="mocks" :activeMock="activeMock" class="flex-1"/>
         </div>
         <div class="flex flex-1 justify-between">
           <div class="ml-5">
-            <a href="#" class="pr-3 py-2 text-green-500">Routes</a>
-            <a href="#" class="px-3 py-2 hover:text-green-500">Proxy</a>
-            <a href="#" class="px-3 py-2 hover:text-green-500">Logs</a>
-            <a href="#" class="px-3 py-2 hover:text-green-500">Settings</a>
+            <router-link v-for="item in menuItems" active-class="text-green-500" class="pr-3 py-2 hover:text-green-500"
+                         :to="{name: item.route, params: {id: activeMock.data.id}}">
+              {{ item.name }}
+            </router-link>
           </div>
           <div class="mr-5 flex">
             <a href="#">
@@ -33,7 +33,26 @@
 import {Disclosure} from '@headlessui/vue';
 import {SaveIcon, ShareIcon} from '@heroicons/vue/outline';
 import MockSelect from './MockSelect.vue';
-import MockStart from './MockStart.vue';</script>
+import MockStart from './MockStart.vue';
+
+const menuItems: { name: string, route: string }[] = [
+  {
+    route: 'routes-view',
+    name: 'Routes',
+  },
+  {
+    route: 'route-proxy-view',
+    name: 'Proxy',
+  },
+  {
+    route: 'route-log-view',
+    name: 'Logs',
+  },
+  {
+    route: 'route-settings-view',
+    name: 'Settings',
+  }
+];</script>
 
 
 <script lang="ts">

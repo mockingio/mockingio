@@ -19,7 +19,7 @@ type Mock struct {
 
 func New() *Mock {
 	return &Mock{
-		ID: uuid.NewString(),
+		ID: newID(),
 	}
 }
 
@@ -35,15 +35,51 @@ func FromFile(file string) (*Mock, error) {
 
 func FromYaml(text string) (*Mock, error) {
 	decoder := yaml.NewDecoder(strings.NewReader(text))
-	cfg := &Mock{}
-	if err := decoder.Decode(cfg); err != nil {
+	m := &Mock{}
+	if err := decoder.Decode(m); err != nil {
 		return nil, errors.Wrap(err, "decode yaml to mock")
 	}
-	if cfg.ID == "" {
-		cfg.ID = uuid.NewString()
-	}
+	addIds(m)
+	defaultVals(m)
 
-	return cfg, nil
+	return m, nil
+}
+
+func defaultVals(m *Mock) {
+	for _, r := range m.Routes {
+		for i, res := range r.Responses {
+			if res.Status == 0 {
+				res.Status = 200
+			}
+			r.Responses[i] = res
+		}
+	}
+}
+
+// Add ids for mock and routes, responses and rules
+func addIds(m *Mock) {
+	if m.ID == "" {
+		m.ID = newID()
+	}
+	for _, r := range m.Routes {
+		if r.ID == "" {
+			r.ID = newID()
+		}
+
+		for i, res := range r.Responses {
+			if res.ID == "" {
+				res.ID = newID()
+				r.Responses[i] = res
+			}
+
+			for j, rule := range res.Rules {
+				if rule.ID == "" {
+					rule.ID = newID()
+					res.Rules[j] = rule
+				}
+			}
+		}
+	}
 }
 
 func (c Mock) Validate() error {
@@ -51,4 +87,8 @@ func (c Mock) Validate() error {
 		&c,
 		validation.Field(&c.Routes, validation.Required),
 	)
+}
+
+func newID() string {
+	return uuid.NewString()
 }
