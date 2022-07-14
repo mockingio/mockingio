@@ -1,21 +1,18 @@
 import {defineStore} from 'pinia'
 import axios from 'axios'
 
-export enum Status {
-    STOPPED = "stopped",
-    RUNNING = "running"
-}
-
 export interface MockData {
     id: string
     name: string
     description: string
     routes: Route[]
+    url: string
 }
 
 export interface MockState {
-    url?: string
-    status: Status
+    url: string
+    status: string
+    mock_id: string
 }
 
 export interface Mock {
@@ -99,12 +96,20 @@ export const useMockStore = defineStore({
         },
         async fetchMocks() {
             try {
-                const {data} = await axios.get<MockData[]>(getUrl("/mocks"))
-                this.mocks = data.map(mock => ({
+                const [mockData, stateData] = await Promise.all([
+                    axios.get<MockData[]>(getUrl("/mocks")),
+                    axios.get<MockState[]>(getUrl("/mocks/states")),
+                ])
+
+                const states = stateData.data.reduce((acc, state) => {
+                    acc[state.mock_id] = state
+                    return acc
+                }, {} as { [key: string]: MockState })
+
+
+                this.mocks = mockData.data.map(mock => ({
                     data: mock,
-                    state: {
-                        status: Status.STOPPED
-                    }
+                    state: states[mock.id]
                 }))
             } catch (error) {
                 this.error = {

@@ -12,6 +12,15 @@ type manager struct {
 	controllers map[string]*Controller
 }
 
+func GetStates() []State {
+	states := make([]State, len(_manager.controllers))
+	for _, c := range _manager.controllers {
+		states = append(states, c.State)
+	}
+
+	return states
+}
+
 func RemoveServer(id string) {
 	if controller, ok := _manager.controllers[id]; ok {
 		controller.Shutdown()
@@ -41,7 +50,7 @@ func RemoveAllServers() {
 func GetServerURLs() []string {
 	var urls []string
 	for _, controller := range _manager.controllers {
-		urls = append(urls, controller.URL)
+		urls = append(urls, controller.State.URL)
 	}
 
 	return urls

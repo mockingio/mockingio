@@ -12,13 +12,6 @@ import (
 	"github.com/smockyio/smocky/engine/mock"
 )
 
-type Controller struct {
-	Pause    func()
-	Resume   func()
-	Shutdown func()
-	URL      string
-}
-
 func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 	eng := engine.New(mo.ID)
 	srv := buildHTTPServer(eng)
@@ -39,7 +32,8 @@ func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 		_ = srv.Shutdown(ctx)
 	}()
 
-	serverURL := fmt.Sprintf("http://0.0.0.0:%v", listener.Addr().(*net.TCPAddr).Port)
+	serverPort := listener.Addr().(*net.TCPAddr).Port
+	serverURL := fmt.Sprintf("http://127.0.0.1:%v", serverPort)
 	addServer(mo.ID, &Controller{
 		Pause:  eng.Pause,
 		Resume: eng.Resume,
@@ -47,7 +41,11 @@ func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 			fmt.Printf("shutting down server: %v\n", serverURL)
 			done <- true
 		},
-		URL: serverURL,
+		State: State{
+			MockID: mo.ID,
+			URL:    serverURL,
+			Status: Running,
+		},
 	})
 
 	return serverURL, nil

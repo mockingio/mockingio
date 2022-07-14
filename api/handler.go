@@ -23,6 +23,10 @@ func GetMocksHandler(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, mocks)
 }
 
+func GetMocksStatesHandler(w http.ResponseWriter, _ *http.Request) {
+	response(w, http.StatusOK, server.GetStates())
+}
+
 func CreateMockHandler(w http.ResponseWriter, r *http.Request) {
 	db := persistent.GetDefault()
 	mo := mock.New()
@@ -41,6 +45,13 @@ func CreateMockHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, http.StatusCreated, map[string]any{"id": mo.ID, "url": url})
+}
+
+func StopMockServerHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["mock_id"]
+	server.RemoveServer(id)
+	response(w, http.StatusOK, map[string]any{"id": id, "state": "stopped"})
 }
 
 func PauseMockServerHandler(w http.ResponseWriter, r *http.Request) {
