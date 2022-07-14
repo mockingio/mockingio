@@ -98,18 +98,12 @@ export const useMockStore = defineStore({
             try {
                 const [mockData, stateData] = await Promise.all([
                     axios.get<MockData[]>(getUrl("/mocks")),
-                    axios.get<MockState[]>(getUrl("/mocks/states")),
+                    axios.get<{ [key: string]: MockState }>(getUrl("/mocks/states")),
                 ])
-
-                const states = stateData.data.reduce((acc, state) => {
-                    acc[state.mock_id] = state
-                    return acc
-                }, {} as { [key: string]: MockState })
-
 
                 this.mocks = mockData.data.map(mock => ({
                     data: mock,
-                    state: states[mock.id]
+                    state: stateData.data[mock.id]
                 }))
             } catch (error) {
                 this.error = {

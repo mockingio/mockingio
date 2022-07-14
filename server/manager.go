@@ -5,26 +5,40 @@ var _manager *manager
 func init() {
 	_manager = &manager{
 		controllers: map[string]*Controller{},
+		states:      map[string]State{},
 	}
 }
 
 type manager struct {
 	controllers map[string]*Controller
+	states      map[string]State
 }
 
-func GetStates() []State {
-	states := make([]State, len(_manager.controllers))
-	for _, c := range _manager.controllers {
-		states = append(states, c.State)
-	}
+func GetStates() map[string]State {
+	return _manager.states
+}
 
-	return states
+func InitState(mockID string) {
+	_manager.states[mockID] = State{
+		MockID: mockID,
+		URL:    "",
+		Status: Stopped,
+	}
+}
+
+func SetState(mockId, url string, status string) {
+	_manager.states[mockId] = State{
+		MockID: mockId,
+		URL:    url,
+		Status: status,
+	}
 }
 
 func RemoveServer(id string) {
 	if controller, ok := _manager.controllers[id]; ok {
 		controller.Shutdown()
 		delete(_manager.controllers, id)
+		InitState(id)
 	}
 }
 
@@ -49,8 +63,10 @@ func RemoveAllServers() {
 
 func GetServerURLs() []string {
 	var urls []string
-	for _, controller := range _manager.controllers {
-		urls = append(urls, controller.State.URL)
+	for _, state := range _manager.states {
+		if state.Status == Running {
+			urls = append(urls, state.URL)
+		}
 	}
 
 	return urls

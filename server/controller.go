@@ -15,5 +15,4 @@ type Controller struct {
 	Pause    func()
 	Resume   func()
 	Shutdown func()
-	State    State
 }

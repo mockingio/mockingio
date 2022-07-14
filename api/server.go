@@ -23,6 +23,7 @@ func (a *Server) Start(ctx context.Context, port string) (string, func(), error)
 	r.Path("/mocks/{mock_id}/pause").HandlerFunc(PauseMockServerHandler).Methods(http.MethodPost)
 	r.Path("/mocks/{mock_id}/resume").HandlerFunc(ResumeMockServerHandler).Methods(http.MethodPost)
 	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodPost)
+	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost)
 
 	addr := "0.0.0.0:" + port
 	srv := &http.Server{

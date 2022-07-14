@@ -10,7 +10,19 @@ import (
 
 	"github.com/smockyio/smocky/engine"
 	"github.com/smockyio/smocky/engine/mock"
+	"github.com/smockyio/smocky/engine/persistent"
 )
+
+func StartByID(ctx context.Context, id string) (string, error) {
+	db := persistent.GetDefault()
+	
+	mo, err := db.GetMock(ctx, id)
+	if err != nil {
+		return "", err
+	}
+
+	return Start(ctx, mo)
+}
 
 func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 	eng := engine.New(mo.ID)
@@ -41,12 +53,8 @@ func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 			fmt.Printf("shutting down server: %v\n", serverURL)
 			done <- true
 		},
-		State: State{
-			MockID: mo.ID,
-			URL:    serverURL,
-			Status: Running,
-		},
 	})
+	SetState(mo.ID, serverURL, Running)
 
 	return serverURL, nil
 }
