@@ -6,9 +6,9 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/smockyio/smocky/engine/mock"
-	"github.com/smockyio/smocky/engine/persistent"
 	"github.com/smockyio/smocky/server"
+	"github.com/tuongaz/smocky-engine/engine/mock"
+	"github.com/tuongaz/smocky-engine/engine/persistent"
 )
 
 func GetMocksHandler(w http.ResponseWriter, r *http.Request) {

@@ -8,9 +8,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/smockyio/smocky/engine"
-	"github.com/smockyio/smocky/engine/mock"
-	"github.com/smockyio/smocky/engine/persistent"
+	"github.com/tuongaz/smocky-engine/engine"
+	"github.com/tuongaz/smocky-engine/engine/mock"
+	"github.com/tuongaz/smocky-engine/engine/persistent"
 )
 
 func StartByID(ctx context.Context, id string) (State, error) {

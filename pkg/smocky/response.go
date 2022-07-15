@@ -4,7 +4,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smockyio/smocky/engine/mock"
+	"github.com/tuongaz/smocky-engine/engine/mock"
 )
 
 type Response struct {

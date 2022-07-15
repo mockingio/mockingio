@@ -7,10 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smockyio/smocky/engine"
-	"github.com/smockyio/smocky/engine/mock"
-	"github.com/smockyio/smocky/engine/persistent"
-	"github.com/smockyio/smocky/engine/persistent/memory"
+	"github.com/tuongaz/smocky-engine/engine"
+	"github.com/tuongaz/smocky-engine/engine/mock"
+	"github.com/tuongaz/smocky-engine/engine/persistent"
+	"github.com/tuongaz/smocky-engine/engine/persistent/memory"
 )
 
 const (

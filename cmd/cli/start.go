@@ -13,10 +13,10 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/smockyio/smocky/api"
-	"github.com/smockyio/smocky/engine/mock"
-	"github.com/smockyio/smocky/engine/persistent"
-	"github.com/smockyio/smocky/engine/persistent/memory"
 	"github.com/smockyio/smocky/server"
+	"github.com/tuongaz/smocky-engine/engine/mock"
+	"github.com/tuongaz/smocky-engine/engine/persistent"
+	"github.com/tuongaz/smocky-engine/engine/persistent/memory"
 )
 
 var filenames []string
@@ -54,6 +54,7 @@ smocky start --filename mock.yml --output-json
 
 		for _, filename := range filenames {
 			loadedMock, err := mock.FromFile(filename)
+			mock.AddIDs(loadedMock) // generate random ids
 			if err != nil {
 				panic(err)
 			}
