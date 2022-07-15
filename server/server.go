@@ -13,24 +13,24 @@ import (
 	"github.com/smockyio/smocky/engine/persistent"
 )
 
-func StartByID(ctx context.Context, id string) (string, error) {
+func StartByID(ctx context.Context, id string) (State, error) {
 	db := persistent.GetDefault()
-	
+
 	mo, err := db.GetMock(ctx, id)
 	if err != nil {
-		return "", err
+		return State{}, err
 	}
 
 	return Start(ctx, mo)
 }
 
-func Start(ctx context.Context, mo *mock.Mock) (string, error) {
+func Start(ctx context.Context, mo *mock.Mock) (State, error) {
 	eng := engine.New(mo.ID)
 	srv := buildHTTPServer(eng)
 
 	listener, err := net.Listen("tcp", ":"+mo.Port)
 	if err != nil {
-		return "", err
+		return State{}, err
 	}
 
 	done := make(chan bool, 1)
@@ -56,7 +56,7 @@ func Start(ctx context.Context, mo *mock.Mock) (string, error) {
 	})
 	SetState(mo.ID, serverURL, Running)
 
-	return serverURL, nil
+	return GetState(mo.ID), nil
 }
 
 func buildHTTPServer(e *engine.Engine) *http.Server {

@@ -50,8 +50,14 @@ func CreateMockHandler(w http.ResponseWriter, r *http.Request) {
 func StopMockServerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["mock_id"]
-	server.RemoveServer(id)
-	response(w, http.StatusOK, map[string]any{"id": id, "state": "stopped"})
+	resp, err := server.RemoveServer(id)
+	if err != nil {
+		log.WithError(err).Error("stop mock server")
+		responseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response(w, http.StatusOK, resp)
 }
 
 func StartMockServerHandler(w http.ResponseWriter, r *http.Request) {
@@ -63,19 +69,5 @@ func StartMockServerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response(w, http.StatusOK, map[string]any{"id": id, "state": "running"})
-}
-
-func PauseMockServerHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["mock_id"]
-	server.PauseServer(id)
-	response(w, http.StatusOK, map[string]any{"id": id, "state": "paused"})
-}
-
-func ResumeMockServerHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["mock_id"]
-	server.ResumeServer(id)
 	response(w, http.StatusOK, map[string]any{"id": id, "state": "running"})
 }

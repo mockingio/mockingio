@@ -20,8 +20,6 @@ func (a *Server) Start(ctx context.Context, port string) (string, func(), error)
 	r.Path("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet)
 	r.Path("/mocks/states").HandlerFunc(GetMocksStatesHandler).Methods(http.MethodGet)
 	r.Path("/mocks").HandlerFunc(CreateMockHandler).Methods(http.MethodPost)
-	r.Path("/mocks/{mock_id}/pause").HandlerFunc(PauseMockServerHandler).Methods(http.MethodPost)
-	r.Path("/mocks/{mock_id}/resume").HandlerFunc(ResumeMockServerHandler).Methods(http.MethodPost)
 	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodPost)
 	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost)
 

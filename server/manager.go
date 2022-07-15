@@ -1,5 +1,7 @@
 package server
 
+import "errors"
+
 var _manager *manager
 
 func init() {
@@ -26,32 +28,29 @@ func InitState(mockID string) {
 	}
 }
 
-func SetState(mockId, url string, status string) {
-	_manager.states[mockId] = State{
-		MockID: mockId,
+func GetState(mockID string) State {
+	return _manager.states[mockID]
+}
+
+func SetState(mockID, url string, status string) {
+	_manager.states[mockID] = State{
+		MockID: mockID,
 		URL:    url,
 		Status: status,
 	}
 }
 
-func RemoveServer(id string) {
-	if controller, ok := _manager.controllers[id]; ok {
-		controller.Shutdown()
-		delete(_manager.controllers, id)
-		InitState(id)
+func RemoveServer(id string) (State, error) {
+	controller, ok := _manager.controllers[id]
+	if !ok {
+		return State{}, errors.New("mock not found")
 	}
-}
 
-func PauseServer(id string) {
-	if controller, ok := _manager.controllers[id]; ok {
-		controller.Pause()
-	}
-}
+	controller.Shutdown()
+	delete(_manager.controllers, id)
+	InitState(id)
 
-func ResumeServer(id string) {
-	if controller, ok := _manager.controllers[id]; ok {
-		controller.Resume()
-	}
+	return _manager.states[id], nil
 }
 
 func RemoveAllServers() {
