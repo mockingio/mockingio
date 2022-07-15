@@ -18,6 +18,14 @@ const router = createRouter({
             ]
         },
         {
+            path: '/mocks',
+            name: 'mocks-view',
+            component: MockView,
+            children: [
+                {path: "", component: RoutesView},
+            ]
+        },
+        {
             path: '/mocks/:id',
             name: 'mock-view',
             component: MockView,

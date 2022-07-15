@@ -1,18 +1,25 @@
 <template>
-  <router-link active-class="border-green-500" :to="{name: 'route-view', params: {routeId: route.id, id: mock.data.id}}"
-               class="hover:border-green-500 border-transparent border-l-2 flex items-center group block pl-3 pr-1 py-2 border-l-2 text-sm">
-    <div class="flex-1">
+  <div
+      class="flex items-center group block text-sm">
+    <router-link v-slot="{ isActive }"
+                 class="flex-1"
+                 :to="{name: 'route-view', params: {routeId: route.id, id: mock.data.id}}"
+    >
+      <div
+          :class="[isActive ? 'border-green-500' : 'border-transparent', 'pl-3 pr-1 py-2 hover:border-green-500 border-l-2']">
       <span>
           <span :class="`method method-${method.toLowerCase()} mr-2`">{{ method }}</span>
           <span>{{ path }}</span>
       </span>
-      <p class="text-xs text-gray-500 dark:text-slate-400">
-        {{ route.description }}
-      </p>
-    </div>
+        <p class="text-xs my-1 text-gray-500 dark:text-slate-600">
+          {{ route.description }}
+        </p>
+      </div>
+
+    </router-link>
     <div>
       <Popover class="relative flex">
-        <PopoverButton class="text-white items-center text-base font-medium focus:outline-none">
+        <PopoverButton class="p-1 text-white items-center text-base font-medium focus:outline-none">
           <DotsVerticalIcon class="text-gray-900 dark:text-slate-200 w-4 h-4"/>
         </PopoverButton>
         <PopoverPanel class="absolute z-10 left-[10px] transform mt-3 px-2 w-32 max-w-md sm:px-0">
@@ -38,7 +45,7 @@
         </PopoverPanel>
       </Popover>
     </div>
-  </router-link>
+  </div>
 </template>
 
 <script setup lang="ts">
