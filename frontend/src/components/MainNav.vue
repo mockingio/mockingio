@@ -5,10 +5,10 @@
         mock
       </div>
       <div class="flex-1 mt-6">
-        <router-link v-for="item in items" :to="item.href"
-                     active-class="border-green-500" class="p-5 flex flex-col items-center">
+        <router-link v-slot="{isActive}" v-for="item in items" :to="item.path"
+                     class="p-5 flex flex-col items-center">
           <component :is="item.icon"
-                     class="text-gray-900 dark:text-slate-200 h-6 w-6 hover:text-green-500 dark:hover:text-green-500"/>
+                     :class="[isActive ? 'text-green-500' : 'text-gray-900 dark:text-slate-200', 'h-6 w-6 hover:text-green-500 dark:hover:text-green-500']"/>
         </router-link>
       </div>
     </div>
@@ -19,8 +19,8 @@
 import {CogIcon, CollectionIcon} from '@heroicons/vue/outline';
 
 const items = [
-  {href: '/', icon: CollectionIcon, current: true},
-  {href: '/setting', icon: CogIcon, current: false}
+  {path: '/mocks', icon: CollectionIcon, current: true},
+  {path: '/settings', icon: CogIcon, current: false}
 ];
 </script>
 

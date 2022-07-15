@@ -7,7 +7,7 @@ import LogView from '@/views/mock/LogView.vue'
 import SettingsView from '@/views/mock/SettingsView.vue'
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(),
     routes: [
         {
             path: '/',
@@ -46,8 +46,8 @@ const router = createRouter({
             ]
         },
         {
-            path: '/setting',
-            name: 'setting',
+            path: '/settings',
+            name: 'settings-view',
             component: SettingView
         }
     ]

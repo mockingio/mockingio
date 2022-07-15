@@ -17,8 +17,13 @@ const {fetchMocks, setActiveMock, setDefaultActiveMock} = useMockStore()
 const {mocks, error, activeMock} = storeToRefs(useMockStore())
 
 watch(() => route.params.id, (newId) => {
-  setActiveMock(newId as string)
+  if (newId) {
+    setActiveMock(newId as string)
+  } else {
+    setDefaultActiveMock()
+  }
 })
+
 fetchMocks().then(() => {
   if (route.params.id) {
     setActiveMock(route.params.id as string)
