@@ -1,39 +1,43 @@
 package server
 
-import "errors"
+import (
+	"fmt"
+)
 
 var _manager *manager
 
 func init() {
 	_manager = &manager{
-		controllers: map[string]*Controller{},
-		states:      map[string]State{},
+		mocks: map[string]item{},
 	}
+}
+
+type item struct {
+	controller *Controller
+	state      State
 }
 
 type manager struct {
-	controllers map[string]*Controller
-	states      map[string]State
+	mocks map[string]item
 }
 
 func GetStates() map[string]State {
-	return _manager.states
-}
-
-func InitState(mockID string) {
-	_manager.states[mockID] = State{
-		MockID: mockID,
-		URL:    "",
-		Status: Stopped,
+	states := map[string]State{}
+	for id, mock := range _manager.mocks {
+		states[id] = mock.state
 	}
+	return states
 }
 
 func GetState(mockID string) State {
-	return _manager.states[mockID]
+	if m, ok := _manager.mocks[mockID]; ok {
+		return m.state
+	}
+	return State{}
 }
 
-func SetState(mockID, url string, status string) {
-	_manager.states[mockID] = State{
+func NewState(mockID, url string, status string) State {
+	return State{
 		MockID: mockID,
 		URL:    url,
 		Status: status,
@@ -41,36 +45,38 @@ func SetState(mockID, url string, status string) {
 }
 
 func RemoveServer(id string) (State, error) {
-	controller, ok := _manager.controllers[id]
+	mock, ok := _manager.mocks[id]
 	if !ok {
-		return State{}, errors.New("mock not found")
+		return State{}, fmt.Errorf("mock id: %v not found", id)
 	}
 
-	controller.Shutdown()
-	delete(_manager.controllers, id)
-	InitState(id)
+	mock.controller.Shutdown()
+	mock.state = NewState(id, "", Stopped)
+	_manager.mocks[id] = mock
 
-	return _manager.states[id], nil
+	return mock.state, nil
 }
 
 func RemoveAllServers() {
-	for _, state := range _manager.controllers {
-		state.Shutdown()
+	for id, _ := range _manager.mocks {
+		_, _ = RemoveServer(id)
 	}
-	_manager.controllers = map[string]*Controller{}
 }
 
 func GetServerURLs() []string {
 	var urls []string
-	for _, state := range _manager.states {
-		if state.Status == Running {
-			urls = append(urls, state.URL)
+	for _, mock := range _manager.mocks {
+		if mock.state.Status == Running {
+			urls = append(urls, mock.state.URL)
 		}
 	}
 
 	return urls
 }
 
-func addServer(id string, controller *Controller) {
-	_manager.controllers[id] = controller
+func addServer(id string, controller *Controller, state State) {
+	_manager.mocks[id] = item{
+		controller: controller,
+		state:      state,
+	}
 }

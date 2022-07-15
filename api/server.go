@@ -17,11 +17,13 @@ func NewServer() *Server {
 
 func (a *Server) Start(ctx context.Context, port string) (string, func(), error) {
 	r := mux.NewRouter()
-	r.Path("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet)
-	r.Path("/mocks/states").HandlerFunc(GetMocksStatesHandler).Methods(http.MethodGet)
-	r.Path("/mocks").HandlerFunc(CreateMockHandler).Methods(http.MethodPost)
-	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodPost)
-	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost)
+
+	r.Path("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet, http.MethodOptions)
+	r.Path("/mocks/states").HandlerFunc(GetMocksStatesHandler).Methods(http.MethodGet, http.MethodOptions)
+	r.Path("/mocks").HandlerFunc(CreateMockHandler).Methods(http.MethodPost, http.MethodOptions)
+	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodDelete, http.MethodOptions)
+	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost, http.MethodOptions)
+	r.Use(mux.CORSMethodMiddleware(r))
 
 	addr := "0.0.0.0:" + port
 	srv := &http.Server{

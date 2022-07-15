@@ -46,6 +46,8 @@ func Start(ctx context.Context, mo *mock.Mock) (State, error) {
 
 	serverPort := listener.Addr().(*net.TCPAddr).Port
 	serverURL := fmt.Sprintf("http://127.0.0.1:%v", serverPort)
+
+	state := NewState(mo.ID, serverURL, Running)
 	addServer(mo.ID, &Controller{
 		Pause:  eng.Pause,
 		Resume: eng.Resume,
@@ -53,10 +55,9 @@ func Start(ctx context.Context, mo *mock.Mock) (State, error) {
 			fmt.Printf("shutting down server: %v\n", serverURL)
 			done <- true
 		},
-	})
-	SetState(mo.ID, serverURL, Running)
+	}, state)
 
-	return GetState(mo.ID), nil
+	return state, nil
 }
 
 func buildHTTPServer(e *engine.Engine) *http.Server {

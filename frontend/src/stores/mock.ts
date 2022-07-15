@@ -57,6 +57,28 @@ export const useMockStore = defineStore({
         }
     },
     actions: {
+        async stopMockServer(id: string) {
+            const mock = this.getMockByID(id)
+            if (!mock) return
+
+            const state = await axios.delete<MockState>(getUrl(`/mocks/${id}/stop`))
+            this.updateMockState(id, state.data)
+        },
+        async startMockServer(id: string) {
+            const mock = this.getMockByID(id)
+            if (!mock) return
+
+            const state = await axios.post<MockState>(getUrl(`/mocks/${id}/start`))
+            this.updateMockState(id, state.data)
+        },
+        updateMockState(id: string, state: MockState) {
+            const mock = this.getMockByID(id)
+            if (!mock) return
+
+            const idx = this.mocks.findIndex(m => m.data.id === id)
+            console.log({state})
+            this.mocks[idx] = {...mock, state}
+        },
         setActiveMock(id: string) {
             if (id === this.activeId) {
                 return
