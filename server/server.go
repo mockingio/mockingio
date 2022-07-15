@@ -49,8 +49,6 @@ func Start(ctx context.Context, mo *mock.Mock) (State, error) {
 
 	state := NewState(mo.ID, serverURL, Running)
 	addServer(mo.ID, &Controller{
-		Pause:  eng.Pause,
-		Resume: eng.Resume,
 		Shutdown: func() {
 			fmt.Printf("shutting down server: %v\n", serverURL)
 			done <- true

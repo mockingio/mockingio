@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -18,17 +19,18 @@ func NewServer() *Server {
 func (a *Server) Start(ctx context.Context, port string) (string, func(), error) {
 	r := mux.NewRouter()
 
-	r.Path("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet, http.MethodOptions)
-	r.Path("/mocks/states").HandlerFunc(GetMocksStatesHandler).Methods(http.MethodGet, http.MethodOptions)
-	r.Path("/mocks").HandlerFunc(CreateMockHandler).Methods(http.MethodPost, http.MethodOptions)
-	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodDelete, http.MethodOptions)
-	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost, http.MethodOptions)
-	r.Use(mux.CORSMethodMiddleware(r))
+	r.Path("/mocks").HandlerFunc(GetMocksHandler).Methods(http.MethodGet)
+	r.Path("/mocks/states").HandlerFunc(GetMocksStatesHandler).Methods(http.MethodGet)
+	r.Path("/mocks").HandlerFunc(CreateMockHandler).Methods(http.MethodPost)
+	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodDelete)
+	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost)
 
 	addr := "0.0.0.0:" + port
+
+	methods := []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut, http.MethodOptions}
 	srv := &http.Server{
 		Addr:    addr,
-		Handler: r,
+		Handler: handlers.CORS(handlers.AllowedMethods(methods))(r),
 	}
 
 	go func() {

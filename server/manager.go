@@ -29,13 +29,6 @@ func GetStates() map[string]State {
 	return states
 }
 
-func GetState(mockID string) State {
-	if m, ok := _manager.mocks[mockID]; ok {
-		return m.state
-	}
-	return State{}
-}
-
 func NewState(mockID, url string, status string) State {
 	return State{
 		MockID: mockID,

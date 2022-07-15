@@ -28,6 +28,10 @@
                     class="hover:border-green-500 border-transparent border-l-2 flex p-2 flex items-start transition ease-in-out duration-150">
                   Delete
                 </div>
+                <div
+                    class="hover:border-green-500 border-transparent border-l-2 flex p-2 flex items-start transition ease-in-out duration-150">
+                  Open [->]
+                </div>
               </div>
             </div>
           </div>
