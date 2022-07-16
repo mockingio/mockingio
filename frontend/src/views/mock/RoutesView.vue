@@ -10,8 +10,8 @@
 <script setup lang="ts">
 import {useMockStore} from "@/stores";
 import {storeToRefs} from 'pinia'
-import RouteList from "@/components/routes/RouteList.vue";
-import RouteDetail from "@/components/routes/RouteDetail.vue";
+import RouteList from "@/components/mock/routes/RouteList.vue";
+import RouteDetail from "@/components/mock/routes/RouteDetail.vue";
 import {useRoute} from "vue-router";
 import {watch} from "vue";
 

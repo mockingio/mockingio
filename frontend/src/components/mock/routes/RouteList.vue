@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import {FilterIcon, PlusIcon} from '@heroicons/vue/outline';
 import type {Mock} from "@/stores";
-import RouteListItem from "@/components/routes/RouteListItem.vue";
+import RouteListItem from "./RouteListItem.vue";
 
 defineProps({
   activeMock: {type: Object as () => Mock, required: true}
