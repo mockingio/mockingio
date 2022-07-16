@@ -3,15 +3,15 @@
     <draggable handle=".handle" class="dragArea block list-group w-full" :list="list">
       <Rule v-for="element in list" :key="element.name" class="list-group-item mb-2" />
     </draggable>
-    <div class="ml-5 border-gray-400 dark:border-slate-400 border-solid border-2 border-l-0 w-[10px]"></div>
+    <div class="ml-5 border-gray-400 dark:border-green-500 border-solid border-2 border-l-0 w-[10px]"></div>
     <div class="flex items-center ml-5">
       <span class="relative z-0 inline-flex shadow-sm rounded-md">
         <button type="button"
-          class="relative hover:text-green-500 text-green-500 dark:text-green-500 dark:bg-slate-800 inline-flex items-center px-4 py-2 rounded-l-md dark:border-slate-700 border border-gray-300 bg-white text-xs font-bold focus:outline-none focus:ring-1">
+          class="relative hover:text-green-500 text-green-500 dark:text-green-500 inline-flex items-center px-4 py-2 rounded-l-md dark:border-slate-700 border border-gray-300 text-xs font-bold focus:outline-none focus:ring-1">
           AND
         </button>
         <button type="button"
-          class="-ml-px hover:text-green-500 dark:hover:text-green-500 dark:text-slate-400 dark:bg-slate-800 relative inline-flex items-center px-4 py-2 dark:border-slate-700 rounded-r-md border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1">
+          class="-ml-px hover:text-green-500 dark:hover:text-green-500 dark:text-slate-400 relative inline-flex items-center px-4 py-2 dark:border-slate-700 rounded-r-md border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1">
           OR
         </button>
       </span>

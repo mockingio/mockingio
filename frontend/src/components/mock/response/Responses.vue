@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-white dark:bg-slate-800 shadow overflow-hidden sm:rounded-md">
+  <div class="overflow-hidden sm:rounded-md">
     <div role="list" class="text-sm">
       <draggable handle=".handle"
-                 class="dragArea block list-group w-full divide-y divide-solid dark:divide-slate-700">
+                 class="dragArea block list-group w-full divide-y divide-solid dark:divide-slate-900">
         <Response v-for="item in list" :key="item.id" :response="item"/>
       </draggable>
     </div>

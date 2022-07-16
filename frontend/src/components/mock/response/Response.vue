@@ -1,16 +1,16 @@
 <template>
   <div>
     <div @click="toggleOpen" class="select-none flex dark:bg-slate-800 bg-white cursor-pointer">
-      <div class="m-5 block flex-1 flex justify-between">
+      <div class="m-3 block flex-1 flex justify-between">
         <h4>{{ response.status }}</h4>
         <ViewListIcon class="handle w-5 h-5 ml-5"/>
       </div>
     </div>
 
     <div :class="open ? 'block' : 'hidden'">
-      <div class="mx-5">
+      <div class="dark:border-slate-800 border border-t-0 p-3 pt-0">
         <TabGroup>
-          <div class="border-b border-gray-200 dark:border-slate-700">
+          <div class="border-b border-gray-200 dark:border-slate-800">
             <TabList class="-mb-px flex space-x-8">
               <Tab v-for="item in tabs" :key="item.name" v-slot="{ selected }" as="template">
                 <button
@@ -28,7 +28,7 @@
             </TabPanel>
           </TabPanels>
         </TabGroup>
-        <div class="my-5 flex justify-end">
+        <div class="flex justify-end">
           <button type="button"
                   class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-red-500 border-red-500 hover:text-white hover:bg-red-500">
             Delete

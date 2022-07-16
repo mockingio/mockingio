@@ -6,9 +6,9 @@
                  :to="{name: 'route-view', params: {routeId: route.id, id: mock.data.id}}"
     >
       <div
-          :class="[isActive ? 'border-green-500' : 'border-transparent', 'pl-3 pr-1 py-2 hover:border-green-500 border-l-2']">
+          :class="[isActive ? 'border-green-500' : 'border-transparent', 'pl-3 pr-1 py-1 hover:border-green-500 border-l-2']">
       <span>
-          <span :class="`method method-${method.toLowerCase()} mr-2`">{{ method }}</span>
+          <span :class="`method method-${method.toLowerCase()} mr-1 text-xs`">{{ method }}</span>
           <span>{{ path }}</span>
       </span>
         <p class="text-xs my-1 text-gray-500 dark:text-slate-600">
