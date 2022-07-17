@@ -12,7 +12,6 @@
             <div @click="onItemClick(item, close)" v-for="item in items" :key="item.name"
                  class="hover:text-green-500 border-transparent border-l-2 flex items-center p-2 cursor-pointer">
               {{ item.name }}
-              <ExternalLinkIcon class="w-4 h-4 ml-2" v-if="item.isExternal"/>
             </div>
           </div>
         </div>
@@ -24,12 +23,11 @@
 <script setup lang="ts">
 import type {PropType} from "vue";
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
-import {DotsVerticalIcon, ExternalLinkIcon} from '@heroicons/vue/solid';
+import {DotsVerticalIcon} from '@heroicons/vue/solid';
 
 export interface Item {
   name: string
   path?: string
-  isExternal?: boolean
   click?: () => void
 }
 

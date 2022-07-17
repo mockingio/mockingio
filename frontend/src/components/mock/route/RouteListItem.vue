@@ -39,13 +39,6 @@ const items = [
   {
     name: "Delete",
   },
-  {
-    name: "View",
-    isExternal: true,
-    click: () => {
-      console.log(props.route)
-    }
-  }
 ]
 </script>
 
