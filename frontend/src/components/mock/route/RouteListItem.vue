@@ -22,22 +22,23 @@
         <PopoverButton class="p-1 text-white items-center text-base font-medium focus:outline-none">
           <DotsVerticalIcon class="text-gray-900 dark:text-slate-200 w-4 h-4"/>
         </PopoverButton>
-        <PopoverPanel class="absolute z-10 left-[10px] transform mt-3 px-2 w-32 max-w-md sm:px-0">
+        <PopoverPanel class="absolute z-10 right-[10px] top-[15px] transform mt-3 px-2 w-32 max-w-md sm:px-0">
           <div
-              class="shadow rounded-lg dark:ring-slate-800 overflow-hiddenring-1 ring-black dark:ring-slate-800 ring-opacity-5">
-            <div class="relative grid bg-white dark:bg-slate-900 p-3">
+              class="shadow rounded dark:ring-slate-800 overflow-hidden ring-1 ring-black dark:ring-slate-800 ring-opacity-5">
+            <div class="relative grid bg-white dark:bg-slate-900">
               <div class="max-h-96 overflow-auto">
                 <div
-                    class="hover:border-green-500 border-transparent border-l-2 flex p-2 mb-3 items-start transition ease-in-out duration-150">
+                    class="hover:text-green-500 border-transparent border-l-2 flex p-2 cursor-pointer">
                   Duplicate
                 </div>
                 <div
-                    class="hover:border-green-500 border-transparent border-l-2 flex p-2 flex items-start transition ease-in-out duration-150">
+                    class="hover:text-green-500 border-transparent border-l-2 flex p-2 flex cursor-pointer">
                   Delete
                 </div>
                 <div
-                    class="hover:border-green-500 border-transparent border-l-2 flex p-2 flex items-start transition ease-in-out duration-150">
-                  Open [->]
+                    class="hover:text-green-500 border-transparent border-l-2 items-center flex p-2 flex cursor-pointer">
+                  <span>Open</span>
+                  <ExternalLinkIcon class="w-4 h-4 ml-2"/>
                 </div>
               </div>
             </div>
@@ -50,7 +51,7 @@
 
 <script setup lang="ts">
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
-import {DotsVerticalIcon} from '@heroicons/vue/solid';
+import {DotsVerticalIcon, ExternalLinkIcon} from '@heroicons/vue/solid';
 import {computed} from "vue";
 import type {Mock, Route} from "@/stores";
 
