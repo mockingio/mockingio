@@ -8,8 +8,8 @@
       <div
           :class="[isActive ? 'border-green-500' : 'border-transparent', 'pl-3 pr-1 py-1 hover:border-green-500 border-l-2']">
       <span>
-          <span :class="`method method-${method.toLowerCase()} mr-1 text-xs`">{{ method }}</span>
-          <span>{{ path }}</span>
+          <span :class="`method method-${route.method.toLowerCase()} mr-1 text-xs`">{{ route.method }}</span>
+          <span>{{ route.path }}</span>
       </span>
         <p class="text-xs my-1 text-gray-500 dark:text-slate-600">
           {{ route.description }}
@@ -24,23 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from "vue";
 import type {Mock, Route} from "@/stores";
 import PopoverMenu from "@/components/ui/PopoverMenu.vue";
 
 const props = defineProps({
   route: {type: Object as () => Route, required: true},
   mock: {type: Object as () => Mock, required: true},
-})
-
-const method = computed(() => {
-  const [method] = props.route.request.split(' ')
-  return method
-})
-
-const path = computed(() => {
-  const [_, path] = props.route.request.split(' ')
-  return path
 })
 
 const items = [

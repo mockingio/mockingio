@@ -1,13 +1,15 @@
 name: Example mock 2
 routes:
-  - request: GET /account
+  - method: GET
+    path: /account
     description: "account detail"
     responses:
       - body: |
           {
             "name": "Test Account"
           }
-  - request: POST /account
+  - method: POST
+    path: /account
     responses:
       - body: |
           {

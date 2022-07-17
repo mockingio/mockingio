@@ -1,6 +1,7 @@
 name: Example mock 1
 routes:
-  - request: GET /products
+  - method: GET
+    path: /products
     description: "hello world here"
     responses:
       - body: |
@@ -31,7 +32,8 @@ routes:
         headers:
           Content-Type: application/json
 
-  - request: GET /settings
+  - method: GET
+    path: /settings
     responses:
       - body: |
           {

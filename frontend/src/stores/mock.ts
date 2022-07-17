@@ -22,7 +22,8 @@ export interface Mock {
 
 export interface Route {
     id: string
-    request: string
+    method: string
+    path: string
     description: string
     responses: Response[]
 }
