@@ -15,9 +15,12 @@
           </div>
           <div class="mr-5 flex">
             <a href="#">
-              <ShareIcon
+              <DuplicateIcon
                   class="text-gray-500 dark:text-slate-400 dark:hover:text-green-500 hover:text-green-500 h-5 w-5 mr-5"/>
-            </a>
+            </a> <a href="#">
+            <ShareIcon
+                class="text-gray-500 dark:text-slate-400 dark:hover:text-green-500 hover:text-green-500 h-5 w-5 mr-5"/>
+          </a>
             <a href="#">
               <SaveIcon
                   class="text-gray-500 dark:text-slate-400 hover:text-green-500 dark:hover:text-green-500 h-5 w-5"/>
@@ -31,7 +34,7 @@
 
 <script setup lang="ts">
 import {Disclosure} from '@headlessui/vue';
-import {SaveIcon, ShareIcon} from '@heroicons/vue/outline';
+import {DuplicateIcon, SaveIcon, ShareIcon} from '@heroicons/vue/outline';
 import MockSelect from './MockSelect.vue';
 import MockStart from './MockStart.vue';
 

@@ -1,7 +1,7 @@
 <template>
   <Popover class="relative flex">
     <PopoverButton class="p-1 text-white items-center text-base font-medium focus:outline-none">
-      <DotsVerticalIcon class="text-gray-900 dark:text-slate-200 w-4 h-4"/>
+      <DotsVerticalIcon class="text-gray-900 dark:text-slate-500 w-4 h-4"/>
     </PopoverButton>
     <PopoverPanel v-slot="{close}"
                   class="absolute z-10 right-[10px] top-[15px] transform mt-3 px-2 w-32 max-w-md sm:px-0">

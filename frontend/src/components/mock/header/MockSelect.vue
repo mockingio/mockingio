@@ -9,9 +9,8 @@
     </div>
     <Popover class="relative flex">
       <PopoverButton class="text-white items-center text-base font-medium focus:outline-none">
-        <DotsVerticalIcon class="text-gray-900 dark:text-slate-200 w-6 h-6"/>
+        <DotsVerticalIcon class="text-gray-900 dark:text-slate-500 w-6 h-6"/>
       </PopoverButton>
-
       <PopoverPanel v-slot="{close}" class="absolute z-10 right-[10px] top-[15px] transform mt-3 px-2  w-64">
         <div
             class="shadow overflow-hidden grid bg-white dark:bg-slate-900 rounded ring-1 ring-black dark:ring-slate-800 ring-opacity-5">
