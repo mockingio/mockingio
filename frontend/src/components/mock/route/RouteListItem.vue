@@ -7,9 +7,9 @@
     >
       <div
           :class="[isActive ? 'border-green-500' : 'border-transparent', 'pl-3 pr-1 py-1 hover:border-green-500 border-l-2']">
-      <span>
-          <span :class="`method method-${route.method.toLowerCase()} mr-1 text-xs`">{{ route.method }}</span>
+      <span class="flex items-center justify-between">
           <span>{{ route.path }}</span>
+          <span :class="`rounded p-1 text-white method-${route.method.toLowerCase()} text-xxs`">{{ route.method }}</span>
       </span>
         <p class="text-xs my-1 text-gray-500 dark:text-slate-600">
           {{ route.description }}

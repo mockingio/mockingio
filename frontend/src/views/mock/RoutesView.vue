@@ -20,11 +20,16 @@ const {setActiveRoute, setDefaultActiveRoute} = useMockStore()
 
 const route = useRoute()
 watch(() => route.params.routeId, (newId) => {
-  if (newId) {
-    setActiveRoute(newId as string)
+  setRouteId(newId as string)
+})
+
+const setRouteId = (id?: string) => {
+  if (id) {
+    setActiveRoute(id as string)
   } else {
     setDefaultActiveRoute()
   }
-})
+}
+setRouteId(route.params.routeId as string)
 </script>
 

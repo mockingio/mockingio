@@ -32,7 +32,7 @@ routes:
         headers:
           Content-Type: application/json
 
-  - method: GET
+  - method: PUT
     path: /settings
     responses:
       - body: |

@@ -72,6 +72,23 @@ export const useMockStore = defineStore({
             const state = await axios.post<MockState>(getUrl(`/mocks/${id}/start`))
             this.updateMockState(id, state.data)
         },
+        async patchRoute(mockId: string, routeId: string, data: { [key: string]: any }) {
+            const mockIdx = this.mocks.findIndex(m => m.data.id === mockId)
+            if (mockIdx === undefined) {
+                return
+            }
+
+            const mock = this.mocks[mockIdx]
+
+            const routeIdx = mock.data.routes.findIndex(r => r.id === routeId)
+            if (routeIdx === undefined) {
+                return
+            }
+
+            mock.data.routes[routeIdx] = {...mock.data.routes[routeIdx], ...data}
+
+            this.mocks[mockIdx] = {...mock, data: {...mock.data, routes: [...mock.data.routes]}}
+        },
         updateMockState(id: string, state: MockState) {
             const mock = this.getMockByID(id)
             if (!mock) return
@@ -85,10 +102,6 @@ export const useMockStore = defineStore({
                 return
             }
             this.activeId = id
-            const mock = this.getMockByID(id)
-            if (!!mock) {
-                this.setActiveRoute(mock.data.routes[0].id)
-            }
         },
         setDefaultActiveMock() {
             if (this.mocks.length === 0) {
