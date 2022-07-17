@@ -30,7 +30,7 @@
         </TabGroup>
         <div class="flex justify-end">
           <button type="button"
-                  class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-red-500 border-red-500 hover:text-white hover:bg-red-500">
+                  class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded shadow-sm text-red-500 border-red-500 hover:text-white hover:bg-red-500">
             Delete
           </button>
         </div>
