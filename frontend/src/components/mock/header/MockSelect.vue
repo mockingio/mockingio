@@ -2,8 +2,9 @@
   <div class="flex-1 flex items-center">
     <div class="flex-1" v-if="activeMock">
       <h2 class="font-semibold">{{ activeMock.data.name }}</h2>
-      <p class="text-xs text-gray-500 dark:text-slate-400" v-if="activeMock.state.url">
-        <span>{{ activeMock.state.url }}</span>
+      <p class="text-xs text-gray-500 dark:text-slate-400">
+        <span v-if="activeMock.state.url">{{ activeMock.state.url }}</span>
+        <span v-else>offline</span>
       </p>
     </div>
     <Popover class="relative flex">
