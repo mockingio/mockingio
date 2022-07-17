@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="{name: 'routes-view', params: {id: mock.data.id}}"
+  <router-link @click="close" :to="{name: 'routes-view', params: {id: mock.data.id}}"
                class="p-2 flex items-start border-transparent border-l-2 hover:text-green-500">
     <div>
       <p class="text-base flex items-center text-sm text-gray-900 dark:text-slate-400 dark:hover:text-green-500  cursor-pointer">
@@ -19,13 +19,12 @@
   </router-link>
 </template>
 
-<script setup lang="ts"></script>
-
 <script lang="ts">
 import type {Mock} from "@/stores";
 
 export default {
   props: {
+    close: {type: Function as () => void, required: true},
     mock: {type: Object as () => Mock, required: true},
   }
 };

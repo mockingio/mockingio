@@ -18,42 +18,15 @@
 
     </router-link>
     <div>
-      <Popover class="relative flex">
-        <PopoverButton class="p-1 text-white items-center text-base font-medium focus:outline-none">
-          <DotsVerticalIcon class="text-gray-900 dark:text-slate-200 w-4 h-4"/>
-        </PopoverButton>
-        <PopoverPanel class="absolute z-10 right-[10px] top-[15px] transform mt-3 px-2 w-32 max-w-md sm:px-0">
-          <div
-              class="shadow rounded dark:ring-slate-800 overflow-hidden ring-1 ring-black dark:ring-slate-800 ring-opacity-5">
-            <div class="relative grid bg-white dark:bg-slate-900">
-              <div class="max-h-96 overflow-auto">
-                <div
-                    class="hover:text-green-500 border-transparent border-l-2 flex p-2 cursor-pointer">
-                  Duplicate
-                </div>
-                <div
-                    class="hover:text-green-500 border-transparent border-l-2 flex p-2 flex cursor-pointer">
-                  Delete
-                </div>
-                <div
-                    class="hover:text-green-500 border-transparent border-l-2 items-center flex p-2 flex cursor-pointer">
-                  <span>Open</span>
-                  <ExternalLinkIcon class="w-4 h-4 ml-2"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </PopoverPanel>
-      </Popover>
+      <PopoverMenu :items="items"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
-import {DotsVerticalIcon, ExternalLinkIcon} from '@heroicons/vue/solid';
 import {computed} from "vue";
 import type {Mock, Route} from "@/stores";
+import PopoverMenu from "@/components/ui/PopoverMenu.vue";
 
 const props = defineProps({
   route: {type: Object as () => Route, required: true},
@@ -69,6 +42,22 @@ const path = computed(() => {
   const [_, path] = props.route.request.split(' ')
   return path
 })
+
+const items = [
+  {
+    name: "Duplicate",
+  },
+  {
+    name: "Delete",
+  },
+  {
+    name: "View",
+    isExternal: true,
+    click: () => {
+      console.log(props.route)
+    }
+  }
+]
 </script>
 
 
