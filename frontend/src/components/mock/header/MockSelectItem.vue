@@ -1,27 +1,32 @@
 <template>
-  <router-link :to="{name: 'routes-view', params: {id}}"
-               class="p-2 flex items-start hover:border-green-500 border-transparent border-l-2">
+  <router-link :to="{name: 'routes-view', params: {id: mock.data.id}}"
+               class="p-2 flex items-start border-transparent border-l-2 hover:text-green-500">
     <div>
-      <p class="text-base flex items-center font-medium text-gray-900 dark:text-slate-400">
-        <PlayIcon class="text-green-500 h-4 w-4 mr-2"/>
-        <span>{{ name }}</span>
+      <p class="text-base flex items-center text-sm text-gray-900 dark:text-slate-400 dark:hover:text-green-500  cursor-pointer">
+        <span class="inline-flex items-center">
+          <svg :class="[mock.state.status === 'running' ? ' text-green-500' : 'text-gray-500', 'mr-1.5 h-2 w-2']"
+               fill="currentColor" viewBox="0 0 8 8">
+            <circle cx="4" cy="4" r="3"/>
+          </svg>
+
+          {{ mock.data.name }}
+        </span>
       </p>
       <p class="mt-1 text-sm text-gray-500 dark:text-slate-400 dark:text-slate-600">
-        {{ description }}
+        {{ mock.data.description }}
       </p>
     </div>
   </router-link>
 </template>
 
-<script setup lang="ts">
-import {PlayIcon} from '@heroicons/vue/solid';</script>
+<script setup lang="ts"></script>
 
 <script lang="ts">
+import type {Mock} from "@/stores";
+
 export default {
   props: {
-    id: {type: String, required: true},
-    name: {type: String, required: true},
-    description: {type: String, required: false}
+    mock: {type: Object as () => Mock, required: true},
   }
 };
 </script>

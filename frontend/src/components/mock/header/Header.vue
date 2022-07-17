@@ -1,6 +1,6 @@
 <template>
   <Disclosure as="nav">
-    <div class="h-20 flex border-b border-gray-200 dark:border-slate-800">
+    <div class="h-20 flex border-b border-gray-200 dark:border-slate-800 text-sm dark:text-sm">
       <div class="flex flex-1 items-center">
         <div class="flex w-72">
           <MockStart :activeMock="activeMock" class="mx-4"/>
