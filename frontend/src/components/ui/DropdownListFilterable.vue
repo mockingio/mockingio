@@ -22,7 +22,7 @@
           @after-leave="query = ''"
       >
         <ComboboxOptions
-            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-slate-900 py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none text-sm"
+            class="absolute mt-1 max-h-90 w-full overflow-auto rounded-md bg-slate-900 py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none text-sm"
         >
           <ComboboxOption
               v-for="item in filteredItems"

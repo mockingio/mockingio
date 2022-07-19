@@ -7,7 +7,7 @@
       <div class="pl-3 pr-1 py-1 flex-1">
       <span class="flex items-center justify-between">
           <span>{{ route.path }}</span>
-          <span :class="`rounded p-1 text-white method-${route.method.toLowerCase()} text-xxs`">{{
+          <span :class="`rounded p-1 text-white method-${route.method.toLowerCase()} text-xs`">{{
               route.method
             }}</span>
       </span>
