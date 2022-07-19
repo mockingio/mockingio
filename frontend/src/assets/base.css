@@ -10,25 +10,25 @@
 }
 
 .method-get {
-    background: theme('colors.green.500');
+    color: theme('colors.green.500');
 }
 
 .method-post {
-    background: theme('colors.blue.500');
+    color: theme('colors.blue.500');
 }
 
 .method-put {
-    background: theme('colors.yellow.500');
+    color: theme('colors.yellow.500');
 }
 
 .method-delete {
-    background: theme('colors.red.500');
+    color: theme('colors.red.500');
 }
 
 .method-patch {
-    background: theme('colors.purple.500');
+    color: theme('colors.purple.500');
 }
 
 .method-options {
-    background: theme('colors.fuchsia.500');
+    color: theme('colors.fuchsia.500');
 }
