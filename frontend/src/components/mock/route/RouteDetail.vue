@@ -2,7 +2,7 @@
   <div class="m-5">
     <div class="mt-1 flex rounded-md">
       <div class="w-32">
-        <DropdownListFilterable v-model="method" :items="items"/>
+        <DropdownListFilterable :selected="method" @change="change" :items="items"/>
       </div>
       <input :value="route.path" type="text" name="path" id="path"
              class="flex-1 bg-transparent block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 dark:border-slate-800"/>
@@ -19,7 +19,7 @@ import type {Mock, Route} from "@/stores";
 import {useMockStore} from "@/stores";
 import Responses from "@/components/mock/response/Responses.vue";
 import DropdownListFilterable from '@/components/ui/DropdownListFilterable.vue'
-import {computed} from "vue";
+import type {Item} from "@/components/ui/PopoverMenu.vue";
 
 const {patchRoute} = useMockStore()
 
@@ -37,17 +37,9 @@ let items = [
   {name: 'OPTIONS'},
 ]
 items = items.map(i => ({...i, id: i.name}))
+const method = items.find(i => i.name === props.route.method)
 
-const emits = defineEmits(['update:modelValue'])
-const method = computed({
-  get() {
-    return items.find(i => i.name === props.route.method)
-  },
-  set(value) {
-    emits('update:modelValue', value)
-    if (value) {
-      patchRoute(props.mock.data.id, props.route.id, {method: value.name})
-    }
-  }
-})
+const change = (value: Item) => {
+  patchRoute(props.mock.data.id, props.route.id, {method: value.name})
+}
 </script>

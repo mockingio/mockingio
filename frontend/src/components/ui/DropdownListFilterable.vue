@@ -60,26 +60,29 @@ import {computed, ref} from 'vue'
 
 const props = defineProps({
   items: {type: Array as () => Array<Item>, required: true},
-  modelValue: {type: Object as () => Item, required: true},
+  selected: {type: Object as () => Item, required: true},
 })
 
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['change'])
 
 interface Item {
   id: string
   name: string
 }
 
-let query = ref('')
+let _value = ref(props.selected)
+
 let value = computed({
   get() {
-    return props.modelValue
+    return _value.value
   },
   set(value) {
-    emits('update:modelValue', value)
+    _value.value = value
+    emits('change', value)
   }
 })
 
+let query = ref('')
 const filteredItems = computed(() => {
   return query.value === ''
       ? props.items
