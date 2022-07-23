@@ -11,40 +11,42 @@ import (
 	"github.com/tuongaz/smocky-engine/engine/persistent"
 )
 
-func GetMocksHandler(w http.ResponseWriter, r *http.Request) {
-	db := persistent.GetDefault()
-	mocks, err := db.GetMocks(r.Context())
-	if err != nil {
-		log.WithError(err).Error("get configs")
-		responseError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+func GetMocksHandler(db persistent.Persistent) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		mocks, err := db.GetMocks(r.Context())
+		if err != nil {
+			log.WithError(err).Error("get configs")
+			responseError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 
-	response(w, http.StatusOK, mocks)
+		response(w, http.StatusOK, mocks)
+	}
 }
 
 func GetMocksStatesHandler(w http.ResponseWriter, _ *http.Request) {
 	response(w, http.StatusOK, server.GetStates())
 }
 
-func CreateMockHandler(w http.ResponseWriter, r *http.Request) {
-	db := persistent.GetDefault()
-	mo := mock.New()
+func CreateMockHandler(db persistent.Persistent) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		mo := mock.New()
 
-	if err := db.SetMock(r.Context(), mo); err != nil {
-		log.WithError(err).Error("create new mock")
-		responseError(w, http.StatusInternalServerError, err.Error())
-		return
+		if err := db.SetMock(r.Context(), mo); err != nil {
+			log.WithError(err).Error("create new mock")
+			responseError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		url, err := server.Start(r.Context(), mo)
+		if err != nil {
+			log.WithError(err).Error("start server")
+			responseError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		response(w, http.StatusCreated, map[string]any{"id": mo.ID, "url": url})
 	}
-
-	url, err := server.Start(r.Context(), mo)
-	if err != nil {
-		log.WithError(err).Error("start server")
-		responseError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	response(w, http.StatusCreated, map[string]any{"id": mo.ID, "url": url})
 }
 
 func StopMockServerHandler(w http.ResponseWriter, r *http.Request) {

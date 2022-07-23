@@ -11,21 +11,18 @@ import (
 
 	"github.com/smockyio/smocky/api"
 	"github.com/tuongaz/smocky-engine/engine/mock"
-	"github.com/tuongaz/smocky-engine/engine/persistent"
 	"github.com/tuongaz/smocky-engine/engine/persistent/memory"
 )
 
 func Test_GetMocksHandler(t *testing.T) {
 	db := memory.New()
-	persistent.New(db)
-
 	_ = db.SetMock(context.Background(), &mock.Mock{
 		ID: "123",
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/mocks", nil)
 	w := httptest.NewRecorder()
-	api.GetMocksHandler(w, req)
+	api.GetMocksHandler(db)(w, req)
 
 	res := w.Result()
 	defer func() {
@@ -39,12 +36,9 @@ func Test_GetMocksHandler(t *testing.T) {
 }
 
 func Test_CreateMockHandler(t *testing.T) {
-	db := memory.New()
-	persistent.New(db)
-
 	req := httptest.NewRequest(http.MethodPost, "/mocks", nil)
 	w := httptest.NewRecorder()
-	api.CreateMockHandler(w, req)
+	api.CreateMockHandler(memory.New())(w, req)
 
 	res := w.Result()
 	defer func() {
