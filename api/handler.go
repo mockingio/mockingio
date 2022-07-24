@@ -1,11 +1,11 @@
 package api
 
 import (
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-
 	"github.com/smockyio/smocky/server"
 	"github.com/tuongaz/smocky-engine/engine/mock"
 	"github.com/tuongaz/smocky-engine/engine/persistent"
@@ -46,6 +46,26 @@ func CreateMockHandler(db persistent.Persistent) func(w http.ResponseWriter, r *
 		}
 
 		response(w, http.StatusCreated, map[string]any{"id": mo.ID, "url": url})
+	}
+}
+
+func PatchRouteHandler(db persistent.Persistent) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		mockID := mux.Vars(r)["mock_id"]
+		routeID := mux.Vars(r)["route_id"]
+		data, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.WithError(err).Error("read request body")
+			responseError(w, http.StatusInternalServerError, err.Error())
+		}
+
+		if err := db.PatchRoute(r.Context(), mockID, routeID, string(data)); err != nil {
+			log.WithError(err).Error("patch route")
+			responseError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		response(w, http.StatusOK, nil)
 	}
 }
 

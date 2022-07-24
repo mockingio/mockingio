@@ -27,12 +27,25 @@ func (a *Server) Start(ctx context.Context, port string) (string, func(), error)
 	r.Path("/mocks/{mock_id}/stop").HandlerFunc(StopMockServerHandler).Methods(http.MethodDelete)
 	r.Path("/mocks/{mock_id}/start").HandlerFunc(StartMockServerHandler).Methods(http.MethodPost)
 
+	// routes
+	r.Path("/mocks/{mock_id}/routes/{route_id}").HandlerFunc(PatchRouteHandler(db)).Methods(http.MethodPatch)
+
 	addr := "0.0.0.0:" + port
 
-	methods := []string{http.MethodGet, http.MethodPost, http.MethodDelete, http.MethodPut, http.MethodOptions}
+	methods := []string{
+		http.MethodGet,
+		http.MethodPost,
+		http.MethodDelete,
+		http.MethodPut,
+		http.MethodPatch,
+		http.MethodOptions,
+	}
 	srv := &http.Server{
-		Addr:    addr,
-		Handler: handlers.CORS(handlers.AllowedMethods(methods))(r),
+		Addr: addr,
+		Handler: handlers.CORS(
+			handlers.AllowedMethods(methods),
+			handlers.AllowedHeaders([]string{"Content-Type"}),
+		)(r),
 	}
 
 	go func() {

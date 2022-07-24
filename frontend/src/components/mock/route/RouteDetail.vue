@@ -20,6 +20,7 @@ import {useMockStore} from "@/stores";
 import Responses from "@/components/mock/response/Responses.vue";
 import DropdownListFilterable from '@/components/ui/DropdownListFilterable.vue'
 import type {Item} from "@/components/ui/PopoverMenu.vue";
+import {computed} from "vue";
 
 const {patchRoute} = useMockStore()
 
@@ -37,7 +38,9 @@ let items = [
   {name: 'OPTIONS'},
 ]
 items = items.map(i => ({...i, id: i.name}))
-const method = items.find(i => i.name === props.route.method)
+const method = computed(() => {
+  return items.find(i => i.name === props.route.method)
+})
 
 const change = (value: Item) => {
   patchRoute(props.mock.data.id, props.route.id, {method: value.name})

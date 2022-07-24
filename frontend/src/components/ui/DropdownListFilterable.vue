@@ -70,7 +70,7 @@ interface Item {
   name: string
 }
 
-let _value = ref(props.selected)
+let _value = computed(() => props.selected)
 
 let value = computed({
   get() {
