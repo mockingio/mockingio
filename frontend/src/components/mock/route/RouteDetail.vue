@@ -2,9 +2,9 @@
   <div class="m-5">
     <div class="mt-1 flex rounded-md">
       <div class="w-32">
-        <DropdownListFilterable :selected="method" @change="change" :items="items"/>
+        <DropdownListFilterable :selected="method" v-on="{change: change('method')}" :items="items"/>
       </div>
-      <input :value="route.path" type="text" name="path" id="path"
+      <input :value="route.path" v-on="{input: change('path')}" type="text" name="path" id="path"
              class="flex-1 bg-transparent block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 dark:border-slate-800"/>
     </div>
   </div>
@@ -21,6 +21,7 @@ import Responses from "@/components/mock/response/Responses.vue";
 import DropdownListFilterable from '@/components/ui/DropdownListFilterable.vue'
 import type {Item} from "@/components/ui/PopoverMenu.vue";
 import {computed} from "vue";
+import debounce from "lodash/debounce"
 
 const {patchRoute} = useMockStore()
 
@@ -39,10 +40,16 @@ let items = [
 ]
 items = items.map(i => ({...i, id: i.name}))
 const method = computed(() => {
-  return items.find(i => i.name === props.route.method)
+  return props.route.method
 })
 
-const change = (value: Item) => {
-  patchRoute(props.mock.data.id, props.route.id, {method: value.name})
-}
+const change = (field: string) => debounce((evt: any) => {
+  let val = ""
+  if (typeof evt === 'string') {
+    val = evt
+  } else if (typeof evt === 'object') {
+    val = evt.target.value
+  }
+  patchRoute(props.mock.data.id, props.route.id, {[field]: val})
+}, 300)
 </script>

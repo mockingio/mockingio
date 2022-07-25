@@ -56,11 +56,11 @@ import {
   TransitionRoot,
 } from '@headlessui/vue'
 import {SelectorIcon} from '@heroicons/vue/solid'
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 
 const props = defineProps({
   items: {type: Array as () => Array<Item>, required: true},
-  selected: {type: Object as () => Item, required: true},
+  selected: {type: String, required: true},
 })
 
 const emits = defineEmits(['change'])
@@ -70,7 +70,10 @@ interface Item {
   name: string
 }
 
-let _value = computed(() => props.selected)
+let _value = ref(props.items.find(i => i.id === props.selected))
+watch(() => props.selected, (val) => {
+  _value.value = props.items.find(i => i.id === val)
+})
 
 let value = computed({
   get() {
@@ -78,7 +81,7 @@ let value = computed({
   },
   set(value) {
     _value.value = value
-    emits('change', value)
+    emits('change', value!.name)
   }
 })
 
