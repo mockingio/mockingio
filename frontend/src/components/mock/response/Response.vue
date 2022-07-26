@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
+import {provide, ref} from "vue";
 import {ViewListIcon} from '@heroicons/vue/outline';
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/vue'
 import Body from "@/components/mock/response/Body.vue";
@@ -71,5 +71,6 @@ const open = ref(false)
 function toggleOpen() {
   open.value = !open.value
 }
+
 </script>
 

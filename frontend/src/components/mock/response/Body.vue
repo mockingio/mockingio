@@ -3,15 +3,19 @@
     <DropdownListFilterable :selected="httpStatus" v-on="{change: change('status')}" :items="statuses"/>
   </div>
   <div>
-    <textarea v-on="{input: change('body')}" class="bg-transparent border border-slate-800 w-full h-[400px]"/>
+    <textarea :value="response.body" v-on="{input: change('body')}" class="bg-transparent border border-slate-800 w-full h-[400px]"/>
   </div>
 </template>
 
 <script setup lang="ts">
 import debounce from "lodash/debounce"
-import type {Response} from "@/stores";
-import {computed} from "vue";
+import type {Mock, Response, Route} from "@/stores";
+import {useMockStore} from "@/stores";
+import type {Ref} from "vue";
+import {computed, inject} from "vue";
 import DropdownListFilterable from "@/components/ui/DropdownListFilterable.vue";
+
+const {patchResponse} = useMockStore()
 
 const props = defineProps({
   response: {type: Object as () => Response, required: true}
@@ -21,6 +25,9 @@ const httpStatus = computed(() => {
   return props.response.status + ""
 })
 
+const mock = inject<Ref<Mock>>("mock")
+const route = inject<Ref<Route>>("route")
+
 const change = (field: string) => debounce((evt: any) => {
   let val = ""
   if (typeof evt === 'string') {
@@ -28,8 +35,8 @@ const change = (field: string) => debounce((evt: any) => {
   } else if (typeof evt === 'object') {
     val = evt.target.value
   }
-  console.log({val})
-})
+  patchResponse(mock!.value.data.id, route!.value.id, props.response.id, {[field]: val})
+}, 300)
 
 const statuses = [
   {"name": "200 OK", "id": "200"},

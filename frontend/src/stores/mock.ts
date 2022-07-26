@@ -92,6 +92,30 @@ export const useMockStore = defineStore({
             // send data to server
             return axios.patch(getUrl(`/mocks/${mockId}/routes/${routeId}`), data)
         },
+        async patchResponse(mockId: string, routeId: string, responseId: string, data: { [key: string]: any }) {
+            const mockIdx = this.mocks.findIndex(m => m.data.id === mockId)
+            if (mockIdx === undefined) {
+                return
+            }
+            const mock = this.mocks[mockIdx]
+
+            const routeIdx = mock.data.routes.findIndex(r => r.id === routeId)
+            if (routeIdx === undefined) {
+                return
+            }
+
+            const responseIdx = mock.data.routes[routeIdx].responses.findIndex(r => r.id === responseId)
+            if (responseIdx === undefined) {
+                return
+            }
+
+            mock.data.routes[routeIdx].responses[responseIdx] = {...mock.data.routes[routeIdx].responses[responseIdx], ...data}
+
+            this.mocks[mockIdx] = {...mock, data: {...mock.data, routes: [...mock.data.routes]}}
+
+            // send data to server
+            return axios.patch(getUrl(`/mocks/${mockId}/routes/${routeId}/responses/${responseId}`), data)
+        },
         updateMockState(id: string, state: MockState) {
             const mock = this.getMockByID(id)
             if (!mock) return
