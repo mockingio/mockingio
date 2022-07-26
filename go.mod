@@ -9,7 +9,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
-	github.com/tuongaz/smocky-engine v0.0.0-20220724125043-ff91e5c21fc7
+	github.com/tuongaz/smocky-engine v0.0.0-20220726141729-261d0740abb0
 )
 
 require (

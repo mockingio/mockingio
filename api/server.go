@@ -29,6 +29,7 @@ func (a *Server) Start(ctx context.Context, port string) (string, func(), error)
 
 	// routes
 	r.Path("/mocks/{mock_id}/routes/{route_id}").HandlerFunc(PatchRouteHandler(db)).Methods(http.MethodPatch)
+	r.Path("/mocks/{mock_id}/routes/{route_id}/responses/{response_id}").HandlerFunc(PatchResponseHandler(db)).Methods(http.MethodPatch)
 
 	addr := "0.0.0.0:" + port
 

@@ -69,6 +69,27 @@ func PatchRouteHandler(db persistent.Persistent) func(w http.ResponseWriter, r *
 	}
 }
 
+func PatchResponseHandler(db persistent.Persistent) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		mockID := mux.Vars(r)["mock_id"]
+		routeID := mux.Vars(r)["route_id"]
+		responseID := mux.Vars(r)["response_id"]
+		data, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.WithError(err).Error("read request body")
+			responseError(w, http.StatusInternalServerError, err.Error())
+		}
+
+		if err := db.PatchResponse(r.Context(), mockID, routeID, responseID, string(data)); err != nil {
+			log.WithError(err).Error("patch route")
+			responseError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		response(w, http.StatusOK, nil)
+	}
+}
+
 func StopMockServerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["mock_id"]

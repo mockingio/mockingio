@@ -30,7 +30,7 @@ export interface Route {
 
 export interface Response {
     id: string
-    status: number
+    status: string
     body: string
 }
 

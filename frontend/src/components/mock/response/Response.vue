@@ -23,7 +23,7 @@
           <TabPanels>
             <TabPanel v-for="item in tabs" :key="item.name">
               <div class="my-5">
-                <component :is="item.component"/>
+                <component :is="item.component" :response="props.response"/>
               </div>
             </TabPanel>
           </TabPanels>
@@ -41,7 +41,6 @@
 
 <script setup lang="ts">
 import {ref} from "vue";
-import type {Response} from "@/stores";
 import {ViewListIcon} from '@heroicons/vue/outline';
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/vue'
 import Body from "@/components/mock/response/Body.vue";
@@ -63,8 +62,8 @@ const tabs = [
   }
 ];
 
-defineProps({
-  response: {type: Object as () => Response, required: true}
+const props = defineProps({
+  response: {type: Object as () => Response, required: true},
 })
 
 const open = ref(false)

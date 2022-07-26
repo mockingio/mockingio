@@ -2,7 +2,7 @@
   <Combobox v-model="value">
     <div class="relative">
       <div
-          class="relative cursor-pointer overflow-hidden text-left focus:outline-none text-sm rounded-l-md border border-r-0 border-slate-800"
+          class="relative cursor-pointer overflow-hidden text-left focus:outline-none text-sm rounded-l-md border border-slate-800"
       >
         <ComboboxInput
             class="w-full border-0 bg-transparent dark:text-gray-400 py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
@@ -22,7 +22,7 @@
           @after-leave="query = ''"
       >
         <ComboboxOptions
-            class="absolute mt-1 max-h-90 w-full overflow-auto rounded-md bg-slate-900 py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none text-sm"
+            class="absolute z-100 max-h-96 mt-1 max-h-90 w-full overflow-auto rounded-md bg-slate-900 py-1 text-base ring-1 ring-black ring-opacity-5 focus:outline-none text-sm"
         >
           <ComboboxOption
               v-for="item in filteredItems"
@@ -81,7 +81,7 @@ let value = computed({
   },
   set(value) {
     _value.value = value
-    emits('change', value!.name)
+    emits('change', value!.id)
   }
 })
 

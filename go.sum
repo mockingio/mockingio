@@ -60,8 +60,8 @@ github.com/tuongaz/smocky-engine v0.0.0-20220715081847-f0913d8c2d64 h1:+YGltJhed
 github.com/tuongaz/smocky-engine v0.0.0-20220715081847-f0913d8c2d64/go.mod h1:fBDH16KsYl3qTSprsNDBmxizk7JMi3hZZx9uAuME7F8=
 =======
 github.com/thoas/go-funk v0.9.1 h1:O549iLZqPpTUQ10ykd26sZhzD+rmR5pWhuElrhbC20M=
-github.com/tuongaz/smocky-engine v0.0.0-20220724125043-ff91e5c21fc7 h1:1qomBU87jfWxZkvngOMHngjTkuXMHsjsRxCGqIqE+no=
-github.com/tuongaz/smocky-engine v0.0.0-20220724125043-ff91e5c21fc7/go.mod h1:hPizcfhmHPP0qkxYIDVyfLmQwjccV3dTp++5r9agCmE=
+github.com/tuongaz/smocky-engine v0.0.0-20220726141729-261d0740abb0 h1:UV+Ox4sdN5wbqk3gqLzriVUPKu7NdDda62oPu2iTyTA=
+github.com/tuongaz/smocky-engine v0.0.0-20220726141729-261d0740abb0/go.mod h1:hPizcfhmHPP0qkxYIDVyfLmQwjccV3dTp++5r9agCmE=
 golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 h1:3MTrJm4PyNL9NBqvYDSj3DHl46qQakyfqfWo4jgfaEM=
 golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17/go.mod h1:lgLbSvA5ygNOMpwM/9anMpWVlVJ7Z+cHWq/eFuinpGE=
 golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
