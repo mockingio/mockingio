@@ -43,7 +43,7 @@ const method = computed(() => {
   return props.route.method
 })
 
-const change = (field: string) => debounce((evt: any) => {
+const change = (field: string) => (evt: any) => {
   let val = ""
   if (typeof evt === 'string') {
     val = evt
@@ -51,5 +51,5 @@ const change = (field: string) => debounce((evt: any) => {
     val = evt.target.value
   }
   patchRoute(props.mock.data.id, props.route.id, {[field]: val})
-}, 300)
+}
 </script>

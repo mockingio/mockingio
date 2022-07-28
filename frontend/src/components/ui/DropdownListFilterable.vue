@@ -1,5 +1,5 @@
 <template>
-  <Combobox v-model="value">
+  <Combobox :modelValue="value" @update:modelValue="onSelect">
     <div class="relative">
       <div
           class="relative cursor-pointer overflow-hidden text-left focus:outline-none text-sm rounded-l-md border border-slate-800"
@@ -32,7 +32,7 @@
               v-slot="{ selected, active }"
           >
             <li
-                class="relative cursor-pointer select-none p-2 hover:text-green-500">
+                :class="[selected ? 'text-green-500' : '', 'relative cursor-pointer select-none p-2 hover:text-green-500']">
                 <span
                     class="block truncate"
                 >
@@ -56,7 +56,7 @@ import {
   TransitionRoot,
 } from '@headlessui/vue'
 import {SelectorIcon} from '@heroicons/vue/solid'
-import {computed, ref, watch} from 'vue'
+import {computed, ref} from 'vue'
 
 const props = defineProps({
   items: {type: Array as () => Array<Item>, required: true},
@@ -70,20 +70,11 @@ interface Item {
   name: string
 }
 
-let _value = ref(props.items.find(i => i.id === props.selected))
-watch(() => props.selected, (val) => {
-  _value.value = props.items.find(i => i.id === val)
-})
+const value = ref<Item | undefined>(props.items.find(i => i.id === props.selected))
 
-let value = computed({
-  get() {
-    return _value.value
-  },
-  set(value) {
-    _value.value = value
-    emits('change', value!.id)
-  }
-})
+const onSelect = (i: Item) => {
+  emits('change', i.id)
+}
 
 let query = ref('')
 const filteredItems = computed(() => {

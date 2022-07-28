@@ -3,7 +3,8 @@
     <DropdownListFilterable :selected="httpStatus" v-on="{change: change('status')}" :items="statuses"/>
   </div>
   <div>
-    <textarea :value="response.body" v-on="{input: change('body')}" class="bg-transparent border border-slate-800 w-full h-[400px]"/>
+    <textarea :value="response.body" v-on="{input: change('body')}"
+              class="bg-transparent border border-slate-800 w-full h-[400px]"/>
   </div>
 </template>
 
