@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div @click="toggleOpen" class="select-none flex dark:bg-slate-800 bg-white cursor-pointer">
+    <div @click="toggleOpen" class="select-none flex dark:bg-slate-800 bg-white cursor-pointer handle">
       <div class="m-3 block flex-1 flex justify-between">
-        <h4>{{ response.status }}</h4>
-        <ViewListIcon class="handle w-5 h-5 ml-5"/>
+        <div>{{ status }}</div>
+        <TrashIcon class="w-5 h-5 ml-5 hover:text-red-500"/>
       </div>
     </div>
 
@@ -28,24 +28,19 @@
             </TabPanel>
           </TabPanels>
         </TabGroup>
-        <div class="flex justify-end">
-          <button type="button"
-                  class="inline-flex items-center px-2.5 py-1.5 text-xs font-medium rounded shadow-sm text-red-500 border-red-500 hover:text-white hover:bg-red-500">
-            Delete
-          </button>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {provide, ref} from "vue";
-import {ViewListIcon} from '@heroicons/vue/outline';
+import {computed, ref} from "vue";
+import {TrashIcon} from '@heroicons/vue/outline';
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/vue'
 import Body from "@/components/mock/response/Body.vue";
 import Headers from "@/components/mock/response/Headers.vue";
-import Rules from "@/components/mock/rule/Rules.vue";
+import Rules from "./Rules.vue";
+import {getStatusById} from "@/helpers";
 
 const tabs = [
   {
@@ -65,6 +60,8 @@ const tabs = [
 const props = defineProps({
   response: {type: Object as () => Response, required: true},
 })
+
+const status = computed(() => getStatusById(props.response.status.toString())?.name)
 
 const open = ref(false)
 

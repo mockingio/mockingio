@@ -32,6 +32,11 @@ export interface Response {
     id: string
     status: string
     body: string
+    headers: Header[]
+}
+
+export interface Header {
+
 }
 
 export const useMockStore = defineStore({
