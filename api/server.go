@@ -21,7 +21,7 @@ func NewServer(db persistent.Persistent) *Server {
 	}
 }
 
-func (a *Server) Start(ctx context.Context, port string) (string, func(), error) {
+func (a *Server) Start(_ context.Context, port string) (string, func(), error) {
 	r := mux.NewRouter()
 
 	r.Path("/mocks").HandlerFunc(GetMocksHandler(a.db)).Methods(http.MethodGet)

@@ -4,13 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"strconv"
 	"syscall"
 
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/smockyio/smocky/api"
 	"github.com/smockyio/smocky/server"
@@ -21,7 +25,7 @@ import (
 var filenames []string
 var adminPort = 2601
 var enableAdmin = false
-var persist = false
+var filePersist = false
 
 type output struct {
 	URLS  []string `json:"urls,omitempty"`
@@ -50,6 +54,7 @@ smocky start --filename mock.yml --output-json
 		ctx := context.Background()
 
 		db := memory.New()
+		mockFileMap := map[string]string{}
 
 		for _, filename := range filenames {
 			loadedMock, err := mock.FromFile(filename)
@@ -61,6 +66,7 @@ smocky start --filename mock.yml --output-json
 			if err := db.SetMock(ctx, loadedMock); err != nil {
 				panic(err)
 			}
+			mockFileMap[loadedMock.ID] = filename
 
 			if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
 				panic(err)
@@ -70,6 +76,14 @@ smocky start --filename mock.yml --output-json
 				fmt.Printf("Failed to start server with file %v. Error: %v\n", filename, err)
 				quit()
 			}
+		}
+
+		if filePersist {
+			db.SubscribeMockChanges(func(mock mock.Mock) {
+				if err := toFile(mock, mockFileMap[mock.ID]); err != nil {
+					log.WithError(err).Errorf("failed to write mock to file %s", mockFileMap[mock.ID])
+				}
+			})
 		}
 
 		out := output{
@@ -96,6 +110,24 @@ smocky start --filename mock.yml --output-json
 	},
 }
 
+func toFile(mock mock.Mock, filename string) error {
+	text, err := yaml.Marshal(mock)
+	if err != nil {
+		return errors.Wrap(err, "marshal mock to yaml")
+	}
+
+	fileStats, err := os.Stat(filename)
+	if err != nil {
+		return errors.Wrap(err, "get file stats")
+	}
+
+	if err := ioutil.WriteFile(filename, text, fileStats.Mode().Perm()); err != nil {
+		return errors.Wrap(err, "write file")
+	}
+
+	return nil
+}
+
 func quit() {
 	server.RemoveAllServers()
 	os.Exit(1)
@@ -106,6 +138,6 @@ func init() {
 	startCmd.Flags().StringArrayVarP(&filenames, "filename", "f", []string{}, "location of the mock file")
 	startCmd.Flags().IntVar(&adminPort, "admin-port", 2601, "port for admin API server")
 	startCmd.Flags().BoolVar(&enableAdmin, "admin", false, "start with admin")
-	startCmd.Flags().BoolVar(&persist, "persist", false, "save changes to files")
+	startCmd.Flags().BoolVar(&filePersist, "persist", false, "save changes to files")
 	_ = startCmd.MarkFlagRequired("filename")
 }
