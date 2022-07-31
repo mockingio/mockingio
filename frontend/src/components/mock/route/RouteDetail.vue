@@ -10,6 +10,11 @@
   </div>
 
   <div class="m-5">
+    <input :value="route.description" v-on="{input: change('description')}" type="text"
+           class="flex-1 bg-transparent block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300 dark:border-slate-800"/>
+  </div>
+
+  <div class="m-5">
     <Responses :mock="mock" :route="route"/>
   </div>
 </template>
@@ -21,7 +26,6 @@ import Responses from "@/components/mock/response/Responses.vue";
 import DropdownListFilterable from '@/components/ui/DropdownListFilterable.vue'
 import type {Item} from "@/components/ui/PopoverMenu.vue";
 import {computed} from "vue";
-import debounce from "lodash/debounce"
 
 const {patchRoute} = useMockStore()
 
