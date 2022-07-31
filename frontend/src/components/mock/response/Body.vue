@@ -9,25 +9,20 @@
 </template>
 
 <script setup lang="ts">
-import type {Ref} from "vue";
-import {computed, inject} from "vue";
-import type {Mock, Response, Route} from "@/stores";
-import {useMockStore} from "@/stores";
+import {computed} from "vue";
+import type {Response} from "@/stores";
 import DropdownListFilterable from "@/components/ui/DropdownListFilterable.vue";
 import {getStatuses} from "@/helpers";
-
-const {patchResponse} = useMockStore()
 
 const props = defineProps({
   response: {type: Object as () => Response, required: true}
 })
 
+const emits = defineEmits(['change'])
+
 const httpStatus = computed(() => {
   return props.response.status.toString()
 })
-
-const mock = inject<Ref<Mock>>("mock")
-const route = inject<Ref<Route>>("route")
 
 const change = (field: string) => (evt: any) => {
   let val = 0
@@ -36,7 +31,7 @@ const change = (field: string) => (evt: any) => {
   } else if (typeof evt === 'object') {
     val = parseInt(evt.target.value)
   }
-  patchResponse(mock!.value.data.id, route!.value.id, props.response.id, {[field]: val})
+  emits("change", {[field]: val})
 }
 
 const statuses = getStatuses()

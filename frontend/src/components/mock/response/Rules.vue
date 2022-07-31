@@ -33,12 +33,12 @@ import {defineProps} from "vue";
 const props = defineProps({
   response: {type: Object as () => Response, required: true},
 })
+const emits = defineEmits(['change'])
 </script>
 
 <script lang="ts">
 import {defineComponent} from 'vue';
 import {VueDraggableNext} from 'vue-draggable-next';
-
 
 export default defineComponent({
   components: {

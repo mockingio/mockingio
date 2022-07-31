@@ -2,7 +2,7 @@
   <div class="overflow-hidden sm:rounded-md">
     <div role="list" class="text-sm">
       <draggable handle=".handle"
-                 class="dragArea block list-group w-full divide-y divide-solid dark:divide-slate-900">
+                 class="dragArea block list-group w-full divide-y-4 divide-solid dark:divide-slate-900">
         <Response v-for="item in list" :key="item.id" :response="item"/>
       </draggable>
     </div>
@@ -10,7 +10,7 @@
   <div>
     <a href="#" class="flex justify-start my-5 items-center hover:text-green-500">
       <PlusIcon class="w-4 h-4 mr-2 text-green-500"/>
-      <span class="text-sm">Add new response</span>
+      <span class="text-sm">Add response</span>
     </a>
   </div>
 </template>

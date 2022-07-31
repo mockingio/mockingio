@@ -4,8 +4,6 @@ github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46t
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/echlebek/patch v0.2.0 h1:nFSMh/BXBd/HUdWUD90v1EJW0FBBPOcturbefE+y2Fk=
-github.com/echlebek/patch v0.2.0/go.mod h1:63Pj7t7+Y6tdK+4M+/0nILv5Wi9PJTLMahq98pRqC3M=
 github.com/felixge/httpsnoop v1.0.1 h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=
 github.com/felixge/httpsnoop v1.0.1/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/go-ozzo/ozzo-validation/v4 v4.3.0 h1:byhDUpfEwjsVQb1vBunvIjh2BHQ9ead57VkAEY4V+Es=
@@ -60,8 +58,8 @@ github.com/tuongaz/smocky-engine v0.0.0-20220715081847-f0913d8c2d64 h1:+YGltJhed
 github.com/tuongaz/smocky-engine v0.0.0-20220715081847-f0913d8c2d64/go.mod h1:fBDH16KsYl3qTSprsNDBmxizk7JMi3hZZx9uAuME7F8=
 =======
 github.com/thoas/go-funk v0.9.1 h1:O549iLZqPpTUQ10ykd26sZhzD+rmR5pWhuElrhbC20M=
-github.com/tuongaz/smocky-engine v0.0.0-20220726141729-261d0740abb0 h1:UV+Ox4sdN5wbqk3gqLzriVUPKu7NdDda62oPu2iTyTA=
-github.com/tuongaz/smocky-engine v0.0.0-20220726141729-261d0740abb0/go.mod h1:hPizcfhmHPP0qkxYIDVyfLmQwjccV3dTp++5r9agCmE=
+github.com/tuongaz/smocky-engine v0.0.0-20220729230136-35159727afec h1:BN558SdQxtXyVY2NW7TjzY64ksIVkt6kXurNNu3UfBk=
+github.com/tuongaz/smocky-engine v0.0.0-20220729230136-35159727afec/go.mod h1:RUG4KAVQss739fizV4lB9RFEnl2p80ZJog414amhN5M=
 golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 h1:3MTrJm4PyNL9NBqvYDSj3DHl46qQakyfqfWo4jgfaEM=
 golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17/go.mod h1:lgLbSvA5ygNOMpwM/9anMpWVlVJ7Z+cHWq/eFuinpGE=
 golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
