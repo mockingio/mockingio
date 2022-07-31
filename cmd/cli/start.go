@@ -15,13 +15,13 @@ import (
 	"github.com/smockyio/smocky/api"
 	"github.com/smockyio/smocky/server"
 	"github.com/tuongaz/smocky-engine/engine/mock"
-	"github.com/tuongaz/smocky-engine/engine/persistent"
 	"github.com/tuongaz/smocky-engine/engine/persistent/memory"
 )
 
 var filenames []string
 var adminPort = 2601
 var enableAdmin = false
+var persist = false
 
 type output struct {
 	URLS  []string `json:"urls,omitempty"`
@@ -50,7 +50,6 @@ smocky start --filename mock.yml --output-json
 		ctx := context.Background()
 
 		db := memory.New()
-		persistent.New(db)
 
 		for _, filename := range filenames {
 			loadedMock, err := mock.FromFile(filename)
@@ -67,7 +66,7 @@ smocky start --filename mock.yml --output-json
 				panic(err)
 			}
 
-			if _, err := server.Start(ctx, loadedMock); err != nil {
+			if _, err := server.Start(ctx, loadedMock, db); err != nil {
 				fmt.Printf("Failed to start server with file %v. Error: %v\n", filename, err)
 				quit()
 			}
@@ -78,7 +77,7 @@ smocky start --filename mock.yml --output-json
 		}
 
 		if enableAdmin {
-			apiServ := api.NewServer()
+			apiServ := api.NewServer(db)
 			adminURL, shutdownServer, err := apiServ.Start(ctx, strconv.Itoa(adminPort))
 			if err != nil {
 				fmt.Printf("Failed to start admin server. Error: %v\n", err)
@@ -107,5 +106,6 @@ func init() {
 	startCmd.Flags().StringArrayVarP(&filenames, "filename", "f", []string{}, "location of the mock file")
 	startCmd.Flags().IntVar(&adminPort, "admin-port", 2601, "port for admin API server")
 	startCmd.Flags().BoolVar(&enableAdmin, "admin", false, "start with admin")
+	startCmd.Flags().BoolVar(&persist, "persist", false, "save changes to files")
 	_ = startCmd.MarkFlagRequired("filename")
 }
