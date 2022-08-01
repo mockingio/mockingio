@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/smockyio/smocky/api"
-	"github.com/tuongaz/smocky-engine/engine/mock"
-	"github.com/tuongaz/smocky-engine/engine/persistent/memory"
+	"github.com/mockingio/engine/engine/mock"
+	"github.com/mockingio/engine/engine/persistent/memory"
+	"github.com/mockingio/mockingio/api"
 )
 
 func Test_GetMocksHandler(t *testing.T) {

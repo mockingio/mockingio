@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/tuongaz/smocky-engine/engine/persistent"
+	"github.com/mockingio/engine/engine/persistent"
 )
 
 type Server struct {

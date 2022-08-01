@@ -16,10 +16,10 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/smockyio/smocky/api"
-	"github.com/smockyio/smocky/server"
-	"github.com/tuongaz/smocky-engine/engine/mock"
-	"github.com/tuongaz/smocky-engine/engine/persistent/memory"
+	"github.com/mockingio/engine/engine/mock"
+	"github.com/mockingio/engine/engine/persistent/memory"
+	"github.com/mockingio/mockingio/api"
+	"github.com/mockingio/mockingio/server"
 )
 
 var filenames []string
@@ -37,9 +37,9 @@ var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start a mock server",
 	Long: `
-smocky start --filename mock.yml
-smocky start --filename mock1.yml --filename mock2.yml
-smocky start --filename mock.yml --output-json
+mockingio start --filename mock.yml
+mockingio start --filename mock1.yml --filename mock2.yml
+mockingio start --filename mock.yml --output-json
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		stopSignalChanel := make(chan os.Signal, 1)

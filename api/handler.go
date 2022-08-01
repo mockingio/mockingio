@@ -7,9 +7,9 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/smockyio/smocky/server"
-	"github.com/tuongaz/smocky-engine/engine/mock"
-	"github.com/tuongaz/smocky-engine/engine/persistent"
+	"github.com/mockingio/engine/engine/mock"
+	"github.com/mockingio/engine/engine/persistent"
+	"github.com/mockingio/mockingio/server"
 )
 
 func GetMocksHandler(db persistent.Persistent) func(w http.ResponseWriter, r *http.Request) {

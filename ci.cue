@@ -8,7 +8,7 @@ import (
 		"universe.dagger.io/alpine"
     "universe.dagger.io/go"
 
-		"github.com/smockyio/dagger/ci/golangci"
+		"github.com/mockingio/dagger/ci/golangci"
 )
 
 dagger.#Plan & {
@@ -66,7 +66,7 @@ dagger.#Plan & {
 							package: "."
 							os: *client.platform.os | "linux"
 							arch: client.platform.arch
-							ldflags: "-s -w -X github.com/smockyio/smocky/cmd/version.Revision=\(version.output)"
+							ldflags: "-s -w -X github.com/mockingio/mockingio/cmd/version.Revision=\(version.output)"
 							env: depends_unit: "\(test.unit.exit)"
 					}
 

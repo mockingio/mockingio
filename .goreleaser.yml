@@ -1,4 +1,4 @@
-project_name: smocky
+project_name: mockingio
 
 before:
   hooks:
@@ -6,11 +6,11 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-    binary: smocky
+    binary: mockingio
     ldflags:
       - -s -w
-      - -X github.com/smockyio/smocky/cmd/version.Version={{.Version}}
-      - -X github.com/smockyio/smocky/cmd/version.Revision={{.ShortCommit}}
+      - -X github.com/mockingio/mockingio/cmd/version.Version={{.Version}}
+      - -X github.com/mockingio/mockingio/cmd/version.Revision={{.ShortCommit}}
     goos:
       - linux
       - windows
@@ -42,14 +42,14 @@ changelog:
 brews:
   - tap:
       owner: tuongaz
-      name: smocky-tap
+      name: mockingio-tap
     commit_author:
       name: tuongaz
       email: tuongaz@gmail.com
-    homepage: "https://github.com/tuongaz/smocky"
-    description: "Smocky is a mocking tool"
+    homepage: "https://github.com/mockingio/mockingio"
+    description: "mockingio is a mocking tool"
     test: |
-      system "#{bin}/smocky --version"
+      system "#{bin}/mockingio --version"
 
 dockers:
   - goos: linux
