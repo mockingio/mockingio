@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/smockyio/smocky/cmd/cli"
+	"github.com/mockingio/mockingio/cmd/cli"
 )
 
 func main() {

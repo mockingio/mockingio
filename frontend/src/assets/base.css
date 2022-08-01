@@ -3,20 +3,18 @@
 @tailwind utilities;
 
 @layer components {
-
-}
-
-.method {
-    width: 40px;
-    display: inline-block;
+    .text-xxs {
+        font-size: 0.6rem; /* 12px */
+        line-height: 0.75rem; /* 16px */
+    }
 }
 
 .method-get {
-    color: theme('colors.blue.500');
+    color: theme('colors.green.500');
 }
 
 .method-post {
-    color: theme('colors.green.500');
+    color: theme('colors.blue.500');
 }
 
 .method-put {
@@ -25,4 +23,12 @@
 
 .method-delete {
     color: theme('colors.red.500');
+}
+
+.method-patch {
+    color: theme('colors.pink.500');
+}
+
+.method-options {
+    color: theme('colors.fuchsia.500');
 }

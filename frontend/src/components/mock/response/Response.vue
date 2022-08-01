@@ -1,16 +1,16 @@
 <template>
   <div>
-    <div @click="toggleOpen" class="select-none flex dark:bg-slate-800 bg-white cursor-pointer">
-      <div class="m-5 block flex-1 flex justify-between">
-        <h4>{{ response.status }}</h4>
-        <ViewListIcon class="handle w-5 h-5 ml-5"/>
+    <div @click="toggleOpen" class="select-none flex dark:bg-slate-800 bg-white cursor-pointer handle group">
+      <div class="m-3 block flex-1 flex justify-between">
+        <div>{{ status }}</div>
+        <TrashIcon class="w-5 h-5 ml-5 hover:text-red-500 invisible group-hover:visible"/>
       </div>
     </div>
 
     <div :class="open ? 'block' : 'hidden'">
-      <div class="mx-5">
+      <div class="dark:border-slate-800 border border-t-0 p-3 pt-0">
         <TabGroup>
-          <div class="border-b border-gray-200 dark:border-slate-700">
+          <div class="border-b border-gray-200 dark:border-slate-800">
             <TabList class="-mb-px flex space-x-8">
               <Tab v-for="item in tabs" :key="item.name" v-slot="{ selected }" as="template">
                 <button
@@ -23,30 +23,26 @@
           <TabPanels>
             <TabPanel v-for="item in tabs" :key="item.name">
               <div class="my-5">
-                <component :is="item.component"/>
+                <component :is="item.component" :response="props.response" @change="change"/>
               </div>
             </TabPanel>
           </TabPanels>
         </TabGroup>
-        <div class="my-5 flex justify-end">
-          <button type="button"
-                  class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-red-500 border-red-500 hover:text-white hover:bg-red-500">
-            Delete
-          </button>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
-import type {Response} from "@/stores";
-import {ViewListIcon} from '@heroicons/vue/outline';
+import {computed, inject, ref, Ref} from "vue";
+import {TrashIcon} from '@heroicons/vue/outline';
 import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/vue'
 import Body from "@/components/mock/response/Body.vue";
 import Headers from "@/components/mock/response/Headers.vue";
-import Rules from "@/components/mock/rule/Rules.vue";
+import Rules from "./Rules.vue";
+import {getStatusById} from "@/helpers";
+import type {Mock, Response, Route} from "@/stores";
+import {useMockStore} from "@/stores";
 
 const tabs = [
   {
@@ -63,14 +59,25 @@ const tabs = [
   }
 ];
 
-defineProps({
-  response: {type: Object as () => Response, required: true}
+const props = defineProps({
+  response: {type: Object as () => Response, required: true},
 })
+
+const status = computed(() => getStatusById(props.response.status.toString())?.name)
 
 const open = ref(false)
 
 function toggleOpen() {
   open.value = !open.value
 }
+
+const mock = inject<Ref<Mock>>("mock")
+const route = inject<Ref<Route>>("route")
+const {patchResponse} = useMockStore()
+
+const change = (data: any) => {
+  patchResponse(mock!.value.data.id, route!.value.id, props.response.id, data)
+}
+
 </script>
 

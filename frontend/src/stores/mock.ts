@@ -22,16 +22,19 @@ export interface Mock {
 
 export interface Route {
     id: string
-    request: string
+    method: string
+    path: string
     description: string
     responses: Response[]
 }
 
 export interface Response {
     id: string
-    status: number
+    status: string
     body: string
+    headers: { [key: string]: string }
 }
+
 
 export const useMockStore = defineStore({
     id: "mocks",
@@ -71,6 +74,48 @@ export const useMockStore = defineStore({
             const state = await axios.post<MockState>(getUrl(`/mocks/${id}/start`))
             this.updateMockState(id, state.data)
         },
+        async patchRoute(mockId: string, routeId: string, data: { [key: string]: any }) {
+            const mockIdx = this.mocks.findIndex(m => m.data.id === mockId)
+            if (mockIdx === undefined) {
+                return
+            }
+
+            const mock = this.mocks[mockIdx]
+
+            const routeIdx = mock.data.routes.findIndex(r => r.id === routeId)
+            if (routeIdx === undefined) {
+                return
+            }
+
+            mock.data.routes[routeIdx] = {...mock.data.routes[routeIdx], ...data}
+
+            this.mocks[mockIdx] = {...mock, data: {...mock.data, routes: [...mock.data.routes]}}
+            // send data to server
+            return axios.patch(getUrl(`/mocks/${mockId}/routes/${routeId}`), data)
+        },
+        async patchResponse(mockId: string, routeId: string, responseId: string, data: { [key: string]: any }) {
+            const mockIdx = this.mocks.findIndex(m => m.data.id === mockId)
+            if (mockIdx === undefined) {
+                return
+            }
+            const mock = this.mocks[mockIdx]
+
+            const routeIdx = mock.data.routes.findIndex(r => r.id === routeId)
+            if (routeIdx === undefined) {
+                return
+            }
+
+            const responseIdx = mock.data.routes[routeIdx].responses.findIndex(r => r.id === responseId)
+            if (responseIdx === undefined) {
+                return
+            }
+
+            mock.data.routes[routeIdx].responses[responseIdx] = {...mock.data.routes[routeIdx].responses[responseIdx], ...data}
+
+            this.mocks[mockIdx] = {...mock, data: {...mock.data, routes: [...mock.data.routes]}}
+            // send data to server
+            return axios.patch(getUrl(`/mocks/${mockId}/routes/${routeId}/responses/${responseId}`), data)
+        },
         updateMockState(id: string, state: MockState) {
             const mock = this.getMockByID(id)
             if (!mock) return
@@ -84,10 +129,6 @@ export const useMockStore = defineStore({
                 return
             }
             this.activeId = id
-            const mock = this.getMockByID(id)
-            if (!!mock) {
-                this.setActiveRoute(mock.data.routes[0].id)
-            }
         },
         setDefaultActiveMock() {
             if (this.mocks.length === 0) {

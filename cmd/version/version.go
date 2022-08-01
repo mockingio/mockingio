@@ -15,7 +15,7 @@ var (
 )
 
 func Short() string {
-	return fmt.Sprintf("smocky %s (%s)", Version, Revision)
+	return fmt.Sprintf("mockingio %s (%s)", Version, Revision)
 }
 
 func Long() string {

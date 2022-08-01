@@ -1,10 +1,10 @@
-# smocky
+# mockingio
 
-[![CI](https://github.com/tuongaz/smocky/actions/workflows/main.yml/badge.svg)](https://github.com/tuongaz/smocky/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/tuongaz/smocky/branch/main/graph/badge.svg?token=0AXGI7UR85)](https://codecov.io/gh/tuongaz/smocky)
-[![Docker Repository](https://img.shields.io/docker/pulls/tuongaz/smocky)](https://hub.docker.com/r/tuongaz/smocky)
-[![Github Release](https://img.shields.io/github/v/release/tuongaz/smocky)](https://github.com/tuongaz/smocky/releases/latest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tuongaz/smocky)](https://goreportcard.com/report/github.com/tuongaz/smocky)
+[![CI](https://github.com/mockingio/mockingio/actions/workflows/main.yml/badge.svg)](https://github.com/mockingio/mockingio/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/mockingio/mockingio/branch/main/graph/badge.svg?token=0AXGI7UR85)](https://codecov.io/gh/mockingio/mockingio)
+[![Docker Repository](https://img.shields.io/docker/pulls/mockingio/mockingio)](https://hub.docker.com/r/mockingio/mockingio)
+[![Github Release](https://img.shields.io/github/v/release/mockingio/mockingio)](https://github.com/mockingio/mockingio/releases/latest)
+[![Go Report Card](https://goreportcard.com/badge/github.com/mockingio/mockingio)](https://goreportcard.com/report/github.com/mockingio/mockingio)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 
@@ -13,29 +13,29 @@
 ### Go install
 
 ```go
-go install github.com/smockyio/smocky@latest
+go install github.com/mockingio/mockingio@latest
 ```
 
 ### Homebrew
 
 ```shell
-brew tap tuongaz/smocky-tap
-brew install tuongaz/smocky-tap/smocky
+brew tap mockingio/mockingio-tap
+brew install mockingio/mockingio-tap/mockingio
 ```
 
 ### Docker hub
 
 ```shell
-docker pull tuongaz/smocky
+docker pull mockingio/mockingio
 
-docker run -ti tuongaz/smocky --version
+docker run -ti mockingio/mockingio --version
 ```
 
 ## Usage
 
 ### CLI
 
-`smocky start --filename example/mock.yml`
+`mockingio start --filename example/mock.yml`
 
 ### Go package
 
@@ -46,11 +46,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/smockyio/smocky/backend/pkg/smocky"
+	"github.com/mockingio/mockingio/backend/pkg/mockingio"
 )
 
 func Test_Example(t *testing.T) {
-	srv := smocky.
+	srv := mockingio.
 		New().
 		Get("/hello").
 		Response(http.StatusOK, "hello world").
@@ -64,7 +64,7 @@ func Test_Example(t *testing.T) {
 }
 
 func Test_Example_WithRules(t *testing.T) {
-	srv := smocky.
+	srv := mockingio.
 		New().
 		Get("/hello").
 		When("cookie", "name", "equal", "Chocolate").

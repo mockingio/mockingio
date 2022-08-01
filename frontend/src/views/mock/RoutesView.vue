@@ -13,18 +13,26 @@ import {storeToRefs} from 'pinia'
 import RouteList from "@/components/mock/route/RouteList.vue";
 import RouteDetail from "@/components/mock/route/RouteDetail.vue";
 import {useRoute} from "vue-router";
-import {watch} from "vue";
+import {provide, watch} from "vue";
 
 const {activeMock, activeRoute} = storeToRefs(useMockStore())
 const {setActiveRoute, setDefaultActiveRoute} = useMockStore()
 
 const route = useRoute()
 watch(() => route.params.routeId, (newId) => {
-  if (newId) {
-    setActiveRoute(newId as string)
+  setRouteId(newId as string)
+})
+
+const setRouteId = (id?: string) => {
+  if (id) {
+    setActiveRoute(id as string)
   } else {
     setDefaultActiveRoute()
   }
-})
+}
+setRouteId(route.params.routeId as string)
+
+provide('mock', activeMock)
+provide('route', activeRoute)
 </script>
 

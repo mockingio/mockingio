@@ -4,8 +4,9 @@ vendor
 server/vendor
 tasks.md
 _build
-/smocky
+/mockingio
 dagger-debug
 bin
 dist/
 coverage.out
+testdata

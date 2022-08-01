@@ -6,13 +6,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/smockyio/smocky/cmd/version"
+	"github.com/mockingio/mockingio/cmd/version"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "smocky",
-	Short: "Smocky command",
+	Use:   "mockingio",
+	Short: "mockingio command",
 	Run: func(cmd *cobra.Command, args []string) {
 		showVersion, _ := cmd.Flags().GetBool("version")
 		if !showVersion {

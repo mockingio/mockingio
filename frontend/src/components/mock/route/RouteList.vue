@@ -1,7 +1,6 @@
 <template>
-  <nav class="space-y-1" v-if="activeMock">
-    <RouteListItem v-for="route in activeMock.data.routes" :route="route" :mock="activeMock"
-                   :key="route.id" :request="route.request"/>
+  <nav v-if="activeMock">
+    <RouteListItem v-for="route in activeMock.data.routes" :route="route" :mock="activeMock" :key="route.id"/>
   </nav>
 </template>
 
