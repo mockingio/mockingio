@@ -9,4 +9,4 @@ dagger-debug
 bin
 dist/
 coverage.out
-testdata
+testdata/
