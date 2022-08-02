@@ -2,7 +2,7 @@ version: '3'
 
 tasks:
   backend:build:
-    deps: [ lint, test ]
+    deps: [ backend:lint, backend:test ]
     cmds:
       - dagger do build --log-format=plain
   backend:start:
