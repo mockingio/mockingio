@@ -24,7 +24,6 @@ import (
 
 var filenames []string
 var adminPort = 2601
-var enableAdmin = false
 var filePersist = false
 
 type output struct {
@@ -90,16 +89,14 @@ mockingio start --filename mock.yml --output-json
 			URLS: server.GetServerURLs(),
 		}
 
-		if enableAdmin {
-			apiServ := api.NewServer(db)
-			adminURL, shutdownServer, err := apiServ.Start(ctx, strconv.Itoa(adminPort))
-			if err != nil {
-				fmt.Printf("Failed to start admin server. Error: %v\n", err)
-				shutdownServer()
-				quit()
-			}
-			out.Admin = adminURL
+		apiServ := api.NewServer(db)
+		adminURL, shutdownServer, err := apiServ.Start(ctx, strconv.Itoa(adminPort))
+		if err != nil {
+			fmt.Printf("Failed to start admin server. Error: %v\n", err)
+			shutdownServer()
+			quit()
 		}
+		out.Admin = adminURL
 
 		data, _ := json.Marshal(out)
 		fmt.Println(string(data))
@@ -137,7 +134,6 @@ func init() {
 	rootCmd.AddCommand(startCmd)
 	startCmd.Flags().StringArrayVarP(&filenames, "filename", "f", []string{}, "location of the mock file")
 	startCmd.Flags().IntVar(&adminPort, "admin-port", 2601, "port for admin API server")
-	startCmd.Flags().BoolVar(&enableAdmin, "admin", false, "start with admin")
 	startCmd.Flags().BoolVar(&filePersist, "persist", false, "save changes to files")
 	_ = startCmd.MarkFlagRequired("filename")
 }

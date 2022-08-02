@@ -1,27 +1,20 @@
 version: '3'
 
 tasks:
-  backend:build:
-    deps: [ backend:lint, backend:test ]
+  build:
+    deps: [ lint, test ]
     cmds:
       - dagger do build --log-format=plain
-  backend:start:
+  start:
     cmds:
-      - go run main.go start --filename ./example/mock.yml
-  backend:start-with-admin:
-    cmds:
-      - go run main.go start --filename ./example/mock1.yml --filename ./example/mock2.yml  --admin
-  backend:tidy:
+      - go run main.go start --filename ./example/mock1.yml
+  tidy:
     cmds:
       - go mod tidy && go mod vendor && go mod download
-  backend:lint:
+  lint:
     cmds:
       - dagger do lint --log-format=plain
-  backend:test:
+  test:
     cmds:
       - dagger do test --log-format=plain
-  frontend:start:
-    dir: frontend
-    cmds:
-      - npm run dev
 
