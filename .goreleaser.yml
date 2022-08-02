@@ -23,7 +23,7 @@ builds:
 
 release:
   github:
-    owner: tuongaz
+    owner: mockingio
     name: mockingio
 
 archives:
