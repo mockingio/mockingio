@@ -56,14 +56,14 @@ brews:
     test: |
       system "#{bin}/mockingio --version"
 
-#dockers:
-#  - goos: linux
-#    goarch: arm64
-#    dockerfile: Dockerfile.release
-#    use: buildx
-#    image_templates:
-#      - "tuongaz/{{.ProjectName}}:latest"
-#      - "tuongaz/{{.ProjectName}}:{{ .Tag }}"
-#      - "tuongaz/{{.ProjectName}}:v{{ .Major }}"
-#    build_flag_templates:
-#      - "--platform=linux/arm64"
+dockers:
+  - goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile.release
+    use: buildx
+    image_templates:
+      - "tuongaz/{{.ProjectName}}:latest"
+      - "tuongaz/{{.ProjectName}}:{{ .Tag }}"
+      - "tuongaz/{{.ProjectName}}:v{{ .Major }}"
+    build_flag_templates:
+      - "--platform=linux/arm64"
