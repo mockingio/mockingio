@@ -75,4 +75,4 @@ jobs:
         with:
           args: release --rm-dist --debug
         env:
-          GITHUB_TOKEN: ${{ secrets.mockingio_CI_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
