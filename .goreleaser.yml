@@ -21,6 +21,11 @@ builds:
     goarm:
       - 7
 
+release:
+  github:
+    owner: tuongaz
+    name: mockingio
+
 archives:
   - name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
     format_overrides:
