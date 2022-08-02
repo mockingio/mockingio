@@ -46,7 +46,7 @@ changelog:
 
 brews:
   - tap:
-      owner: tuongaz
+      owner: mockingio
       name: mockingio-tap
     commit_author:
       name: tuongaz
