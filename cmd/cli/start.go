@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mockingio/engine/persistent"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -18,6 +17,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/engine/persistent"
 	"github.com/mockingio/engine/persistent/memory"
 	"github.com/mockingio/mockingio/api"
 	"github.com/mockingio/mockingio/server"
@@ -26,11 +26,6 @@ import (
 var filenames []string
 var adminPort = 2601
 var filePersist = false
-
-type output struct {
-	URLS  []string `json:"urls,omitempty"`
-	Admin string   `json:"admin,omitempty"`
-}
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -45,17 +40,26 @@ mockingio start --filename mock.yml --output-json
 		ctx := context.Background()
 
 		db := memory.New()
+		mockServer := server.New(db)
 		mockFileMap := mustLoadMocks(ctx, filenames, db)
 
-		serv := server.New(db)
-
+		// start mock servers
 		for _, item := range mockFileMap {
-			if _, err := serv.Start(ctx, item.mock); err != nil {
+			if _, err := mockServer.Start(ctx, item.mock); err != nil {
 				fmt.Printf("Failed to start server with file %v. Error: %v\n", item.filename, err)
 				quit()
 			}
 		}
 
+		// start admin server
+		adminURL, shutdownServer, err := api.NewServer(db).Start(ctx, strconv.Itoa(adminPort))
+		if err != nil {
+			log.WithError(err).Error("Failed to start api server")
+			shutdownServer()
+			quit()
+		}
+
+		// save mock changes to files
 		if filePersist {
 			db.SubscribeMockChanges(func(mock mock.Mock) {
 				if err := toFile(mock, mockFileMap[mock.ID].filename); err != nil {
@@ -64,27 +68,17 @@ mockingio start --filename mock.yml --output-json
 			})
 		}
 
-		out := output{
-			URLS: server.GetServerURLs(),
-		}
-
-		apiServ := api.NewServer(db)
-		adminURL, shutdownServer, err := apiServ.Start(ctx, strconv.Itoa(adminPort))
-		if err != nil {
-			fmt.Printf("Failed to start admin server. Error: %v\n", err)
-			shutdownServer()
-			quit()
-		}
-		out.Admin = adminURL
-
-		data, _ := json.Marshal(out)
-		fmt.Println(string(data))
-
-		stopSignalChanel := registerStopSignal()
-		<-stopSignalChanel
-		server.RemoveAllServers()
-		fmt.Println("servers stopped")
+		printServersInfo(server.GetServerURLs(), adminURL)
+		onStopSignal(server.RemoveAllServers)
 	},
+}
+
+func printServersInfo(mockUrls []string, adminURL string) {
+	data, _ := json.Marshal(map[string]any{
+		"urls":      mockUrls,
+		"admin_url": adminURL,
+	})
+	fmt.Println(string(data))
 }
 
 // mustLoadMocks loop through mock files and load them to database.
@@ -123,7 +117,8 @@ func mustLoadMocks(ctx context.Context, filenames []string, db persistent.Persis
 	return mockFileMap
 }
 
-func registerStopSignal() chan os.Signal {
+// onStopSignal registers a signal handler for SIGINT and SIGTERM.
+func onStopSignal(handler func()) {
 	stopSignalChanel := make(chan os.Signal, 1)
 	signal.Notify(
 		stopSignalChanel,
@@ -133,7 +128,9 @@ func registerStopSignal() chan os.Signal {
 		syscall.SIGQUIT,
 	)
 
-	return stopSignalChanel
+	<-stopSignalChanel
+	handler()
+	log.Info("servers stopped")
 }
 
 func toFile(mock mock.Mock, filename string) error {
