@@ -56,8 +56,7 @@ mockingio start --filename mock.yml --output-json
 		mockFileMap := map[string]string{}
 
 		for _, filename := range filenames {
-			loadedMock, err := mock.FromFile(filename)
-			mock.AddIDs(loadedMock) // generate random ids
+			loadedMock, err := mock.FromFile(filename, mock.WithIDGeneration())
 			if err != nil {
 				panic(err)
 			}
