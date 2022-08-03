@@ -13,17 +13,25 @@ import (
 	"github.com/mockingio/engine/persistent"
 )
 
-func StartByID(ctx context.Context, id string, db persistent.Persistent) (State, error) {
-	mo, err := db.GetMock(ctx, id)
+type Server struct {
+	db persistent.Persistent
+}
+
+func New(db persistent.Persistent) *Server {
+	return &Server{db: db}
+}
+
+func (s *Server) StartByID(ctx context.Context, id string) (State, error) {
+	mo, err := s.db.GetMock(ctx, id)
 	if err != nil {
 		return State{}, err
 	}
 
-	return Start(ctx, mo, db)
+	return s.Start(ctx, mo)
 }
 
-func Start(ctx context.Context, mo *mock.Mock, db persistent.Persistent) (State, error) {
-	eng := engine.New(mo.ID, db)
+func (s *Server) Start(ctx context.Context, mo *mock.Mock) (State, error) {
+	eng := engine.New(mo.ID, s.db)
 	srv := buildHTTPServer(eng)
 
 	listener, err := net.Listen("tcp", ":"+mo.Port)

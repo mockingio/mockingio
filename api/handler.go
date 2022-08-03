@@ -39,7 +39,7 @@ func CreateMockHandler(db persistent.Persistent) func(w http.ResponseWriter, r *
 			return
 		}
 
-		url, err := server.Start(r.Context(), mo, db)
+		url, err := server.New(db).Start(r.Context(), mo)
 		if err != nil {
 			log.WithError(err).Error("start server")
 			responseError(w, http.StatusInternalServerError, err.Error())
@@ -108,7 +108,7 @@ func StartMockServerHandler(db persistent.Persistent) func(w http.ResponseWriter
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id := vars["mock_id"]
-		resp, err := server.StartByID(r.Context(), id, db)
+		resp, err := server.New(db).StartByID(r.Context(), id)
 		if err != nil {
 			log.WithError(err).Error("start server by id")
 			responseError(w, http.StatusInternalServerError, err.Error())

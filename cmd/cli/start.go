@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/mockingio/engine/persistent"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -41,45 +42,24 @@ mockingio start --filename mock1.yml --filename mock2.yml
 mockingio start --filename mock.yml --output-json
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		stopSignalChanel := make(chan os.Signal, 1)
-		signal.Notify(
-			stopSignalChanel,
-			syscall.SIGHUP,
-			syscall.SIGINT,
-			syscall.SIGTERM,
-			syscall.SIGQUIT,
-		)
-
 		ctx := context.Background()
 
 		db := memory.New()
-		mockFileMap := map[string]string{}
+		mockFileMap := mustLoadMocks(ctx, filenames, db)
 
-		for _, filename := range filenames {
-			loadedMock, err := mock.FromFile(filename, mock.WithIDGeneration())
-			if err != nil {
-				panic(err)
-			}
+		serv := server.New(db)
 
-			if err := db.SetMock(ctx, loadedMock); err != nil {
-				panic(err)
-			}
-			mockFileMap[loadedMock.ID] = filename
-
-			if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
-				panic(err)
-			}
-
-			if _, err := server.Start(ctx, loadedMock, db); err != nil {
-				fmt.Printf("Failed to start server with file %v. Error: %v\n", filename, err)
+		for _, item := range mockFileMap {
+			if _, err := serv.Start(ctx, item.mock); err != nil {
+				fmt.Printf("Failed to start server with file %v. Error: %v\n", item.filename, err)
 				quit()
 			}
 		}
 
 		if filePersist {
 			db.SubscribeMockChanges(func(mock mock.Mock) {
-				if err := toFile(mock, mockFileMap[mock.ID]); err != nil {
-					log.WithError(err).Errorf("failed to write mock to file %s", mockFileMap[mock.ID])
+				if err := toFile(mock, mockFileMap[mock.ID].filename); err != nil {
+					log.WithError(err).Errorf("failed to write mock to file %s", mockFileMap[mock.ID].filename)
 				}
 			})
 		}
@@ -100,10 +80,60 @@ mockingio start --filename mock.yml --output-json
 		data, _ := json.Marshal(out)
 		fmt.Println(string(data))
 
+		stopSignalChanel := registerStopSignal()
 		<-stopSignalChanel
 		server.RemoveAllServers()
 		fmt.Println("servers stopped")
 	},
+}
+
+// mustLoadMocks loop through mock files and load them to database.
+func mustLoadMocks(ctx context.Context, filenames []string, db persistent.Persistent) map[string]struct {
+	filename string
+	mock     *mock.Mock
+} {
+	mockFileMap := map[string]struct {
+		filename string
+		mock     *mock.Mock
+	}{}
+
+	for _, filename := range filenames {
+		loadedMock, err := mock.FromFile(filename, mock.WithIDGeneration())
+		if err != nil {
+			panic(err)
+		}
+
+		if err := db.SetMock(ctx, loadedMock); err != nil {
+			panic(err)
+		}
+
+		mockFileMap[loadedMock.ID] = struct {
+			filename string
+			mock     *mock.Mock
+		}{
+			filename: filename,
+			mock:     loadedMock,
+		}
+
+		if err := db.SetActiveSession(ctx, loadedMock.ID, uuid.NewString()); err != nil {
+			panic(err)
+		}
+	}
+
+	return mockFileMap
+}
+
+func registerStopSignal() chan os.Signal {
+	stopSignalChanel := make(chan os.Signal, 1)
+	signal.Notify(
+		stopSignalChanel,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT,
+	)
+
+	return stopSignalChanel
 }
 
 func toFile(mock mock.Mock, filename string) error {
