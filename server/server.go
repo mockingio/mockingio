@@ -8,9 +8,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/mockingio/engine/engine"
-	"github.com/mockingio/engine/engine/mock"
-	"github.com/mockingio/engine/engine/persistent"
+	"github.com/mockingio/engine"
+	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/engine/persistent"
 )
 
 func StartByID(ctx context.Context, id string, db persistent.Persistent) (State, error) {

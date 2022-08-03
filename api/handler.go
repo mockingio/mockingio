@@ -7,8 +7,8 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/mockingio/engine/engine/mock"
-	"github.com/mockingio/engine/engine/persistent"
+	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/server"
 )
 

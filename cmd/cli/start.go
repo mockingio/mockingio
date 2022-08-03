@@ -16,8 +16,8 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"github.com/mockingio/engine/engine/mock"
-	"github.com/mockingio/engine/engine/persistent/memory"
+	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/engine/persistent/memory"
 	"github.com/mockingio/mockingio/api"
 	"github.com/mockingio/mockingio/server"
 )
