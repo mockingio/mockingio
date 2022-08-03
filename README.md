@@ -34,5 +34,26 @@ docker run -ti mockingio/mockingio --version
 ## Usage
 
 ### CLI
+```yaml
+# mock.yml
+name: Example mock 1
+routes:
+  - method: GET
+    path: /products
+    responses:
+      - body: |
+          [
+            {
+              "id": "1",
+              "name": "Product 1",
+              "price": "10.00"
+            },
+            {
+              "id": "2",
+              "name": "Product 2",
+              "price": "20.00"
+            }
+          ]
 
-`mockingio start --filename example/mock.yml`
+```
+`mockingio start --filename mock.yml`
