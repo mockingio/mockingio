@@ -11,16 +11,17 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	mockEngine "github.com/mockingio/engine/mock"
 	"github.com/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/server"
 )
 
 type Server struct {
 	db         persistent.Persistent
-	mockServer *server.Server
+	mockServer mockServer
 }
 
-func NewServer(db persistent.Persistent, mockServer *server.Server) *Server {
+func NewServer(db persistent.Persistent, mockServer mockServer) *Server {
 	return &Server{
 		db:         db,
 		mockServer: mockServer,
@@ -71,3 +72,14 @@ func (s *Server) Start(_ context.Context, port string) (string, func(), error) {
 		_ = srv.Shutdown(context.Background())
 	}, nil
 }
+
+type mockServer interface {
+	NewMockServerByID(ctx context.Context, id string) (*server.MockServerState, error)
+	NewMockServer(ctx context.Context, mo *mockEngine.Mock) (*server.MockServerState, error)
+	GetMockServerURLs() []string
+	StopMockServer(mockID string) (*server.MockServerState, error)
+	GetMockServerStates() map[string]*server.MockServerState
+	StopAllServers()
+}
+
+var _ mockServer = server.New(nil)
