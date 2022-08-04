@@ -26,8 +26,8 @@ github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27k
 github.com/mattn/go-runewidth v0.0.13/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
 github.com/minio/pkg v1.2.0 h1:R+c48US/+Qlxq8L20cWaml9sipqMX0jdaXLNw6j/4lo=
 github.com/minio/pkg v1.2.0/go.mod h1:z9PfmEI804KFkF6eY4LoGe8IDVvTCsYGVuaf58Dr0WI=
-github.com/mockingio/engine v0.0.0-20220803063805-ed3d7888c3a9 h1:DuJdFenNmivRhbv0+CyTYKwB/cNLkBdgy3Un8iXJZKk=
-github.com/mockingio/engine v0.0.0-20220803063805-ed3d7888c3a9/go.mod h1:eyqPZwkabvFOfkOFQ7bsft2NbbeO43F8115zSO6FCOM=
+github.com/mockingio/engine v0.0.4-0.20220804083507-1746e7f9b515 h1:PfkMK9cdBAt3TpQUCHgVIgDm5pMxFq8E33TKn1xiZk0=
+github.com/mockingio/engine v0.0.4-0.20220804083507-1746e7f9b515/go.mod h1:eyqPZwkabvFOfkOFQ7bsft2NbbeO43F8115zSO6FCOM=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
@@ -44,6 +44,7 @@ github.com/spf13/cobra v1.5.0/go.mod h1:dWXEIy2H428czQCjInthrTRUg7yKbok+2Qi/yBIJ
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/objx v0.4.0 h1:M2gUjqZET1qApGOWNSnZ49BAIMX4F/1plDv3+l31EJ4=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=

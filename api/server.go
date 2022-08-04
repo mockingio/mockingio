@@ -2,10 +2,13 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/mockingio/engine/persistent"
@@ -37,26 +40,29 @@ func (s *Server) Start(_ context.Context, port string) (string, func(), error) {
 	r.Path("/mocks/{mock_id}/routes/{route_id}").HandlerFunc(s.PatchRouteHandler).Methods(http.MethodPatch)
 	r.Path("/mocks/{mock_id}/routes/{route_id}/responses/{response_id}").HandlerFunc(s.PatchResponseHandler).Methods(http.MethodPatch)
 
-	addr := "0.0.0.0:" + port
-
-	methods := []string{
-		http.MethodGet,
-		http.MethodPost,
-		http.MethodDelete,
-		http.MethodPut,
-		http.MethodPatch,
-		http.MethodOptions,
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		return "", nil, errors.Wrapf(err, "listen to tcp port: %s", port)
 	}
+	addr := fmt.Sprintf("0.0.0.0:%v", listener.Addr().(*net.TCPAddr).Port)
+
 	srv := &http.Server{
 		Addr: addr,
 		Handler: handlers.CORS(
-			handlers.AllowedMethods(methods),
+			handlers.AllowedMethods([]string{
+				http.MethodGet,
+				http.MethodPost,
+				http.MethodDelete,
+				http.MethodPut,
+				http.MethodPatch,
+				http.MethodOptions,
+			}),
 			handlers.AllowedHeaders([]string{"Content-Type"}),
 		)(r),
 	}
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.Serve(listener); err != nil {
 			log.Println(err)
 		}
 	}()

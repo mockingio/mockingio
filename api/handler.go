@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/engine/persistent"
 )
 
 func (s *Server) GetMocksHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,4 +113,9 @@ func (s *Server) StartMockServerHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	response(w, http.StatusOK, resp)
+}
+
+//go:generate mockery --name dbMock --structname DBMock
+type dbMock interface {
+	persistent.Persistent
 }

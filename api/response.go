@@ -5,14 +5,14 @@ import (
 	"net/http"
 )
 
-type ErrorResponse struct {
+type errorResponse struct {
 	Error string `json:"error"`
 }
 
 func responseError(w http.ResponseWriter, status int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	resp := ErrorResponse{message}
+	resp := errorResponse{message}
 	response(w, status, resp)
 }
 
