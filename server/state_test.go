@@ -2,14 +2,14 @@ package server
 
 import (
 	"testing"
-	
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestServer_ShutdownServer(t *testing.T) {
 	t.Run("shutdown function exist", func(t *testing.T) {
 		shutdown := false
-		state := &mockServerState{
+		state := &MockServerState{
 			shutdownServerFn: func() {
 				shutdown = true
 			},
@@ -26,7 +26,7 @@ func TestServer_ShutdownServer(t *testing.T) {
 	})
 
 	t.Run("shutdown function doesn't exist", func(t *testing.T) {
-		state := &mockServerState{
+		state := &MockServerState{
 			MockID: "*mocid*",
 			URL:    "https://mocking.io",
 			Status: Running,

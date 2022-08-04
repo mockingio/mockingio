@@ -5,14 +5,14 @@ const (
 	Stopped = "stopped"
 )
 
-type mockServerState struct {
+type MockServerState struct {
 	MockID           string `json:"mock_id"`
 	URL              string `json:"url"`
 	Status           string `json:"status"`
 	shutdownServerFn func()
 }
 
-func (s *mockServerState) shutdownServer() {
+func (s *MockServerState) shutdownServer() {
 	if s.shutdownServerFn != nil {
 		s.shutdownServerFn()
 	}

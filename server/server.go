@@ -17,14 +17,14 @@ import (
 type Server struct {
 	mu               sync.Mutex
 	db               persistent.Persistent
-	mockServerStates map[string]*mockServerState
+	mockServerStates map[string]*MockServerState
 }
 
 func New(db persistent.Persistent) *Server {
-	return &Server{db: db, mockServerStates: make(map[string]*mockServerState)}
+	return &Server{db: db, mockServerStates: make(map[string]*MockServerState)}
 }
 
-func (s *Server) NewMockServerByID(ctx context.Context, id string) (*mockServerState, error) {
+func (s *Server) NewMockServerByID(ctx context.Context, id string) (*MockServerState, error) {
 	mo, err := s.db.GetMock(ctx, id)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (s *Server) NewMockServerByID(ctx context.Context, id string) (*mockServerS
 	return s.NewMockServer(ctx, mo)
 }
 
-func (s *Server) NewMockServer(ctx context.Context, mo *mock.Mock) (*mockServerState, error) {
+func (s *Server) NewMockServer(ctx context.Context, mo *mock.Mock) (*MockServerState, error) {
 	eng := engine.New(mo.ID, s.db)
 	srv := buildHTTPServer(eng)
 
@@ -79,7 +79,7 @@ func (s *Server) GetMockServerURLs() []string {
 	return urls
 }
 
-func (s *Server) StopMockServer(mockID string) (*mockServerState, error) {
+func (s *Server) StopMockServer(mockID string) (*MockServerState, error) {
 	state, err := s.getMockServerState(mockID)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func (s *Server) StopMockServer(mockID string) (*mockServerState, error) {
 	return state, nil
 }
 
-func (s *Server) GetStates() map[string]*mockServerState {
+func (s *Server) GetMockServerStates() map[string]*MockServerState {
 	return s.mockServerStates
 }
 
@@ -100,8 +100,8 @@ func (s *Server) StopAllServers() {
 	}
 }
 
-func (s *Server) addNewMockServerState(mockID string, url string, shutdownServer func()) *mockServerState {
-	state := &mockServerState{
+func (s *Server) addNewMockServerState(mockID string, url string, shutdownServer func()) *MockServerState {
+	state := &MockServerState{
 		MockID:           mockID,
 		URL:              url,
 		Status:           Running,
@@ -115,7 +115,7 @@ func (s *Server) addNewMockServerState(mockID string, url string, shutdownServer
 	return state
 }
 
-func (s *Server) getMockServerState(mockID string) (*mockServerState, error) {
+func (s *Server) getMockServerState(mockID string) (*MockServerState, error) {
 	if state, ok := s.mockServerStates[mockID]; ok {
 		return state, nil
 	}

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -8,14 +9,12 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/mockingio/engine/mock"
-	"github.com/mockingio/engine/persistent"
 )
 
 func (s *Server) GetMocksHandler(w http.ResponseWriter, r *http.Request) {
 	mocks, err := s.db.GetMocks(r.Context())
 	if err != nil {
-		log.WithError(err).Error("get configs")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -23,22 +22,20 @@ func (s *Server) GetMocksHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) GetMocksStatesHandler(w http.ResponseWriter, _ *http.Request) {
-	response(w, http.StatusOK, s.mockServer.GetStates())
+	response(w, http.StatusOK, s.mockServer.GetMockServerStates())
 }
 
 func (s *Server) CreateMockHandler(w http.ResponseWriter, r *http.Request) {
 	mo := mock.New()
 
 	if err := s.db.SetMock(r.Context(), mo); err != nil {
-		log.WithError(err).Error("create new mock")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	url, err := s.mockServer.NewMockServer(r.Context(), mo)
 	if err != nil {
-		log.WithError(err).Error("start server")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -50,13 +47,11 @@ func (s *Server) PatchRouteHandler(w http.ResponseWriter, r *http.Request) {
 	routeID := mux.Vars(r)["route_id"]
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.WithError(err).Error("read request body")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 	}
 
 	if err = s.db.PatchRoute(r.Context(), mockID, routeID, string(data)); err != nil {
-		log.WithError(err).Error("patch route")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -69,20 +64,19 @@ func (s *Server) PatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 	responseID := mux.Vars(r)["response_id"]
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.WithError(err).Error("read request body")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	if len(data) == 0 {
 		log.Error("request body empty")
-		responseError(w, http.StatusBadRequest, "request body empty")
+		responseError(w, http.StatusBadRequest, errors.New("request body empty"))
 		return
 	}
 
 	if err = s.db.PatchResponse(r.Context(), mockID, routeID, responseID, string(data)); err != nil {
 		log.WithError(err).Error("patch route")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -95,7 +89,7 @@ func (s *Server) StopMockServerHandler(w http.ResponseWriter, r *http.Request) {
 	resp, err := s.mockServer.StopMockServer(id)
 	if err != nil {
 		log.WithError(err).Error("stop mock server")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -108,14 +102,9 @@ func (s *Server) StartMockServerHandler(w http.ResponseWriter, r *http.Request) 
 	resp, err := s.mockServer.NewMockServerByID(r.Context(), id)
 	if err != nil {
 		log.WithError(err).Error("start server by id")
-		responseError(w, http.StatusInternalServerError, err.Error())
+		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	response(w, http.StatusOK, resp)
-}
-
-//go:generate mockery --name dbMock --structname DBMock
-type dbMock interface {
-	persistent.Persistent
 }

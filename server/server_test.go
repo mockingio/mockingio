@@ -50,7 +50,7 @@ func TestServer_StopAllServers(t *testing.T) {
 	server := New(setupDatabase())
 	_, _ = server.NewMockServerByID(context.Background(), "*mock-id-1*")
 	_, _ = server.NewMockServerByID(context.Background(), "*mock-id-2*")
-	states := server.GetStates()
+	states := server.GetMockServerStates()
 
 	assert.Equal(t, 2, len(states))
 	assert.Equal(t, "running", states["*mock-id-1*"].Status)
