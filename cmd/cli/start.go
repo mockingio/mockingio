@@ -30,7 +30,7 @@ var filePersist = false
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Start a mock server",
+	Short: "NewMockServer a mock server",
 	Long: `
 mockingio start --filename mock.yml
 mockingio start --filename mock1.yml --filename mock2.yml
@@ -45,18 +45,18 @@ mockingio start --filename mock.yml --output-json
 
 		// start mock servers
 		for _, item := range mockFileMap {
-			if _, err := mockServer.Start(ctx, item.mock); err != nil {
+			if _, err := mockServer.NewMockServer(ctx, item.mock); err != nil {
 				fmt.Printf("Failed to start server with file %v. Error: %v\n", item.filename, err)
-				quit()
+				quit(mockServer)
 			}
 		}
 
 		// start admin server
-		adminURL, shutdownServer, err := api.NewServer(db).Start(ctx, strconv.Itoa(adminPort))
+		adminURL, shutdownServer, err := api.NewServer(db, mockServer).Start(ctx, strconv.Itoa(adminPort))
 		if err != nil {
 			log.WithError(err).Error("Failed to start api server")
 			shutdownServer()
-			quit()
+			quit(mockServer)
 		}
 
 		// save mock changes to files
@@ -68,8 +68,8 @@ mockingio start --filename mock.yml --output-json
 			})
 		}
 
-		printServersInfo(server.GetServerURLs(), adminURL)
-		onStopSignal(server.RemoveAllServers)
+		printServersInfo(mockServer.GetMockServerURLs(), adminURL)
+		onStopSignal(mockServer.StopAllServers)
 	},
 }
 
@@ -151,8 +151,8 @@ func toFile(mock mock.Mock, filename string) error {
 	return nil
 }
 
-func quit() {
-	server.RemoveAllServers()
+func quit(mockServer *server.Server) {
+	mockServer.StopAllServers()
 	os.Exit(1)
 }
 

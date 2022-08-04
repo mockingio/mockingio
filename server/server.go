@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/mux"
 
@@ -14,54 +15,108 @@ import (
 )
 
 type Server struct {
-	db persistent.Persistent
+	mu               sync.Mutex
+	db               persistent.Persistent
+	mockServerStates map[string]*mockServerState
 }
 
 func New(db persistent.Persistent) *Server {
-	return &Server{db: db}
+	return &Server{db: db, mockServerStates: make(map[string]*mockServerState)}
 }
 
-func (s *Server) StartByID(ctx context.Context, id string) (State, error) {
+func (s *Server) NewMockServerByID(ctx context.Context, id string) (*mockServerState, error) {
 	mo, err := s.db.GetMock(ctx, id)
 	if err != nil {
-		return State{}, err
+		return nil, err
 	}
 
-	return s.Start(ctx, mo)
+	return s.NewMockServer(ctx, mo)
 }
 
-func (s *Server) Start(ctx context.Context, mo *mock.Mock) (State, error) {
+func (s *Server) NewMockServer(ctx context.Context, mo *mock.Mock) (*mockServerState, error) {
 	eng := engine.New(mo.ID, s.db)
 	srv := buildHTTPServer(eng)
 
 	listener, err := net.Listen("tcp", ":"+mo.Port)
 	if err != nil {
-		return State{}, err
+		return nil, err
 	}
 
-	done := make(chan bool, 1)
+	shutdownC := make(chan bool, 1)
 
 	go func() {
 		_ = srv.Serve(listener)
 	}()
 
 	go func() {
-		<-done
+		<-shutdownC
 		_ = srv.Shutdown(ctx)
 	}()
 
 	serverPort := listener.Addr().(*net.TCPAddr).Port
 	serverURL := fmt.Sprintf("http://127.0.0.1:%v", serverPort)
 
-	state := NewState(mo.ID, serverURL, Running)
-	addServer(mo.ID, &Controller{
-		Shutdown: func() {
-			fmt.Printf("shutting down server: %v\n", serverURL)
-			done <- true
-		},
-	}, state)
+	state := s.addNewMockServerState(mo.ID, serverURL, func() {
+		fmt.Printf("shutting down server: %v\n", serverURL)
+		shutdownC <- true
+	})
 
 	return state, nil
+}
+
+func (s *Server) GetMockServerURLs() []string {
+	var urls []string
+	for _, state := range s.mockServerStates {
+		if state.Status == Running {
+			urls = append(urls, state.URL)
+		}
+	}
+
+	return urls
+}
+
+func (s *Server) StopMockServer(mockID string) (*mockServerState, error) {
+	state, err := s.getMockServerState(mockID)
+	if err != nil {
+		return nil, err
+	}
+
+	state.shutdownServer()
+
+	return state, nil
+}
+
+func (s *Server) GetStates() map[string]*mockServerState {
+	return s.mockServerStates
+}
+
+func (s *Server) StopAllServers() {
+	for _, state := range s.mockServerStates {
+		state.shutdownServer()
+	}
+}
+
+func (s *Server) addNewMockServerState(mockID string, url string, shutdownServer func()) *mockServerState {
+	state := &mockServerState{
+		MockID:           mockID,
+		URL:              url,
+		Status:           Running,
+		shutdownServerFn: shutdownServer,
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.mockServerStates[mockID] = state
+
+	return state
+}
+
+func (s *Server) getMockServerState(mockID string) (*mockServerState, error) {
+	if state, ok := s.mockServerStates[mockID]; ok {
+		return state, nil
+	}
+
+	return nil, fmt.Errorf("mock server: %v not found", mockID)
 }
 
 func buildHTTPServer(e *engine.Engine) *http.Server {

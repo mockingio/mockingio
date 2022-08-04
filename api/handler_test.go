@@ -22,7 +22,7 @@ func Test_GetMocksHandler(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodGet, "/mocks", nil)
 	w := httptest.NewRecorder()
-	api.GetMocksHandler(db)(w, req)
+	api.NewGetMocksHandler(db)(w, req)
 
 	res := w.Result()
 	defer func() {
