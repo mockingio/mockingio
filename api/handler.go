@@ -75,7 +75,6 @@ func (s *Server) PatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = s.db.PatchResponse(r.Context(), mockID, routeID, responseID, string(data)); err != nil {
-		log.WithError(err).Error("patch route")
 		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -88,7 +87,6 @@ func (s *Server) StopMockServerHandler(w http.ResponseWriter, r *http.Request) {
 	id := vars["mock_id"]
 	resp, err := s.mockServer.StopMockServer(id)
 	if err != nil {
-		log.WithError(err).Error("stop mock server")
 		responseError(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -101,7 +99,6 @@ func (s *Server) StartMockServerHandler(w http.ResponseWriter, r *http.Request) 
 	id := vars["mock_id"]
 	resp, err := s.mockServer.NewMockServerByID(r.Context(), id)
 	if err != nil {
-		log.WithError(err).Error("start server by id")
 		responseError(w, http.StatusInternalServerError, err)
 		return
 	}

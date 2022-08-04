@@ -99,23 +99,37 @@ func TestServer_PatchRouteHandler(t *testing.T) {
 }
 
 func TestServer_PatchResponseHandler(t *testing.T) {
-	db := newDB(fixtures.Mock1())
+	t.Run("success", func(t *testing.T) {
+		db := newDB(fixtures.Mock1())
 
-	writer := httptest.NewRecorder()
-	apiServer := api.NewServer(db, nil)
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
 
-	req := &http.Request{
-		Body: ioutil.NopCloser(bytes.NewBufferString(`{"status":407}`)),
-	}
-	req = mux.SetURLVars(req, map[string]string{
-		"mock_id":     fixtures.Mock1().ID,
-		"route_id":    "route1",
-		"response_id": "response1",
+		req := &http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"status":407}`)),
+		}
+		req = mux.SetURLVars(req, map[string]string{
+			"mock_id":     fixtures.Mock1().ID,
+			"route_id":    "route1",
+			"response_id": "response1",
+		})
+		apiServer.PatchResponseHandler(writer, req)
+
+		mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
+		assert.Equal(t, 407, mok.Routes[0].Responses[0].Status)
 	})
-	apiServer.PatchResponseHandler(writer, req)
 
-	mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
-	assert.Equal(t, 407, mok.Routes[0].Responses[0].Status)
+	t.Run("empty body request", func(t *testing.T) {
+		apiServer := api.NewServer(nil, nil)
+
+		req := &http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(``)),
+		}
+		writer := httptest.NewRecorder()
+		apiServer.PatchResponseHandler(writer, req)
+
+		assert.Equal(t, 400, writer.Code)
+	})
 }
 
 func TestServer_StartStopMockServerHandler(t *testing.T) {
