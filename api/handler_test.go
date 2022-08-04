@@ -3,6 +3,7 @@ package api_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,26 +22,39 @@ import (
 )
 
 func TestServer_CreateMockHandler(t *testing.T) {
-	db := memory.New()
-	mockServer := server.New(db)
-	defer mockServer.StopAllServers()
+	t.Run("success", func(t *testing.T) {
+		db := memory.New()
+		mockServer := server.New(db)
+		defer mockServer.StopAllServers()
 
-	writer := httptest.NewRecorder()
-	apiServer := api.NewServer(db, mockServer)
-	apiServer.CreateMockHandler(writer, &http.Request{})
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, mockServer)
+		apiServer.CreateMockHandler(writer, &http.Request{})
 
-	assert.Equal(t, http.StatusCreated, writer.Code)
+		assert.Equal(t, http.StatusCreated, writer.Code)
+	})
+
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
+
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
+		apiServer.CreateMockHandler(writer, &http.Request{})
+
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
+	})
 }
 
 func TestServer_GetMocksHandler(t *testing.T) {
-	db := newDB(fixtures.Mock1())
+	t.Run("success", func(t *testing.T) {
+		db := newDB(fixtures.Mock1())
 
-	writer := httptest.NewRecorder()
-	apiServer := api.NewServer(db, nil)
-	apiServer.GetMocksHandler(writer, &http.Request{})
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
+		apiServer.GetMocksHandler(writer, &http.Request{})
 
-	assert.Equal(t, http.StatusOK, writer.Code)
-	assert.JSONEq(t, `
+		assert.Equal(t, http.StatusOK, writer.Code)
+		assert.JSONEq(t, `
 [
     {
         "id": "mock1",
@@ -61,6 +75,17 @@ func TestServer_GetMocksHandler(t *testing.T) {
     }
 ]
 `, writer.Body.String())
+	})
+
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
+
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
+		apiServer.GetMocksHandler(writer, &http.Request{})
+
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
+	})
 }
 
 func TestServer_GetMocksStatesHandler(t *testing.T) {
@@ -78,24 +103,44 @@ func TestServer_GetMocksStatesHandler(t *testing.T) {
 }
 
 func TestServer_PatchRouteHandler(t *testing.T) {
-	db := newDB(fixtures.Mock1())
+	t.Run("success", func(t *testing.T) {
+		db := newDB(fixtures.Mock1())
 
-	writer := httptest.NewRecorder()
-	apiServer := api.NewServer(db, nil)
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
 
-	req := &http.Request{
-		Body: ioutil.NopCloser(bytes.NewBufferString(`{"method":"OPTIONS"}`)),
-	}
-	req = mux.SetURLVars(req, map[string]string{
-		"mock_id":  fixtures.Mock1().ID,
-		"route_id": "route1",
+		req := &http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"method":"OPTIONS"}`)),
+		}
+		req = mux.SetURLVars(req, map[string]string{
+			"mock_id":  fixtures.Mock1().ID,
+			"route_id": "route1",
+		})
+		apiServer.PatchRouteHandler(writer, req)
+
+		assert.Equal(t, http.StatusOK, writer.Code)
+
+		mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
+		assert.Equal(t, "OPTIONS", mok.Routes[0].Method)
 	})
-	apiServer.PatchRouteHandler(writer, req)
 
-	assert.Equal(t, http.StatusOK, writer.Code)
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
 
-	mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
-	assert.Equal(t, "OPTIONS", mok.Routes[0].Method)
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
+
+		req := &http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"method":"OPTIONS"}`)),
+		}
+		req = mux.SetURLVars(req, map[string]string{
+			"mock_id":  fixtures.Mock1().ID,
+			"route_id": "route1",
+		})
+		apiServer.PatchRouteHandler(writer, req)
+
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
+	})
 }
 
 func TestServer_PatchResponseHandler(t *testing.T) {
@@ -117,6 +162,24 @@ func TestServer_PatchResponseHandler(t *testing.T) {
 
 		mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
 		assert.Equal(t, 407, mok.Routes[0].Responses[0].Status)
+	})
+
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
+
+		writer := httptest.NewRecorder()
+		apiServer := api.NewServer(db, nil)
+
+		req := &http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"status":407}`)),
+		}
+		req = mux.SetURLVars(req, map[string]string{
+			"mock_id":     fixtures.Mock1().ID,
+			"route_id":    "route1",
+			"response_id": "response1",
+		})
+		apiServer.PatchResponseHandler(writer, req)
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
 	})
 
 	t.Run("empty body request", func(t *testing.T) {
@@ -172,4 +235,24 @@ func newDB(mocks ...*mock.Mock) persistent.Persistent {
 		_ = db.SetMock(context.Background(), m)
 	}
 	return db
+}
+
+type mockDB struct {
+	persistent.Persistent
+}
+
+func (m *mockDB) GetMocks(_ context.Context) ([]*mock.Mock, error) {
+	return nil, errors.New("something is not right")
+}
+
+func (m *mockDB) SetMock(_ context.Context, mo *mock.Mock) error {
+	return errors.New("something is not right")
+}
+
+func (m *mockDB) PatchRoute(ctx context.Context, mockID string, routeID string, data string) error {
+	return errors.New("something is not right")
+}
+
+func (m *mockDB) PatchResponse(ctx context.Context, mockID, routeID, responseID, data string) error {
+	return errors.New("something is not right")
 }

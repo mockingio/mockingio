@@ -44,6 +44,9 @@ func TestServer_StopMockServer(t *testing.T) {
 	newState, _ := server.StopMockServer(state.MockID)
 	assert.Equal(t, "stopped", newState.Status)
 	assert.Equal(t, "", newState.URL)
+
+	_, err := server.StopMockServer("random id")
+	assert.Error(t, err)
 }
 
 func TestServer_StopAllServers(t *testing.T) {
