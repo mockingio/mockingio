@@ -65,11 +65,10 @@ func TestServer_StopAllServers(t *testing.T) {
 func TestServer_GetMockServerURLs(t *testing.T) {
 	server := New(setupDatabase())
 	state1, _ := server.NewMockServerByID(context.Background(), "*mock-id-1*")
-	state2_, _ := server.NewMockServerByID(context.Background(), "*mock-id-2*")
 	defer server.StopAllServers()
 
 	urls := server.GetMockServerURLs()
-	assert.Equal(t, []string{state1.URL, state2_.URL}, urls)
+	assert.Equal(t, []string{state1.URL}, urls)
 }
 
 func setupDatabase() persistent.Persistent {
