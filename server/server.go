@@ -30,6 +30,10 @@ func (s *Server) NewMockServerByID(ctx context.Context, id string) (*mockServerS
 		return nil, err
 	}
 
+	if mo == nil {
+		return nil, fmt.Errorf("mock with ID: %s not found", id)
+	}
+
 	return s.NewMockServer(ctx, mo)
 }
 
