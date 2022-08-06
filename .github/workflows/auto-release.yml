@@ -13,7 +13,8 @@ on:
         description: "Optional release version, e.g. 0.2.0"
         required: false
 jobs:
-  deploy:
+  auto-release:
+    name: "Auto Release"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
