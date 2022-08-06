@@ -1,23 +1,16 @@
-name: CI
+name: "Auto Release"
 concurrency: release
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - '*.*.*' # semver, will override latest
-      - '*-preview' # preview, won't override latest
-  pull_request:
-    branches:
-      - main
+  schedule:
+    - cron: "6 17 * * 2"
   workflow_dispatch:
     inputs:
       release_type:
-        description: "major|minor|patch"
+        description: "major|minor|patch|release|prerel"
         default: "patch"
         required: true
       release_version:
-        description: "Optional release version, e.g. 0.0.1"
+        description: "Optional release version, e.g. 0.2.0"
         required: false
 jobs:
   deploy:
