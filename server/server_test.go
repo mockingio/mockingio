@@ -2,12 +2,24 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	_ "embed"
+	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/mockingio/mockingio/engine/mock"
 	"github.com/mockingio/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/engine/persistent/memory"
-	"github.com/stretchr/testify/assert"
+)
+
+var (
+	//go:embed certs/rootCA.pem
+	defaultRootCAPEM []byte
 )
 
 func TestNew(t *testing.T) {
@@ -72,6 +84,91 @@ func TestServer_GetMockServerURLs(t *testing.T) {
 
 	urls := server.GetMockServerURLs()
 	assert.Equal(t, []string{state1.URL}, urls)
+}
+
+func TestServer_TLS(t *testing.T) {
+	certPath, _ := filepath.Abs("./fixtures/certs/cert.pem")
+	keyPath, _ := filepath.Abs("./fixtures/certs/key.pem")
+
+	var shutdownFns []func()
+	defer func() {
+		for _, fn := range shutdownFns {
+			fn()
+		}
+	}()
+
+	tests := []struct {
+		name string
+		mock *mock.Mock
+	}{
+		{
+			name: "TLS with default config",
+			mock: &mock.Mock{
+				ID: "*mock-id-1*",
+				TLS: &mock.TLS{
+					Enabled: true,
+				},
+			},
+		},
+		{
+			name: "TLS with default config since custom config missing key",
+			mock: &mock.Mock{
+				ID: "*mock-id-1*",
+				TLS: &mock.TLS{
+					Enabled:     true,
+					PEMCertPath: "*",
+				},
+			},
+		},
+		{
+			name: "TLS with default config since custom config missing cert",
+			mock: &mock.Mock{
+				ID: "*mock-id-1*",
+				TLS: &mock.TLS{
+					Enabled:    true,
+					PEMKeyPath: "*",
+				},
+			},
+		},
+		{
+			name: "TLS with custom config",
+			mock: &mock.Mock{
+				ID: "*mock-id-1*",
+				TLS: &mock.TLS{
+					Enabled:     true,
+					PEMCertPath: certPath,
+					PEMKeyPath:  keyPath,
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db := memory.New()
+			_ = db.SetMock(context.Background(), tt.mock)
+
+			server := New(db)
+			state, err := server.NewMockServerByID(context.Background(), "*mock-id-1*")
+			if state != nil {
+				shutdownFns = append(shutdownFns, state.shutdownServer)
+			}
+
+			assert.NoError(t, err)
+
+			cert, err := getTLSCert(tt.mock)
+			require.NoError(t, err)
+
+			roots := x509.NewCertPool()
+			roots.AppendCertsFromPEM(defaultRootCAPEM)
+			_, err = tls.Dial("tcp", strings.ReplaceAll(state.URL, "https://", ""), &tls.Config{
+				Certificates: []tls.Certificate{*cert},
+				RootCAs:      roots,
+			})
+			assert.NoError(t, err)
+		})
+	}
+
 }
 
 func setupDatabase() persistent.Persistent {
