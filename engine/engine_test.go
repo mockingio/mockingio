@@ -129,49 +129,69 @@ func TestEngine_NoResponses(t *testing.T) {
 }
 
 func TestEngine_ProxyHandler(t *testing.T) {
-	proxyServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/hello" {
-			t.Errorf("request path is %s, not /hello", r.URL.Path)
-		}
+	proxyServer := httptest.NewServer(proxyHandler(t))
+	defer proxyServer.Close()
 
-		if r.Header.Get("X-Request") != "from request" {
-			t.Error("header is not append to the request")
-		}
+	httpsProxyServer := httptest.NewTLSServer(proxyHandler(t))
+	defer httpsProxyServer.Close()
 
-		w.Header().Set("Content-Type", "html/text")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("From Proxy"))
-	}))
+	tests := []struct {
+		name     string
+		mock     *mock.Mock
+		assertFn func(t *testing.T, res *http.Response)
+	}{
+		{
+			name: "proxy to http host",
+			mock: proxyMock(proxyServer.URL, false),
+			assertFn: func(t *testing.T, res *http.Response) {
+				body, _ := io.ReadAll(res.Body)
+				defer func() {
+					_ = res.Body.Close()
+				}()
 
-	mok := &mock.Mock{
-		ID: "mock-id",
-		Proxy: &mock.Proxy{
-			Enabled: true,
-			Host:    proxyServer.URL,
-			RequestHeaders: map[string]string{
-				"X-Request": "from request",
+				assert.Equal(t, http.StatusOK, res.StatusCode)
+				assert.Equal(t, "From Proxy", string(body))
+				assert.Equal(t, "html/text", res.Header.Get("Content-Type"))
+				assert.Equal(t, "from response", res.Header.Get("X-Response"))
 			},
-			ResponseHeaders: map[string]string{
-				"X-Response": "from response",
+		},
+		{
+			name: "proxy to https host, skip TLS check",
+			mock: proxyMock(httpsProxyServer.URL, true),
+			assertFn: func(t *testing.T, res *http.Response) {
+				body, _ := io.ReadAll(res.Body)
+				defer func() {
+					_ = res.Body.Close()
+				}()
+
+				assert.Equal(t, http.StatusOK, res.StatusCode)
+				assert.Equal(t, "From Proxy", string(body))
+				assert.Equal(t, "html/text", res.Header.Get("Content-Type"))
+				assert.Equal(t, "from response", res.Header.Get("X-Response"))
+			},
+		},
+		{
+			name: "proxy to https host, TLS check, expect fall back to not found",
+			mock: proxyMock(httpsProxyServer.URL, false),
+			assertFn: func(t *testing.T, res *http.Response) {
+				assert.Equal(t, http.StatusNotFound, res.StatusCode)
 			},
 		},
 	}
-	mem := memory.New()
-	_ = mem.SetMock(context.Background(), mok)
-	eng := engine.New("mock-id", mem)
 
-	w := httptest.NewRecorder()
-	eng.Handler(w, httptest.NewRequest(http.MethodGet, "/hello", nil))
-	res := w.Result()
-	body, _ := io.ReadAll(res.Body)
-	defer func() {
-		_ = res.Body.Close()
-	}()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mem := memory.New()
+			_ = mem.SetMock(context.Background(), tt.mock)
+			_ = mem.SetActiveSession(context.Background(), tt.mock.ID, "session-id")
+			eng := engine.New("mock-id", mem)
 
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, "From Proxy", string(body))
-	assert.Equal(t, "html/text", res.Header.Get("Content-Type"))
-	assert.Equal(t, "from response", res.Header.Get("X-Response"))
+			w := httptest.NewRecorder()
+			eng.Handler(w, httptest.NewRequest(http.MethodGet, "/hello", nil))
+			res := w.Result()
+			tt.assertFn(t, res)
+		})
+	}
 }
 
 func TestEngine_CORS_Request(t *testing.T) {
@@ -269,4 +289,37 @@ func setupMock() persistent.Persistent {
 	_ = mem.SetMock(context.Background(), mok)
 
 	return mem
+}
+
+func proxyHandler(t *testing.T) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/hello" {
+			t.Errorf("request path is %s, not /hello", r.URL.Path)
+		}
+
+		if r.Header.Get("X-Request") != "from request" {
+			t.Error("header is not append to the request")
+		}
+
+		w.Header().Set("Content-Type", "html/text")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("From Proxy"))
+	}
+}
+
+func proxyMock(proxyHost string, skipTLS bool) *mock.Mock {
+	return &mock.Mock{
+		ID: "mock-id",
+		Proxy: &mock.Proxy{
+			Enabled:            true,
+			Host:               proxyHost,
+			InsecureSkipVerify: skipTLS,
+			RequestHeaders: map[string]string{
+				"X-Request": "from request",
+			},
+			ResponseHeaders: map[string]string{
+				"X-Response": "from response",
+			},
+		},
+	}
 }

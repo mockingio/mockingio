@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"crypto/tls"
 	"io"
 	"net/http"
 	"time"
@@ -110,6 +111,7 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 
 func (eng *Engine) noMatchHandler(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
+	_, _ = w.Write([]byte("No route matched"))
 }
 
 func (eng *Engine) corsHandler(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +128,15 @@ func (eng *Engine) proxyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := (&http.Client{}).Do(req)
+	client := &http.Client{}
+	if proxy.InsecureSkipVerify {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client = &http.Client{Transport: tr}
+	}
+
+	res, err := client.Do(req)
 	if err != nil {
 		log.WithError(err).Error("make proxy request")
 		eng.noMatchHandler(w)
