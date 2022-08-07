@@ -57,3 +57,42 @@ routes:
 
 ```
 `mockingio start --filename mock.yml`
+
+### Go package usage
+
+```go
+import (
+	"net/http"
+	"testing"
+
+	mock "github.com/mockingio/mock"
+)
+
+func main() {
+	srv, _ := mock.
+		New().
+		Get("/hello").
+		Response(http.StatusOK, "hello world").
+		Start()
+	defer srv.Close()
+
+	req, _ := http.NewRequest("GET", srv.URL, nil)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	
+    // With rules
+    srv, _ := mock.
+        New().
+        Get("/hello").
+        When("cookie", "name", "equal", "Chocolate").
+        And("header", "Authorization", "equal", "Bearer 123").
+        Response(http.StatusOK, "hello world").
+        Start()
+    defer srv.Close()
+    
+    req, _ := http.NewRequest("GET", srv.URL, nil)
+    client := &http.Client{}
+    
+    resp, err := client.Do(req)
+}
+```
