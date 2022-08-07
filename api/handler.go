@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/mockingio/engine/mock"
 )
 
 func (s *Server) GetMocksHandler(w http.ResponseWriter, r *http.Request) {

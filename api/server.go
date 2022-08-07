@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	mockEngine "github.com/mockingio/engine/mock"
-	"github.com/mockingio/engine/persistent"
+	mockEngine "github.com/mockingio/mockingio/engine/mock"
+	"github.com/mockingio/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/server"
 )
 

@@ -1,0 +1,61 @@
+name: Hello World
+proxy:
+  enabled: true
+  host: https://google.com
+  request_headers:
+    X-Forward: 123
+  response_headers:
+    X-Response: 123
+auto_cors: true
+routes:
+  - method: GET
+    path: /hello/world
+    responses:
+      - status: 200
+        headers:
+          Content-Type: application/json
+        body: |
+          {
+            "name": "John Doe"
+          }
+        rule_aggregation: "and"
+        rules:
+          - target: header
+            modifier: "name"
+            value: "test"
+            operator: "equal"
+  - method: GET
+    path: /greeting/world
+    responses:
+      - status: 200
+        delay: 3000
+        headers:
+          Content-Type: application/json
+        body: |
+          {
+            "name": "Hi John Doe"
+          }
+        rule_aggregation: "and"
+        rules:
+          - target: request_number
+            modifier: ""
+            value: "3"
+            operator: "equal"
+  - method: GET
+    path: /hello/*
+    responses:
+      - status: 200
+        headers:
+          Content-Type: application/json
+        body: |
+          {
+            "name": "John Doe"
+          }
+  - method: POST
+    path: /hello/world
+    body: |
+      {
+        "name": "John Doe"
+      }
+    responses:
+      - status: 201

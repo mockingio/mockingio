@@ -9,9 +9,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/mockingio/engine"
-	"github.com/mockingio/engine/mock"
-	"github.com/mockingio/engine/persistent"
+	"github.com/mockingio/mockingio/engine"
+	"github.com/mockingio/mockingio/engine/mock"
+	"github.com/mockingio/mockingio/engine/persistent"
 )
 
 type Server struct {

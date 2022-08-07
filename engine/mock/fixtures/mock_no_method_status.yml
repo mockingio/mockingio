@@ -1,0 +1,6 @@
+name:
+  Mock Test
+routes:
+  - path: /hello
+    responses:
+      - body: world

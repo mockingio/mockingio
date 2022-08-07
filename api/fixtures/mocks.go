@@ -1,7 +1,7 @@
 package fixtures
 
 import (
-	"github.com/mockingio/engine/mock"
+	"github.com/mockingio/mockingio/engine/mock"
 )
 
 func Mock1() *mock.Mock {
