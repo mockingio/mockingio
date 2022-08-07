@@ -67,4 +67,14 @@ func TestConfig(t *testing.T) {
 		assert.False(t, New().ProxyEnabled())
 		assert.True(t, mock.ProxyEnabled())
 	})
+
+	t.Run("TLS is enabled", func(t *testing.T) {
+		mock := &Mock{
+			TLS: &TLS{
+				Enabled: true,
+			},
+		}
+		assert.False(t, New().TLSEnabled())
+		assert.True(t, mock.TLSEnabled())
+	})
 }

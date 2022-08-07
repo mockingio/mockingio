@@ -19,6 +19,7 @@ type Mock struct {
 	Proxy  *Proxy   `yaml:"proxy,omitempty" json:"proxy,omitempty"`
 	// all OPTIONS calls are responded with success if AutoCORS is true
 	AutoCORS bool `yaml:"auto_cors,omitempty" json:"auto_cors,omitempty"`
+	TLS      *TLS `yaml:"tls,omitempty" json:"tls,omitempty"`
 	options  mockOptions
 }
 
@@ -69,6 +70,10 @@ func (m Mock) ProxyEnabled() bool {
 	return m.Proxy != nil && m.Proxy.Enabled
 }
 
+func (m Mock) TLSEnabled() bool {
+	return m.TLS != nil && m.TLS.Enabled
+}
+
 func defaultValues(m *Mock) {
 	for _, r := range m.Routes {
 		if r.Method == "" {
@@ -83,7 +88,7 @@ func defaultValues(m *Mock) {
 	}
 }
 
-// AddIDs Add ids for mock and routes, responses and rules
+// addIDs Add ids for mock and routes, responses and rules
 func addIDs(m *Mock) {
 	if m.ID == "" {
 		m.ID = newID()

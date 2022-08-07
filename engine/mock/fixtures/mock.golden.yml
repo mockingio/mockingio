@@ -59,3 +59,7 @@ proxy:
   response_headers:
     X-Response: "123"
 auto_cors: true
+tls:
+  enabled: true
+  pem_cert_path: /path/cert.pem
+  pem_key_path: /path/key.pem
