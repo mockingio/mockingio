@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -167,7 +168,7 @@ func (eng *Engine) reloadMock(ctx context.Context) error {
 }
 
 func copyProxyRequest(r *http.Request, proxy *mock.Proxy) (*http.Request, error) {
-	req, err := http.NewRequest(r.Method, proxy.Host+r.URL.Path, r.Body)
+	req, err := http.NewRequest(r.Method, strings.TrimRight(proxy.Host, "/")+r.URL.Path, r.Body)
 	if err != nil {
 		return nil, err
 	}
