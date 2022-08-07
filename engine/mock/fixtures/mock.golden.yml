@@ -58,6 +58,7 @@ proxy:
     X-Forward: "123"
   response_headers:
     X-Response: "123"
+  insecure_skip_verify: true
 auto_cors: true
 tls:
   enabled: true

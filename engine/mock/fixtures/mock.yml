@@ -2,6 +2,7 @@ name: Hello World
 proxy:
   enabled: true
   host: https://google.com
+  insecure_skip_verify: true
   request_headers:
     X-Forward: 123
   response_headers:
