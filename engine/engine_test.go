@@ -187,7 +187,7 @@ func TestEngine_ProxyHandler(t *testing.T) {
 			eng := engine.New("mock-id", mem)
 
 			w := httptest.NewRecorder()
-			eng.Handler(w, httptest.NewRequest(http.MethodGet, "/hello", nil))
+			eng.Handler(w, httptest.NewRequest(http.MethodGet, "/hello?name=world", nil))
 			res := w.Result()
 			tt.assertFn(t, res)
 		})
@@ -295,6 +295,10 @@ func proxyHandler(t *testing.T) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/hello" {
 			t.Errorf("request path is %s, not /hello", r.URL.Path)
+		}
+
+		if r.URL.Query().Get("name") != "world" {
+			t.Errorf("request query is %s, not world", r.URL.Query().Get("name"))
 		}
 
 		if r.Header.Get("X-Request") != "from request" {
