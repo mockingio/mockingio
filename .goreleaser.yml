@@ -42,7 +42,13 @@ changelog:
   filters:
     exclude:
       - '^docs:'
+      - '^doc:'
       - '^test:'
+      - '^tests:'
+      - '^ci:'
+      - '^chore:'
+      - '^refactor:'
+      - "^Merge pull request"
 
 brews:
   - tap:
