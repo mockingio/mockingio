@@ -90,7 +90,7 @@ func (s *Server) NewMockServer(ctx context.Context, mo *mock.Mock) (*MockServerS
 	serverPort := listener.Addr().(*net.TCPAddr).Port
 	go func() {
 		if err := srv.Serve(listener); err != nil {
-			log.Fatal(errors.Wrapf(err, "serving HTTP at %v", listener.Addr().String()))
+			log.Error(errors.Wrapf(err, "serving HTTP at %v", listener.Addr().String()))
 		}
 	}()
 
