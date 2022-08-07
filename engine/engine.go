@@ -172,6 +172,7 @@ func copyProxyRequest(r *http.Request, proxy *mock.Proxy) (*http.Request, error)
 		return nil, err
 	}
 	req.Header = r.Header
+	req.URL.RawQuery = r.URL.RawQuery
 
 	for k, v := range proxy.RequestHeaders {
 		req.Header.Add(k, v)
