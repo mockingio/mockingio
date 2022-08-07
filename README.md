@@ -1,6 +1,6 @@
 # mockingio
 
-[![CI](https://github.com/mockingio/mockingio/actions/workflows/main.yml/badge.svg)](https://github.com/mockingio/mockingio/actions/workflows/main.yml)
+[![CI](https://github.com/mockingio/mockingio/actions/workflows/auto-release.yml/badge.svg)](https://github.com/mockingio/mockingio/actions/workflows/auto_release.yml)
 [![codecov](https://codecov.io/gh/mockingio/mockingio/branch/main/graph/badge.svg?token=0AXGI7UR85)](https://codecov.io/gh/mockingio/mockingio)
 [![Docker Repository](https://img.shields.io/docker/pulls/mockingio/mockingio)](https://hub.docker.com/r/mockingio/mockingio)
 [![Github Release](https://img.shields.io/github/v/release/mockingio/mockingio)](https://github.com/mockingio/mockingio/releases/latest)
