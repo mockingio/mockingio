@@ -51,6 +51,11 @@ routes:
   description: ""
   responses:
   - status: 201
+    body: |-
+      {
+        "name": "John Doe"
+      }
+  disabled: true
 proxy:
   enabled: true
   host: https://google.com

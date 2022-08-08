@@ -80,7 +80,7 @@ func (eng *Engine) Match(req *http.Request) *mock.Response {
 
 func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 	if eng.isPaused {
-		w.WriteHeader(http.StatusServiceUnavailable)
+		eng.noMatchHandler(w)
 		return
 	}
 

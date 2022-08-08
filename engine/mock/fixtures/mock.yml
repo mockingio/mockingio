@@ -58,9 +58,10 @@ routes:
           }
   - method: POST
     path: /hello/world
-    body: |
-      {
-        "name": "John Doe"
-      }
+    disabled: true
     responses:
       - status: 201
+        body: |
+          {
+            "name": "John Doe"
+          }

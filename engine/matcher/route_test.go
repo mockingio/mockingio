@@ -172,6 +172,13 @@ func TestRouteMatcher_Match(t *testing.T) {
 			nil,
 			false,
 		},
+		{
+			"route is disabled, no response returned",
+			httpPostReqWithHeaderBody,
+			&cfg.Route{Method: "POST", Disabled: true, Path: "/how/are/you", Responses: []cfg.Response{singleRuleResponse}},
+			nil,
+			false,
+		},
 	}
 
 	for _, tt := range tests {

@@ -26,7 +26,7 @@ func TestEngine_Pause(t *testing.T) {
 	w := httptest.NewRecorder()
 	eng.Handler(w, req)
 	res := w.Result()
-	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func TestEngine_PauseResume(t *testing.T) {
@@ -38,7 +38,7 @@ func TestEngine_PauseResume(t *testing.T) {
 	w := httptest.NewRecorder()
 	eng.Handler(w, req)
 	res := w.Result()
-	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 
 	eng.Resume()
 	w = httptest.NewRecorder()
@@ -262,6 +262,37 @@ func TestEngine_MockNotFound(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/hello", nil)
 
 	assert.Nil(t, eng.Match(req))
+}
+
+func TestEngine_RouteDisabled(t *testing.T) {
+	mo := &mock.Mock{
+		ID: "mock-id",
+		Routes: []*mock.Route{
+			{
+				Method:   "GET",
+				Path:     "/hello",
+				Disabled: true,
+				Responses: []mock.Response{
+					{
+						Status: 200,
+					},
+				},
+			},
+		},
+	}
+	mem := memory.New()
+	_ = mem.SetMock(context.Background(), mo)
+	eng := engine.New("mock-id", mem)
+
+	req := httptest.NewRequest(http.MethodGet, "/hello", nil)
+	w := httptest.NewRecorder()
+	eng.Handler(w, req)
+	res := w.Result()
+	defer func() {
+		_ = res.Body.Close()
+	}()
+
+	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func setupMock() persistent.Persistent {
