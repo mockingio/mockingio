@@ -7,3 +7,8 @@ type Proxy struct {
 	ResponseHeaders    map[string]string `yaml:"response_headers,omitempty" json:"response_headers,omitempty"`
 	InsecureSkipVerify bool              `yaml:"insecure_skip_verify,omitempty" json:"insecure_skip_verify,omitempty"`
 }
+
+func (r Proxy) Clone() *Proxy {
+	result := r
+	return &result
+}

@@ -20,9 +20,10 @@ type Persistent interface {
 	SetActiveSession(ctx context.Context, mockID string, sessionID string) error
 	GetActiveSession(ctx context.Context, mockID string) (string, error)
 
+	GetRoute(ctx context.Context, mockID string, routeID string) (*mock.Route, error)
 	PatchRoute(ctx context.Context, mockID string, routeID string, data string) error
 	DeleteRoute(ctx context.Context, mockID string, routeID string) error
-	CreateRoute(ctx context.Context, mockID string, data string) error
+	CreateRoute(ctx context.Context, mockID string, newRoute mock.Route) error
 
 	PatchResponse(ctx context.Context, mockID, routeID, responseID, data string) error
 }

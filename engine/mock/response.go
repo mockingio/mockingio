@@ -22,6 +22,19 @@ type Response struct {
 	IsDefault       bool              `yaml:"is_default,omitempty" json:"is_default,omitempty"`
 }
 
+func (r Response) Clone() Response {
+	result := r
+	result.ID = newID()
+	result.RuleAggregation = r.RuleAggregation
+	result.Rules = make([]Rule, len(r.Rules))
+
+	for i, rule := range r.Rules {
+		result.Rules[i] = rule.Clone()
+	}
+
+	return result
+}
+
 func (r Response) Validate() error {
 	return validation.ValidateStruct(
 		&r,

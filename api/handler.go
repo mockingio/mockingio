@@ -58,6 +58,61 @@ func (s *Server) PatchRouteHandler(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, nil)
 }
 
+func (s *Server) DeleteRouteHandler(w http.ResponseWriter, r *http.Request) {
+	mockID := mux.Vars(r)["mock_id"]
+	routeID := mux.Vars(r)["route_id"]
+
+	if err := s.db.DeleteRoute(r.Context(), mockID, routeID); err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response(w, http.StatusOK, nil)
+}
+
+func (s *Server) CreateRouteHandle(w http.ResponseWriter, r *http.Request) {
+	mockID := mux.Vars(r)["mock_id"]
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+	}
+
+	newRoute, err := mock.Route{}.PatchString(string(data))
+
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err = s.db.CreateRoute(r.Context(), mockID, *newRoute); err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response(w, http.StatusOK, *newRoute)
+}
+
+func (s *Server) DuplicateRouteHandle(w http.ResponseWriter, r *http.Request) {
+	mockID := mux.Vars(r)["mock_id"]
+	routeID := mux.Vars(r)["route_id"]
+
+	route, err := s.db.GetRoute(r.Context(), mockID, routeID)
+
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	newRoute := route.Clone()
+
+	if err = s.db.CreateRoute(r.Context(), mockID, *newRoute); err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response(w, http.StatusOK, *newRoute)
+}
+
 func (s *Server) PatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 	mockID := mux.Vars(r)["mock_id"]
 	routeID := mux.Vars(r)["route_id"]

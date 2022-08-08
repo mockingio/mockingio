@@ -1,8 +1,11 @@
 package mock
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -33,6 +36,21 @@ func New(opts ...Option) *Mock {
 	}
 
 	return m
+}
+
+func (r Mock) Clone() Mock {
+	result := r
+	result.ID = newID()
+	result.Routes = make([]*Route, len(r.Routes))
+	result.options = r.options
+	result.Proxy = r.Proxy.Clone()
+	result.TLS = r.TLS.Clone()
+
+	for i, rule := range r.Routes {
+		result.Routes[i] = rule.Clone()
+	}
+
+	return result
 }
 
 func FromFile(file string, opts ...Option) (*Mock, error) {
@@ -116,4 +134,39 @@ func addIDs(m *Mock) {
 
 func newID() string {
 	return uuid.NewString()
+}
+
+func jsonFieldName(field reflect.StructField) string {
+	name := strings.Split(field.Tag.Get("json"), ",")[0]
+	if name == "" {
+		name = field.Name
+	}
+	return name
+}
+
+func patchStruct(resource interface{}, patches map[string]*json.RawMessage) error {
+	value := reflect.ValueOf(resource)
+	for value.Kind() == reflect.Interface || value.Kind() == reflect.Ptr {
+		value = value.Elem()
+	}
+	if value.Kind() != reflect.Struct {
+		return fmt.Errorf("can't operate on non-struct: %s", value.Kind().String())
+	}
+	if !value.CanAddr() {
+		return errors.New("unaddressable struct value")
+	}
+	valueT := value.Type()
+	for i := 0; i < valueT.NumField(); i++ {
+		field := value.Field(i)
+		if !field.CanAddr() || !field.CanInterface() {
+			continue
+		}
+		if patch, ok := patches[jsonFieldName(valueT.Field(i))]; ok {
+			field.Set(reflect.Zero(field.Type()))
+			if err := json.Unmarshal(*patch, field.Addr().Interface()); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }

@@ -142,6 +142,114 @@ func TestServer_PatchRouteHandler(t *testing.T) {
 	})
 }
 
+func TestServer_DeleteRouteHandler(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		db := newDB(fixtures.Mock1())
+
+		writer := httptest.NewRecorder()
+		apiServer := NewServer(db, nil)
+
+		req := mux.SetURLVars(&http.Request{}, map[string]string{
+			"mock_id":  fixtures.Mock1().ID,
+			"route_id": "route1",
+		})
+		apiServer.DeleteRouteHandler(writer, req)
+
+		assert.Equal(t, http.StatusOK, writer.Code)
+
+		mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
+		assert.Equal(t, len(mok.Routes), len(fixtures.Mock1().Routes)-1)
+	})
+
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
+
+		writer := httptest.NewRecorder()
+		apiServer := NewServer(db, nil)
+
+		req := mux.SetURLVars(&http.Request{}, map[string]string{
+			"mock_id":  fixtures.Mock1().ID,
+			"route_id": "route1",
+		})
+		apiServer.DeleteRouteHandler(writer, req)
+
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
+	})
+}
+
+func TestServer_CreateRouteHandler(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		db := newDB(fixtures.Mock1())
+
+		writer := httptest.NewRecorder()
+		apiServer := NewServer(db, nil)
+
+		req := mux.SetURLVars(&http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"id": "route2", "method":"OPTIONS"}`)),
+		}, map[string]string{
+			"mock_id": fixtures.Mock1().ID,
+		})
+		apiServer.CreateRouteHandle(writer, req)
+
+		assert.Equal(t, http.StatusOK, writer.Code)
+
+		mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
+		assert.Equal(t, len(mok.Routes), len(fixtures.Mock1().Routes)+1)
+	})
+
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
+
+		writer := httptest.NewRecorder()
+		apiServer := NewServer(db, nil)
+
+		req := mux.SetURLVars(&http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"id": "route2", "method":"OPTIONS"}`)),
+		}, map[string]string{
+			"mock_id": fixtures.Mock1().ID,
+		})
+		apiServer.CreateRouteHandle(writer, req)
+
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
+	})
+}
+
+func TestServer_DuplicateRouteHandler(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		db := newDB(fixtures.Mock1())
+
+		writer := httptest.NewRecorder()
+		apiServer := NewServer(db, nil)
+
+		req := mux.SetURLVars(&http.Request{}, map[string]string{
+			"mock_id":  fixtures.Mock1().ID,
+			"route_id": fixtures.Mock1().Routes[0].ID,
+		})
+		apiServer.DuplicateRouteHandle(writer, req)
+
+		assert.Equal(t, http.StatusOK, writer.Code)
+
+		mok, _ := db.GetMock(context.Background(), fixtures.Mock1().ID)
+		assert.Equal(t, len(mok.Routes), len(fixtures.Mock1().Routes)+1)
+	})
+
+	t.Run("db error", func(t *testing.T) {
+		db := &mockDB{}
+
+		writer := httptest.NewRecorder()
+		apiServer := NewServer(db, nil)
+
+		req := mux.SetURLVars(&http.Request{
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{"id": "route2", "method":"OPTIONS"}`)),
+		}, map[string]string{
+			"mock_id": fixtures.Mock1().ID,
+		})
+		apiServer.DuplicateRouteHandle(writer, req)
+
+		assert.Equal(t, http.StatusInternalServerError, writer.Code)
+	})
+}
+
 func TestServer_PatchResponseHandler(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		db := newDB(fixtures.Mock1())
@@ -278,7 +386,19 @@ func (m *mockDB) SetMock(_ context.Context, _ *mock.Mock) error {
 	return errors.New("something is not right")
 }
 
+func (m *mockDB) GetRoute(_ context.Context, _ string, _ string) (*mock.Route, error) {
+	return nil, errors.New("something is not right")
+}
+
 func (m *mockDB) PatchRoute(_ context.Context, _ string, _ string, _ string) error {
+	return errors.New("something is not right")
+}
+
+func (m *mockDB) DeleteRoute(_ context.Context, _ string, _ string) error {
+	return errors.New("something is not right")
+}
+
+func (m *mockDB) CreateRoute(_ context.Context, _ string, _ mock.Route) error {
 	return errors.New("something is not right")
 }
 

@@ -7,6 +7,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestResponse_Clone(t *testing.T) {
+	rule := Response{
+		ID:              "",
+		Status:          http.StatusOK,
+		RuleAggregation: Or,
+	}
+
+	clone := rule.Clone()
+	assert.True(t, clone.Validate() == nil)
+	assert.NotEqual(t, rule.ID, clone.ID)
+
+	// TODO: Should compare pointer for all property
+}
+
 func TestResponse_Validate(t *testing.T) {
 	tests := []struct {
 		name    string
