@@ -6,6 +6,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestRule_Clone(t *testing.T) {
+	rule := Rule{
+		ID:       newID(),
+		Target:   "header",
+		Modifier: "Authorization",
+		Value:    "Bearer...",
+		Operator: "equal",
+	}
+
+	clone := rule.Clone()
+	assert.True(t, clone.Validate() == nil)
+	assert.NotEqual(t, rule.ID, clone.ID)
+
+	// TODO: Should compare pointer for all property
+}
+
 func TestRule_Validate(t *testing.T) {
 	tests := []struct {
 		name  string

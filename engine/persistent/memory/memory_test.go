@@ -83,6 +83,40 @@ func TestMemory_SetGetActiveSession(t *testing.T) {
 	assert.Equal(t, "123456", v)
 }
 
+func TestMemory_GetRoute(t *testing.T) {
+	m := New()
+	mok := &mock.Mock{
+		ID: "mockid",
+		Routes: []*mock.Route{
+			{
+				ID:     "routeid",
+				Method: "GET",
+			},
+			{
+				ID:     "routeid1",
+				Method: "PUT",
+			},
+		},
+	}
+	_ = m.SetMock(context.Background(), mok)
+
+	t.Run("success", func(t *testing.T) {
+		route, err := m.GetRoute(context.Background(), "mockid", "routeid")
+		require.NoError(t, err)
+		assert.Equal(t, route, mok.Routes[0])
+	})
+
+	t.Run("mock not found", func(t *testing.T) {
+		_, err := m.GetRoute(context.Background(), "random", "")
+		require.Error(t, err)
+	})
+
+	t.Run("route not found", func(t *testing.T) {
+		_, err := m.GetRoute(context.Background(), "mockid", "random")
+		require.Error(t, err)
+	})
+}
+
 func TestMemory_PatchRoute(t *testing.T) {
 	m := New()
 	mok := &mock.Mock{
@@ -173,7 +207,10 @@ func TestMemory_CreateRoute(t *testing.T) {
 	_ = m.SetMock(context.Background(), mok)
 
 	t.Run("success", func(t *testing.T) {
-		err := m.CreateRoute(context.Background(), "mockid", `{"id":"routeid1","method":"PUT"}`)
+		err := m.CreateRoute(context.Background(), "mockid", mock.Route{
+			ID:     "routeid1",
+			Method: "put",
+		})
 		require.NoError(t, err)
 		configs, err := m.GetMock(context.Background(), "mockid")
 		require.NoError(t, err)
@@ -181,20 +218,17 @@ func TestMemory_CreateRoute(t *testing.T) {
 	})
 
 	t.Run("mock not found", func(t *testing.T) {
-		err := m.CreateRoute(context.Background(), "random", `{}`)
+		err := m.CreateRoute(context.Background(), "random", mock.Route{})
 		assert.Error(t, err)
 	})
 
 	t.Run("route already created", func(t *testing.T) {
-		err := m.CreateRoute(context.Background(), "mockid", `{"id":"routeid1","method":"PUT"}`)
+		err := m.CreateRoute(context.Background(), "mockid", mock.Route{
+			ID:     "routeid1",
+			Method: "put",
+		})
 		assert.Error(t, err)
 	})
-
-	t.Run("invalid json", func(t *testing.T) {
-		err := m.CreateRoute(context.Background(), "mockid", `{"method": "}`)
-		assert.Error(t, err)
-	})
-
 }
 
 func TestMemory_PatchResponse(t *testing.T) {

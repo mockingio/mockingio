@@ -138,6 +138,27 @@ func (m *Memory) GetActiveSession(ctx context.Context, mockID string) (string, e
 	return "", errors.New("unable to convert to string value")
 }
 
+func (m *Memory) GetRoute(ctx context.Context, mockID string, routeID string) (*mock.Route, error) {
+	mok, err := m.GetMock(ctx, mockID)
+	if err != nil {
+		return nil, err
+	}
+
+	if mok == nil {
+		return nil, errors.New("mock not found")
+	}
+
+	route, _, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
+		return route.ID == routeID
+	})
+
+	if !ok {
+		return nil, errors.New("route not found")
+	}
+
+	return route, nil
+}
+
 func (m *Memory) PatchRoute(ctx context.Context, mockID string, routeID string, data string) error {
 	mok, err := m.GetMock(ctx, mockID)
 	if err != nil {
@@ -201,7 +222,7 @@ func (m *Memory) DeleteRoute(ctx context.Context, mockID string, routeID string)
 	return nil
 }
 
-func (m *Memory) CreateRoute(ctx context.Context, mockID string, data string) error {
+func (m *Memory) CreateRoute(ctx context.Context, mockID string, newRoute mock.Route) error {
 	mok, err := m.GetMock(ctx, mockID)
 	if err != nil {
 		return err
@@ -209,16 +230,6 @@ func (m *Memory) CreateRoute(ctx context.Context, mockID string, data string) er
 
 	if mok == nil {
 		return errors.New("mock not found")
-	}
-
-	var values map[string]*json.RawMessage
-	if err := json.Unmarshal([]byte(data), &values); err != nil {
-		return err
-	}
-
-	var newRoute = &mock.Route{}
-	if err := patchStruct(newRoute, values); err != nil {
-		return err
 	}
 
 	_, _, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
@@ -229,7 +240,7 @@ func (m *Memory) CreateRoute(ctx context.Context, mockID string, data string) er
 		return errors.New("route already created")
 	}
 
-	mok.Routes = append(mok.Routes, newRoute)
+	mok.Routes = append(mok.Routes, &newRoute)
 
 	if err := m.SetMock(ctx, mok); err != nil {
 		return err

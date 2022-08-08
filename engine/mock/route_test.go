@@ -9,6 +9,21 @@ import (
 	. "github.com/mockingio/mockingio/engine/mock"
 )
 
+func TestRoute_Clone(t *testing.T) {
+	route := Route{
+		ID:        "",
+		Method:    "POST",
+		Path:      "/",
+		Responses: []Response{{Status: http.StatusOK}},
+	}
+
+	clone := route.Clone()
+	assert.True(t, clone.Validate() == nil)
+	assert.NotEqual(t, route.ID, clone.ID)
+
+	// TODO: Should compare pointer for all property
+}
+
 func TestRoute_Validate(t *testing.T) {
 	validResponse := []Response{{Status: http.StatusOK}}
 

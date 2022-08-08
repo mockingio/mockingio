@@ -29,6 +29,13 @@ type Rule struct {
 	Operator Operator `yaml:"operator" json:"operator"`
 }
 
+func (r Rule) Clone() Rule {
+	result := r
+	result.ID = newID()
+
+	return result
+}
+
 func (r Rule) Validate() error {
 	return validation.ValidateStruct(
 		&r,
