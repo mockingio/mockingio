@@ -7,6 +7,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/mockingio/mockingio)](https://goreportcard.com/report/github.com/mockingio/mockingio)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+[![asciicast](https://asciinema.org/a/7u0HYp6dNWnB3ospc2DdgKOIY.svg)](https://asciinema.org/a/7u0HYp6dNWnB3ospc2DdgKOIY)
 
 ## Installation
 
