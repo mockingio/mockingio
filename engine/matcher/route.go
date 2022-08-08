@@ -28,6 +28,10 @@ func NewRouteMatcher(route *cfg.Route, req Context, db persistent.Persistent) *R
 }
 
 func (r *RouteMatcher) Match() (*cfg.Response, error) {
+	if r.route.Disabled {
+		return nil, nil
+	}
+
 	httpRequest := r.req.HTTPRequest
 	method := r.route.Method
 	if r.route.Method == "" {
