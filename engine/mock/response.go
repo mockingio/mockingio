@@ -17,6 +17,7 @@ type Response struct {
 	Delay           int64             `yaml:"delay,omitempty" json:"delay,omitempty"`
 	Headers         map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
 	Body            string            `yaml:"body,omitempty" json:"body,omitempty"`
+	FilePath        string            `yaml:"file_path,omitempty" json:"file_path,omitempty"`
 	RuleAggregation RuleAggregation   `yaml:"rule_aggregation,omitempty" json:"rule_aggregation,omitempty"`
 	Rules           []Rule            `yaml:"rules,omitempty" json:"rules,omitempty"`
 	IsDefault       bool              `yaml:"is_default,omitempty" json:"is_default,omitempty"`

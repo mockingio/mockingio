@@ -46,6 +46,7 @@ routes:
       {
         "name": "John Doe"
       }
+    file_path: /path/to/file
 - method: POST
   path: /hello/world
   description: ""
