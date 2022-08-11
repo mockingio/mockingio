@@ -52,6 +52,7 @@ routes:
       - status: 200
         headers:
           Content-Type: application/json
+        file_path: "/path/to/file"
         body: |
           {
             "name": "John Doe"

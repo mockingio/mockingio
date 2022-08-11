@@ -5,6 +5,9 @@ import (
 	"crypto/tls"
 	"io"
 	"net/http"
+	"os"
+	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -106,8 +109,39 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add(k, v)
 	}
 
-	w.WriteHeader(response.Status)
-	_, _ = w.Write([]byte(response.Body))
+	if response.FilePath == "" {
+		w.WriteHeader(response.Status)
+		_, _ = w.Write([]byte(response.Body))
+		return
+	}
+
+	file, err := os.Open(response.FilePath)
+	if err != nil {
+		log.WithError(err).Error("open file")
+		eng.noMatchHandler(w)
+		return
+	}
+	defer file.Close()
+
+	fileHeader := make([]byte, 512)
+	if _, err := file.Read(fileHeader); err != nil {
+		log.WithError(err).Error("read file header")
+		eng.noMatchHandler(w)
+		return
+	}
+
+	fileStat, err := file.Stat()
+	if err != nil {
+		log.WithError(err).Error("stat file")
+		eng.noMatchHandler(w)
+		return
+	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename="+path.Base(response.FilePath))
+	w.Header().Set("Content-Type", http.DetectContentType(fileHeader))
+	w.Header().Set("Content-Length", strconv.FormatInt(fileStat.Size(), 10))
+	_, _ = file.Seek(0, 0)
+	_, _ = io.Copy(w, file)
 }
 
 func (eng *Engine) noMatchHandler(w http.ResponseWriter) {
