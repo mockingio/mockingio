@@ -2,10 +2,13 @@ package engine_test
 
 import (
 	"context"
+	_ "embed"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -17,6 +20,9 @@ import (
 	"github.com/mockingio/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/engine/persistent/memory"
 )
+
+//go:embed fixture/mock.yml
+var mockData string
 
 func TestEngine_Pause(t *testing.T) {
 	eng := engine.New("mock-id", memory.New())
@@ -100,6 +106,80 @@ func TestEngine_Match_With_Delay_Response(t *testing.T) {
 
 	assert.True(t, time.Since(timer) > 50*time.Millisecond)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestEngine_DownloadResponse(t *testing.T) {
+
+	tests := []struct {
+		name string
+		mock func() (*mock.Mock, func())
+	}{
+		{
+			name: "serve file from absolute path",
+			mock: func() (*mock.Mock, func()) {
+				filename, closeFn := createTempFile(t, "mockingio", "test.json", `{"hello": "world"}`)
+
+				return &mock.Mock{
+					ID: "mock-id",
+					Routes: []*mock.Route{
+						{
+							Method: "GET",
+							Path:   "/hello",
+							Responses: []mock.Response{
+								{
+									FilePath: filename,
+								},
+							},
+						},
+					},
+				}, closeFn
+			},
+		},
+		{
+			name: "serve file from relative path, same directory with mock file",
+			mock: func() (*mock.Mock, func()) {
+				mockFile, closeFn := createTempFile(t, "mockingio2", "mock.yml", mockData)
+				mok, err := mock.FromFile(mockFile)
+				if err != nil {
+					t.Error(err)
+				}
+
+				dir := filepath.Dir(mockFile)
+				if err := os.WriteFile(filepath.Join(dir, "test.json"), []byte(`{"hello": "world"}`), 0644); err != nil {
+					t.Error(err)
+				}
+
+				mok.Routes[0].Responses[0].FilePath = "test.json"
+
+				return mok, closeFn
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mok, closeFn := tt.mock()
+			defer closeFn()
+
+			mem := memory.New()
+			_ = mem.SetMock(context.Background(), mok)
+			eng := engine.New(mok.ID, mem)
+
+			req := httptest.NewRequest(http.MethodGet, "/hello", nil)
+			w := httptest.NewRecorder()
+			eng.Handler(w, req)
+			res := w.Result()
+			defer func() {
+				_ = res.Body.Close()
+			}()
+
+			body, err := io.ReadAll(res.Body)
+			require.NoError(t, err)
+
+			assert.Equal(t, http.StatusOK, res.StatusCode)
+			assert.Equal(t, `{"hello": "world"}`, string(body))
+		})
+	}
 }
 
 func TestEngine_NoResponses(t *testing.T) {
@@ -356,5 +436,25 @@ func proxyMock(proxyHost string, skipTLS bool) *mock.Mock {
 				"X-Response": "from response",
 			},
 		},
+	}
+}
+
+func createTempFile(t *testing.T, dir, filename, content string) (string, func()) {
+	dir, err := os.MkdirTemp("", dir)
+	if err != nil {
+		t.Error(err)
+	}
+
+	file, err := os.CreateTemp(dir, filename)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if _, err := file.Write([]byte(content)); err != nil {
+		t.Error(err)
+	}
+
+	return file.Name(), func() {
+		_ = os.Remove(file.Name())
 	}
 }

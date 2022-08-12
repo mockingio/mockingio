@@ -1,0 +1,7 @@
+name: Example mock
+id: mock-id
+routes:
+  - method: GET
+    path: /hello
+    responses:
+      - file_path: test.json

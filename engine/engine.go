@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
@@ -88,9 +89,8 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := eng.Match(r)
+	mok := eng.getMock()
 	if response == nil {
-		mok := eng.getMock()
-
 		if mok.AutoCORS && r.Method == http.MethodOptions {
 			eng.corsHandler(w, r)
 			return
@@ -105,30 +105,33 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	eng.serveResponse(w, mok, response)
+}
+
+func (eng *Engine) serveResponse(w http.ResponseWriter, mok *mock.Mock, response *mock.Response) {
 	for k, v := range response.Headers {
 		w.Header().Add(k, v)
 	}
 
-	if response.FilePath == "" {
-		w.WriteHeader(response.Status)
-		_, _ = w.Write([]byte(response.Body))
+	if response.FilePath != "" {
+		eng.serveStaticFile(w, mok, response.FilePath)
 		return
 	}
 
-	file, err := os.Open(response.FilePath)
+	w.WriteHeader(response.Status)
+	_, _ = w.Write([]byte(response.Body))
+	return
+}
+
+func (eng *Engine) serveStaticFile(w http.ResponseWriter, mok *mock.Mock, filepath string) {
+	filepath = eng.getFilePath(mok, filepath)
+	file, err := os.Open(filepath)
 	if err != nil {
 		log.WithError(err).Error("open file")
 		eng.noMatchHandler(w)
 		return
 	}
 	defer file.Close()
-
-	fileHeader := make([]byte, 512)
-	if _, err := file.Read(fileHeader); err != nil {
-		log.WithError(err).Error("read file header")
-		eng.noMatchHandler(w)
-		return
-	}
 
 	fileStat, err := file.Stat()
 	if err != nil {
@@ -137,11 +140,19 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Disposition", "attachment; filename="+path.Base(response.FilePath))
-	w.Header().Set("Content-Type", http.DetectContentType(fileHeader))
+	mime, _ := mimetype.DetectFile(filepath)
+	w.Header().Set("Content-Type", mime.String())
 	w.Header().Set("Content-Length", strconv.FormatInt(fileStat.Size(), 10))
 	_, _ = file.Seek(0, 0)
 	_, _ = io.Copy(w, file)
+}
+
+func (eng *Engine) getFilePath(mok *mock.Mock, filepath string) string {
+	if path.IsAbs(filepath) {
+		return filepath
+	}
+
+	return path.Join(path.Dir(mok.FilePath), filepath)
 }
 
 func (eng *Engine) noMatchHandler(w http.ResponseWriter) {

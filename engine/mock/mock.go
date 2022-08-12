@@ -21,6 +21,7 @@ type Mock struct {
 	AutoCORS bool `yaml:"auto_cors,omitempty" json:"auto_cors,omitempty"`
 	TLS      *TLS `yaml:"tls,omitempty" json:"tls,omitempty"`
 	options  mockOptions
+	FilePath string `yaml:"-" json:"-"`
 }
 
 func New(opts ...Option) *Mock {
@@ -42,7 +43,10 @@ func FromFile(file string, opts ...Option) (*Mock, error) {
 		return nil, errors.Wrap(err, "read mock file")
 	}
 
-	return FromYaml(string(data), opts...)
+	mok, err := FromYaml(string(data), opts...)
+	mok.FilePath = file
+
+	return mok, err
 }
 
 func FromYaml(text string, opts ...Option) (*Mock, error) {

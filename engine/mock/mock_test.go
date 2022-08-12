@@ -25,6 +25,7 @@ func TestConfig(t *testing.T) {
 		text, _ := yaml.Marshal(cfg)
 		test.UpdateGoldenFile(t, goldenFile, text)
 
+		assert.Equal(t, "fixtures/mock.yml", cfg.FilePath)
 		assert.Equal(t, test.ReadGoldenFile(t, goldenFile), string(text))
 	})
 
