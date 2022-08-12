@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"syscall"
 
@@ -92,7 +93,12 @@ func mustLoadMocks(ctx context.Context, filenames []string, db persistent.Persis
 	}{}
 
 	for _, filename := range filenames {
-		loadedMock, err := mock.FromFile(filename, mock.WithIDGeneration())
+		absFilePath, err := filepath.Abs(filename)
+		if err != nil {
+			panic(err)
+		}
+
+		loadedMock, err := mock.FromFile(absFilePath, mock.WithIDGeneration())
 		if err != nil {
 			panic(err)
 		}
