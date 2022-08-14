@@ -42,12 +42,11 @@ func (r Route) PatchString(data string) (*Route, error) {
 		return nil, err
 	}
 
-	var newRoute = &Route{}
-	if err := patchStruct(newRoute, values); err != nil {
+	if err := patchStruct(&r, values); err != nil {
 		return nil, err
 	}
 
-	return newRoute, nil
+	return &r, nil
 }
 
 func (r Route) Validate() error {

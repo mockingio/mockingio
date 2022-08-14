@@ -115,7 +115,6 @@ func (s *Server) DuplicateRouteHandle(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) PatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 	mockID := mux.Vars(r)["mock_id"]
-	routeID := mux.Vars(r)["route_id"]
 	responseID := mux.Vars(r)["response_id"]
 	data, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -129,7 +128,48 @@ func (s *Server) PatchResponseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.db.PatchResponse(r.Context(), mockID, routeID, responseID, string(data)); err != nil {
+	if err = s.db.PatchResponse(r.Context(), mockID, responseID, string(data)); err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response(w, http.StatusOK, nil)
+}
+
+func (s *Server) CreateRuleHandler(w http.ResponseWriter, r *http.Request) {
+	mockID := mux.Vars(r)["mock_id"]
+	responseID := mux.Vars(r)["response_id"]
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if len(data) == 0 {
+		log.Error("request body empty")
+		responseError(w, http.StatusBadRequest, errors.New("request body empty"))
+		return
+	}
+
+	newRule, err := mock.Rule{}.PatchString(string(data))
+
+	if err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	if err = s.db.CreateRule(r.Context(), mockID, responseID, *newRule); err != nil {
+		responseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response(w, http.StatusOK, newRule)
+}
+func (s *Server) DeleteRuleHandler(w http.ResponseWriter, r *http.Request) {
+	mockID := mux.Vars(r)["mock_id"]
+	ruleID := mux.Vars(r)["rule_id"]
+
+	if err := s.db.DeleteRule(r.Context(), mockID, ruleID); err != nil {
 		responseError(w, http.StatusInternalServerError, err)
 		return
 	}

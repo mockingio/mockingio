@@ -11,14 +11,34 @@ import (
 
 	"github.com/mockingio/mockingio/engine/mock"
 	"github.com/mockingio/mockingio/engine/persistent"
-	"github.com/samber/lo"
 )
 
 var _ persistent.Persistent = &Memory{}
 
+type MemoryRoute struct {
+	mockID string
+	route  *mock.Route
+}
+
+type MemoryResponse struct {
+	mockID   string
+	routeID  string
+	response *mock.Response
+}
+
+type MemoryRule struct {
+	mockID     string
+	routeID    string
+	responseID string
+	rule       *mock.Rule
+}
+
 type Memory struct {
 	mu          sync.Mutex
 	configs     map[string]*mock.Mock
+	routes      map[string]MemoryRoute
+	responses   map[string]MemoryResponse
+	rules       map[string]MemoryRule
 	kv          map[string]any
 	subscribers []func(mock mock.Mock)
 }
@@ -54,6 +74,47 @@ func (m *Memory) SetMock(_ context.Context, cfg *mock.Mock) error {
 	defer m.mu.Unlock()
 
 	m.configs[cfg.ID] = cfg
+	m.routes = map[string]MemoryRoute{}
+	m.responses = map[string]MemoryResponse{}
+	m.rules = map[string]MemoryRule{}
+	for _, route := range cfg.Routes {
+		m.routes[route.ID] = MemoryRoute{
+			mockID: cfg.ID,
+			route:  route,
+		}
+		for _, response := range route.Responses {
+			m.responses[response.ID] = MemoryResponse{
+				mockID:   cfg.ID,
+				routeID:  route.ID,
+				response: &response,
+			}
+
+			for _, rule := range response.Rules {
+				r := rule
+				m.rules[rule.ID] = MemoryRule{
+					mockID:     cfg.ID,
+					routeID:    route.ID,
+					responseID: response.ID,
+					rule:       &r,
+				}
+			}
+		}
+	}
+
+	for _, subscriber := range m.subscribers {
+		subscriber(*cfg)
+	}
+
+	return nil
+}
+
+func (m *Memory) SaveMock(ctx context.Context, id string) error {
+	cfg, error := m.GetMock(ctx, id)
+
+	if error != nil {
+		return nil
+	}
+
 	for _, subscriber := range m.subscribers {
 		subscriber(*cfg)
 	}
@@ -66,8 +127,30 @@ func (m *Memory) GetMock(_ context.Context, id string) (*mock.Mock, error) {
 	defer m.mu.Unlock()
 
 	cfg, ok := m.configs[id]
+
 	if !ok {
 		return nil, nil
+	}
+
+	cfg.Routes = []*mock.Route{}
+
+	// FIXME: Avoid to using multiple loop
+	for _, route := range m.routes {
+		if route.mockID == cfg.ID {
+			route.route.Responses = []mock.Response{}
+			for _, response := range m.responses {
+				if response.routeID == route.route.ID {
+					response.response.Rules = []mock.Rule{}
+					for _, rule := range m.rules {
+						if rule.responseID == response.response.ID {
+							response.response.Rules = append(response.response.Rules, *rule.rule)
+						}
+					}
+					route.route.Responses = append(route.route.Responses, *response.response)
+				}
+			}
+			cfg.Routes = append(cfg.Routes, route.route)
+		}
 	}
 
 	return cfg, nil
@@ -139,42 +222,26 @@ func (m *Memory) GetActiveSession(ctx context.Context, mockID string) (string, e
 }
 
 func (m *Memory) GetRoute(ctx context.Context, mockID string, routeID string) (*mock.Route, error) {
-	mok, err := m.GetMock(ctx, mockID)
-	if err != nil {
-		return nil, err
+	_, exists := m.configs[mockID]
+
+	if !exists {
+		return nil, errors.New("Mock not found")
 	}
 
-	if mok == nil {
-		return nil, errors.New("mock not found")
-	}
+	route, exists := m.routes[routeID]
 
-	route, _, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
-		return route.ID == routeID
-	})
-
-	if !ok {
+	if !exists {
 		return nil, errors.New("route not found")
 	}
 
-	return route, nil
+	return route.route, nil
 }
 
 func (m *Memory) PatchRoute(ctx context.Context, mockID string, routeID string, data string) error {
-	mok, err := m.GetMock(ctx, mockID)
+	route, err := m.GetRoute(ctx, mockID, routeID)
+
 	if err != nil {
 		return err
-	}
-
-	if mok == nil {
-		return errors.New("mock not found")
-	}
-
-	route, idx, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
-		return route.ID == routeID
-	})
-
-	if !ok {
-		return errors.New("route not found")
 	}
 
 	var values map[string]*json.RawMessage
@@ -186,9 +253,7 @@ func (m *Memory) PatchRoute(ctx context.Context, mockID string, routeID string, 
 		return err
 	}
 
-	mok.Routes[idx] = route
-
-	if err := m.SetMock(ctx, mok); err != nil {
+	if err := m.SaveMock(ctx, mockID); err != nil {
 		return err
 	}
 
@@ -196,26 +261,15 @@ func (m *Memory) PatchRoute(ctx context.Context, mockID string, routeID string, 
 }
 
 func (m *Memory) DeleteRoute(ctx context.Context, mockID string, routeID string) error {
-	mok, err := m.GetMock(ctx, mockID)
+	_, err := m.GetRoute(ctx, mockID, routeID)
+
 	if err != nil {
 		return err
 	}
 
-	if mok == nil {
-		return errors.New("mock not found")
-	}
+	delete(m.routes, routeID)
 
-	_, idx, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
-		return route.ID == routeID
-	})
-
-	if !ok {
-		return errors.New("route not found")
-	}
-
-	mok.Routes = append(mok.Routes[:idx], mok.Routes[idx+1:]...)
-
-	if err := m.SetMock(ctx, mok); err != nil {
+	if err := m.SaveMock(ctx, mockID); err != nil {
 		return err
 	}
 
@@ -232,11 +286,9 @@ func (m *Memory) CreateRoute(ctx context.Context, mockID string, newRoute mock.R
 		return errors.New("mock not found")
 	}
 
-	_, _, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
-		return route.ID == newRoute.ID
-	})
+	_, err = m.GetRoute(ctx, mockID, newRoute.ID)
 
-	if ok {
+	if err == nil {
 		return errors.New("route already created")
 	}
 
@@ -249,41 +301,95 @@ func (m *Memory) CreateRoute(ctx context.Context, mockID string, newRoute mock.R
 	return nil
 }
 
-func (m *Memory) PatchResponse(ctx context.Context, mockID, routeID, responseID, data string) error {
-	mok, err := m.GetMock(ctx, mockID)
+func (m *Memory) GetResponse(ctx context.Context, mockID string, responseID string) (*mock.Response, error) {
+	mock, exists := m.configs[mockID]
+
+	if !exists || mock == nil {
+		return nil, errors.New("Mock not found")
+	}
+
+	response, exists := m.responses[responseID]
+
+	if !exists {
+		return nil, errors.New("route not found")
+	}
+
+	return response.response, nil
+}
+
+func (m *Memory) PatchResponse(ctx context.Context, mockID, responseID, data string) error {
+	response, err := m.GetResponse(ctx, mockID, responseID)
 	if err != nil {
 		return err
-	}
-	if mok == nil {
-		return errors.New("mock not found")
-	}
-
-	route, routeIdx, ok := lo.FindIndexOf[*mock.Route](mok.Routes, func(route *mock.Route) bool {
-		return route.ID == routeID
-	})
-	if !ok {
-		return errors.New("route not found")
-	}
-
-	response, resIdx, ok := lo.FindIndexOf[mock.Response](route.Responses, func(response mock.Response) bool {
-		return response.ID == responseID
-	})
-	if !ok {
-		return errors.New("response not found")
 	}
 
 	var values map[string]*json.RawMessage
 	if err := json.Unmarshal([]byte(data), &values); err != nil {
 		return err
 	}
-	if err := patchStruct(&response, values); err != nil {
+
+	if err := patchStruct(response, values); err != nil {
 		return err
 	}
 
-	route.Responses[resIdx] = response
-	mok.Routes[routeIdx] = route
+	if err := m.SaveMock(ctx, mockID); err != nil {
+		return err
+	}
 
-	if err := m.SetMock(ctx, mok); err != nil {
+	return nil
+}
+
+func (m *Memory) GetRule(ctx context.Context, mockID string, ruleID string) (*mock.Rule, error) {
+	_, exists := m.configs[mockID]
+
+	if !exists {
+		return nil, errors.New("Mock not found")
+	}
+
+	rule, exists := m.rules[ruleID]
+
+	if !exists {
+		return nil, errors.New("route not found")
+	}
+
+	return rule.rule, nil
+}
+
+func (m *Memory) CreateRule(ctx context.Context, mockID string, responseID string, newRule mock.Rule) error {
+	_, err := m.GetResponse(ctx, mockID, responseID)
+	if err != nil {
+		return err
+	}
+
+	_, err = m.GetRule(ctx, mockID, newRule.ID)
+
+	if err == nil {
+		return errors.New("Rule already created")
+	}
+
+	m.rules[newRule.ID] = MemoryRule{
+		mockID:     mockID,
+		responseID: responseID,
+		rule:       &newRule,
+	}
+
+	if err := m.SaveMock(ctx, mockID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Memory) DeleteRule(ctx context.Context, mockID string, ruleID string) error {
+	_, err := m.GetRule(ctx, mockID, ruleID)
+
+	if err != nil {
+		return errors.New("Rule not found")
+	}
+
+	delete(m.rules, ruleID)
+
+	if err := m.SaveMock(ctx, mockID); err != nil {
 		return err
 	}
 

@@ -43,6 +43,9 @@ func (s *Server) Start(_ context.Context, port string) (string, func(), error) {
 	r.Path("/mocks/{mock_id}/routes/{route_id}/clones").HandlerFunc(s.DuplicateRouteHandle).Methods(http.MethodPost)
 	r.Path("/mocks/{mock_id}/routes/{route_id}").HandlerFunc(s.DeleteRouteHandler).Methods(http.MethodDelete)
 	r.Path("/mocks/{mock_id}/routes/{route_id}/responses/{response_id}").HandlerFunc(s.PatchResponseHandler).Methods(http.MethodPatch)
+	r.Path("/mocks/{mock_id}/routes/{route_id}/responses/{response_id}/rules").HandlerFunc(s.CreateRuleHandler).Methods(http.MethodPost)
+	r.Path("/mocks/{mock_id}/routes/{route_id}/responses/{response_id}/rules/{rule_id}").HandlerFunc(s.CreateRuleHandler).Methods(http.MethodPost)
+	r.Path("/mocks/{mock_id}/routes/{route_id}/responses/{response_id}/rules/{rule_id}").HandlerFunc(s.DeleteRuleHandler).Methods(http.MethodDelete)
 
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {

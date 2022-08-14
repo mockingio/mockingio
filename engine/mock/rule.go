@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"encoding/json"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -34,6 +36,19 @@ func (r Rule) Clone() Rule {
 	result.ID = newID()
 
 	return result
+}
+
+func (r Rule) PatchString(data string) (*Rule, error) {
+	var values map[string]*json.RawMessage
+	if err := json.Unmarshal([]byte(data), &values); err != nil {
+		return nil, err
+	}
+
+	if err := patchStruct(&r, values); err != nil {
+		return nil, err
+	}
+
+	return &r, nil
 }
 
 func (r Rule) Validate() error {

@@ -259,28 +259,113 @@ func TestMemory_PatchResponse(t *testing.T) {
 	_ = m.SetMock(context.Background(), mok)
 
 	t.Run("success", func(t *testing.T) {
-		err := m.PatchResponse(context.Background(), "mockid", "routeid2", "responseid2", `{"status": 201}`)
+		err := m.PatchResponse(context.Background(), "mockid", "responseid2", `{"status": 201}`)
 		require.NoError(t, err)
-		assert.Equal(t, 201, mok.Routes[1].Responses[1].Status)
+		configs, err := m.GetMock(context.Background(), "mockid")
+		assert.Equal(t, 201, configs.Routes[1].Responses[1].Status)
 	})
 
 	t.Run("mock not found", func(t *testing.T) {
-		err := m.PatchResponse(context.Background(), "random", "", "", `{}`)
-		assert.Error(t, err)
-	})
-
-	t.Run("route not found", func(t *testing.T) {
-		err := m.PatchResponse(context.Background(), "mockid", "random", "responseid2", `{}`)
+		err := m.PatchResponse(context.Background(), "random", "", `{}`)
 		assert.Error(t, err)
 	})
 
 	t.Run("response not found", func(t *testing.T) {
-		err := m.PatchResponse(context.Background(), "mockid", "routeid2", "random", `{`)
+		err := m.PatchResponse(context.Background(), "mockid", "random", `{`)
 		assert.Error(t, err)
 	})
 
 	t.Run("invalid json", func(t *testing.T) {
-		err := m.PatchResponse(context.Background(), "mockid", "routeid2", "responseid2", `{": 201}`)
+		err := m.PatchResponse(context.Background(), "mockid", "responseid2", `{": 201}`)
+		assert.Error(t, err)
+	})
+}
+
+func TestMemory_CreateRule(t *testing.T) {
+	m := New()
+	mok := &mock.Mock{
+		ID: "mockid",
+		Routes: []*mock.Route{
+			{
+				ID:     "routeid",
+				Method: "GET",
+				Responses: []mock.Response{
+					{
+						ID:     "responseid1",
+						Status: 200,
+						Rules:  []mock.Rule{},
+					},
+				},
+			},
+		},
+	}
+	_ = m.SetMock(context.Background(), mok)
+
+	t.Run("success", func(t *testing.T) {
+		err := m.CreateRule(context.Background(), mok.ID, "responseid1", mock.Rule{
+			ID:     "rule1",
+			Target: "body",
+		})
+		require.NoError(t, err)
+		response, err := m.GetResponse(context.Background(), mok.ID, "responseid1")
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(response.Rules))
+	})
+
+	t.Run("mock not found", func(t *testing.T) {
+		err := m.CreateRule(context.Background(), "random", "responseid1", mock.Rule{})
+		assert.Error(t, err)
+	})
+
+	t.Run("Rule already created", func(t *testing.T) {
+		err := m.CreateRule(context.Background(), mok.ID, "responseid1", mock.Rule{
+			ID:     "rule1",
+			Target: "body",
+		})
+		assert.Error(t, err)
+	})
+}
+
+func TestMemory_RemoveRule(t *testing.T) {
+	m := New()
+	mok := &mock.Mock{
+		ID: "mockid",
+		Routes: []*mock.Route{
+			{
+				ID:     "routeid",
+				Method: "GET",
+				Responses: []mock.Response{
+					{
+						ID:     "responseid1",
+						Status: 200,
+						Rules: []mock.Rule{
+							{
+								ID:     "rule1",
+								Target: "body",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	_ = m.SetMock(context.Background(), mok)
+
+	t.Run("success", func(t *testing.T) {
+		err := m.DeleteRule(context.Background(), mok.ID, "rule1")
+		require.NoError(t, err)
+		route, err := m.GetRoute(context.Background(), mok.ID, "routeid")
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(route.Responses[0].Rules))
+	})
+
+	t.Run("mock not found", func(t *testing.T) {
+		err := m.DeleteRule(context.Background(), mok.ID, "rule1")
+		assert.Error(t, err)
+	})
+
+	t.Run("Rule not found", func(t *testing.T) {
+		err := m.DeleteRule(context.Background(), mok.ID, "rule1")
 		assert.Error(t, err)
 	})
 }

@@ -61,6 +61,7 @@ func (b *Builder) Start() (*httptest.Server, error) {
 func (b *Builder) Post(url string) *Builder {
 	b.clear()
 	b.route = &mock.Route{
+		ID:     uuid.NewString(),
 		Method: "POST",
 		Path:   url,
 	}
@@ -70,6 +71,7 @@ func (b *Builder) Post(url string) *Builder {
 func (b *Builder) Get(url string) *Builder {
 	b.clear()
 	b.route = &mock.Route{
+		ID:     uuid.NewString(),
 		Method: "GET",
 		Path:   url,
 	}
@@ -79,6 +81,7 @@ func (b *Builder) Get(url string) *Builder {
 func (b *Builder) Put(url string) *Builder {
 	b.clear()
 	b.route = &mock.Route{
+		ID:     uuid.NewString(),
 		Method: "PUT",
 		Path:   url,
 	}
@@ -88,6 +91,7 @@ func (b *Builder) Put(url string) *Builder {
 func (b *Builder) Delete(url string) *Builder {
 	b.clear()
 	b.route = &mock.Route{
+		ID:     uuid.NewString(),
 		Method: "DELETE",
 		Path:   url,
 	}
@@ -97,6 +101,7 @@ func (b *Builder) Delete(url string) *Builder {
 func (b *Builder) Option(url string) *Builder {
 	b.clear()
 	b.route = &mock.Route{
+		ID:     uuid.NewString(),
 		Method: "OPTIONS",
 		Path:   url,
 	}
@@ -109,6 +114,7 @@ func (b *Builder) Response(status int, body string, headers ...Headers) *Respons
 	}
 
 	b.response = &mock.Response{
+		ID:      uuid.NewString(),
 		Body:    body,
 		Status:  status,
 		Headers: headers[0],

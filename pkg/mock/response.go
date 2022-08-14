@@ -2,7 +2,8 @@ package mock
 
 import (
 	"net/http/httptest"
-	
+
+	"github.com/google/uuid"
 	"github.com/mockingio/mockingio/engine/mock"
 )
 
@@ -22,6 +23,7 @@ func (r *Response) Start() (*httptest.Server, error) {
 func (r *Response) When(target, modifier, operator, value string) *When {
 	r.builder.response.RuleAggregation = mock.And
 	r.builder.response.Rules = append(r.builder.response.Rules, mock.Rule{
+		ID:       uuid.NewString(),
 		Target:   mock.Target(target),
 		Modifier: modifier,
 		Operator: mock.Operator(operator),
@@ -43,6 +45,7 @@ func (a *And) Start() (*httptest.Server, error) {
 
 func (a *And) And(target, modifier, operator, value string) *And {
 	a.builder.response.Rules = append(a.builder.response.Rules, mock.Rule{
+		ID:       uuid.NewString(),
 		Target:   mock.Target(target),
 		Modifier: modifier,
 		Operator: mock.Operator(operator),
@@ -58,6 +61,7 @@ type Or struct {
 
 func (o *Or) Or(target, modifier, operator, value string) *Or {
 	o.builder.response.Rules = append(o.builder.response.Rules, mock.Rule{
+		ID:       uuid.NewString(),
 		Target:   mock.Target(target),
 		Modifier: modifier,
 		Operator: mock.Operator(operator),

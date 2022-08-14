@@ -402,7 +402,7 @@ func (m *mockDB) CreateRoute(_ context.Context, _ string, _ mock.Route) error {
 	return errors.New("something is not right")
 }
 
-func (m *mockDB) PatchResponse(_ context.Context, _, _, _, _ string) error {
+func (m *mockDB) PatchResponse(_ context.Context, _, _, _ string) error {
 	return errors.New("something is not right")
 }
 

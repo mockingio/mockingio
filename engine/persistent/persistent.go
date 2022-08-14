@@ -25,5 +25,7 @@ type Persistent interface {
 	DeleteRoute(ctx context.Context, mockID string, routeID string) error
 	CreateRoute(ctx context.Context, mockID string, newRoute mock.Route) error
 
-	PatchResponse(ctx context.Context, mockID, routeID, responseID, data string) error
+	PatchResponse(ctx context.Context, mockID string, responseID string, data string) error
+	CreateRule(ctx context.Context, mockID string, responseID string, newRule mock.Rule) error
+	DeleteRule(ctx context.Context, mockID string, ruleID string) error
 }
