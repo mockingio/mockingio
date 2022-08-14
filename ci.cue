@@ -13,7 +13,7 @@ import (
 
 dagger.#Plan & {
     client: filesystem: ".": read: contents: dagger.#FS
-		client: filesystem: "./bin": write: contents: actions.build."go".output
+		client: filesystem: "./bin": write: contents: actions.build.golang.output
 
     actions: {
 				_source: client.filesystem.".".read.contents
@@ -58,7 +58,7 @@ dagger.#Plan & {
 				}
 
         build: {
-        	"go": go.#Build & {
+        	golang: go.#Build & {
 							source: client.filesystem.".".read.contents
 							env: {
 								CGO_ENABLED: "0"
