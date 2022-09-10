@@ -1,6 +1,6 @@
 module github.com/mockingio/mockingio
 
-go 1.18
+go 1.19
 
 require (
 	github.com/gabriel-vasile/mimetype v1.4.1
