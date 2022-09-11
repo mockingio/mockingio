@@ -13,7 +13,7 @@ import (
 	source: dagger.#FS
 
 	// golangci-lint version
-	version: *"1.45" | string
+	version: *"1.49" | string
 
 	// timeout
 	timeout: *"5m" | string
@@ -22,8 +22,13 @@ import (
 		source: "golangci/golangci-lint:v\(version)"
 	}
 
+	_goImage: go.#Image & {
+		"version": "1.18"
+	}
+
 	go.#Container & {
 		"source": source
+		"image": _goImage.output
 		input:    _image.output
 		command: {
 			name: "golangci-lint"
