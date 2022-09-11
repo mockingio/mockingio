@@ -9,6 +9,8 @@
 
 [![asciicast](https://asciinema.org/a/7u0HYp6dNWnB3ospc2DdgKOIY.svg)](https://asciinema.org/a/7u0HYp6dNWnB3ospc2DdgKOIY)
 
+Visit [mocking.io](https://mocking.io) for documentation and more information.
+
 ## Installation
 
 ### Go install
