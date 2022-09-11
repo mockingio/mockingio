@@ -29,7 +29,7 @@ dagger.#Plan & {
 				lint: {
 						go: golangci.#Lint & {
 						source:  _source
-						version: "1.45"
+						version: "1.49"
 					}
 				}
 
