@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"crypto/tls"
+	"github.com/mockingio/mockingio/engine/plugins/faker"
 	"io"
 	"net/http"
 	"os"
@@ -25,12 +26,14 @@ type Engine struct {
 	isPaused bool
 	db       persistent.Persistent
 	mock     *mock.Mock
+	plugins  []Plugin
 }
 
 func New(mockID string, db persistent.Persistent) *Engine {
 	return &Engine{
-		mockID: mockID,
-		db:     db,
+		mockID:  mockID,
+		db:      db,
+		plugins: []Plugin{faker.New()},
 	}
 }
 
@@ -109,6 +112,10 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (eng *Engine) serveResponse(w http.ResponseWriter, mok *mock.Mock, response *mock.Response) {
+	for _, plugin := range eng.plugins {
+		plugin.Response(response)
+	}
+
 	for k, v := range response.Headers {
 		w.Header().Add(k, v)
 	}
