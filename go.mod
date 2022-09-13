@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/itchyny/gojq v0.12.8
+	github.com/jaswdr/faker v1.15.0
 	github.com/minio/pkg v1.3.1
 	github.com/pkg/errors v0.9.1
 	github.com/samber/lo v1.27.0
