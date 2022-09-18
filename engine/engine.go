@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -150,6 +151,8 @@ func (eng *Engine) serveStaticFile(w http.ResponseWriter, mok *mock.Mock, filepa
 	mime, _ := mimetype.DetectFile(filepath)
 	w.Header().Set("Content-Type", mime.String())
 	w.Header().Set("Content-Length", strconv.FormatInt(fileStat.Size(), 10))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%v"`, path.Base(filepath)))
+
 	_, _ = file.Seek(0, 0)
 	_, _ = io.Copy(w, file)
 }
