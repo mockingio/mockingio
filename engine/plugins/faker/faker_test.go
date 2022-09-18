@@ -14,10 +14,10 @@ func TestParseCommand(t *testing.T) {
 		expectedCommands []commandTuple
 	}{
 		{
-			"something {{faker.person.name}} here {{faker.lorem.text(100)}} example",
+			"something ${faker.person.name} here ${faker.lorem.text(100)} example",
 			[]commandTuple{
 				{
-					placeholder: "{{faker.person.name}}",
+					placeholder: "${faker.person.name}",
 					command: command{
 						"person": command{
 							"name": nil,
@@ -25,7 +25,7 @@ func TestParseCommand(t *testing.T) {
 					},
 				},
 				{
-					placeholder: "{{faker.lorem.text(100)}}",
+					placeholder: "${faker.lorem.text(100)}",
 					command: command{
 						"lorem": command{
 							"text": []any{100},
@@ -35,10 +35,10 @@ func TestParseCommand(t *testing.T) {
 			},
 		},
 		{
-			"{{faker.person.name}}",
+			"${faker.person.name}",
 			[]commandTuple{
 				{
-					placeholder: "{{faker.person.name}}",
+					placeholder: "${faker.person.name}",
 					command: command{
 						"person": command{
 							"name": nil,
@@ -48,10 +48,10 @@ func TestParseCommand(t *testing.T) {
 			},
 		},
 		{
-			"{{faker.person.name('alex')}}",
+			"${faker.person.name('alex')}",
 			[]commandTuple{
 				{
-					placeholder: "{{faker.person.name('alex')}}",
+					placeholder: "${faker.person.name('alex')}",
 					command: command{
 						"person": command{
 							"name": []any{"alex"},
@@ -77,17 +77,17 @@ func TestFaker_Response(t *testing.T) {
 	plug := New()
 
 	resp := &mock.Response{
-		Body: "hi {{faker.person.name}}",
+		Body: "hi ${faker.person.name}",
 		Headers: map[string]string{
-			"X-Name": "token: {{faker.lorem.text(5)}}",
+			"X-Name": "token: ${faker.lorem.text(5)}",
 			"X-Test": "no commands",
 		},
 	}
 	plug.Response(resp)
 
-	assert.NotEqual(t, "hi {{faker.person.name}}", resp.Body)
+	assert.NotEqual(t, "hi ${faker.person.name}", resp.Body)
 	assert.NotEqual(t, map[string]string{
-		"X-Name": "token: {{faker.lorem.text(5)}}",
+		"X-Name": "token: ${faker.lorem.text(5)}",
 		"X-Test": "no commands",
 	}, resp.Headers)
 }

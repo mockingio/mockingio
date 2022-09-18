@@ -16,7 +16,7 @@ type commandTuple struct {
 // parseCommand parse the string and get commands
 func parseCommand(input string) ([]commandTuple, error) {
 	var commands []commandTuple
-	comp, err := regexp.Compile(`{{faker\.([^{}]+)}}`)
+	comp, err := regexp.Compile(`\${faker\.([^{}]+)}`)
 	if err != nil {
 		return nil, err
 	}

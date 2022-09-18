@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"crypto/tls"
-	"github.com/mockingio/mockingio/engine/plugins/faker"
 	"io"
 	"net/http"
 	"os"
@@ -19,6 +18,7 @@ import (
 	"github.com/mockingio/mockingio/engine/matcher"
 	"github.com/mockingio/mockingio/engine/mock"
 	"github.com/mockingio/mockingio/engine/persistent"
+	"github.com/mockingio/mockingio/engine/plugins/faker"
 )
 
 type Engine struct {
