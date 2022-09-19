@@ -262,7 +262,7 @@ func TestServer_StartStopMockServerHandler(t *testing.T) {
 	})
 }
 
-func newDB(mocks ...*mock.Mock) persistent.Persistent {
+func newDB(mocks ...*mock.Mock) persistent.Database {
 	db := memory.New()
 	for _, m := range mocks {
 		_ = db.SetMock(context.Background(), m)
@@ -271,7 +271,7 @@ func newDB(mocks ...*mock.Mock) persistent.Persistent {
 }
 
 type mockDB struct {
-	persistent.Persistent
+	persistent.Database
 }
 
 func (m *mockDB) GetMocks(_ context.Context) ([]*mock.Mock, error) {

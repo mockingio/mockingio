@@ -6,7 +6,7 @@ import (
 	"github.com/mockingio/mockingio/engine/mock"
 )
 
-type Engine interface {
+type EngineDB interface {
 	GetMock(ctx context.Context, id string) (*mock.Mock, error)
 	GetInt(ctx context.Context, key string) (int, error)
 	Increment(ctx context.Context, key string) (int, error)
@@ -16,12 +16,12 @@ type Engine interface {
 	GetActiveSession(ctx context.Context, mockID string) (string, error)
 }
 
-type Persistent interface {
-	Engine
-	API
+type Database interface {
+	EngineDB
+	CRUD
 }
 
-type API interface {
+type CRUD interface {
 	GetMock(ctx context.Context, id string) (*mock.Mock, error)
 	SetMock(ctx context.Context, cfg *mock.Mock) error
 	GetMocks(ctx context.Context) ([]*mock.Mock, error)

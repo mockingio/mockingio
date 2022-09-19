@@ -25,12 +25,12 @@ import (
 type Engine struct {
 	mockID   string
 	isPaused bool
-	db       persistent.Engine
+	db       persistent.EngineDB
 	mock     *mock.Mock
 	plugins  []Plugin
 }
 
-func New(mockID string, db persistent.Engine) *Engine {
+func New(mockID string, db persistent.EngineDB) *Engine {
 	return &Engine{
 		mockID:  mockID,
 		db:      db,

@@ -17,11 +17,11 @@ import (
 )
 
 type Server struct {
-	db         persistent.Persistent
+	db         persistent.Database
 	mockServer mockServer
 }
 
-func NewServer(db persistent.Persistent, mockServer mockServer) *Server {
+func NewServer(db persistent.Database, mockServer mockServer) *Server {
 	return &Server{
 		db:         db,
 		mockServer: mockServer,
