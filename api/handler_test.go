@@ -66,7 +66,11 @@ func TestServer_GetMocksHandler(t *testing.T) {
                 "responses": [
                     {
                         "id": "response1",
-                        "status": 201
+                        "status": 201,
+						"delay": {
+							"min": 0,
+							"max": 0
+						}
                     }
                 ]
             }

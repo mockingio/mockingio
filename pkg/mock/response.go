@@ -2,7 +2,7 @@ package mock
 
 import (
 	"net/http/httptest"
-	
+
 	"github.com/mockingio/mockingio/engine/mock"
 )
 
@@ -10,8 +10,11 @@ type Response struct {
 	builder *Builder
 }
 
-func (r *Response) Delay(delay int64) *Response {
-	r.builder.response.Delay = delay
+func (r *Response) Delay(min, max int) *Response {
+	r.builder.response.Delay = mock.Delay{
+		Min: min,
+		Max: max,
+	}
 	return r
 }
 

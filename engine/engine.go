@@ -76,8 +76,9 @@ func (eng *Engine) Match(req *http.Request) *mock.Response {
 			continue
 		}
 
-		if response.Delay > 0 {
-			time.Sleep(time.Millisecond * time.Duration(response.Delay))
+		delay := response.Delay.Value()
+		if delay > 0 {
+			time.Sleep(time.Millisecond * time.Duration(delay))
 		}
 
 		return response

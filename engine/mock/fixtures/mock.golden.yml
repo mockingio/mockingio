@@ -22,7 +22,9 @@ routes:
   description: ""
   responses:
   - status: 200
-    delay: 3000
+    delay:
+      min: 100
+      max: 200
     headers:
       Content-Type: application/json
     body: |
