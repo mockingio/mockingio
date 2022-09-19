@@ -16,10 +16,10 @@ import (
 type RouteMatcher struct {
 	route *cfg.Route
 	req   Context
-	db    persistent.Persistent
+	db    persistent.Engine
 }
 
-func NewRouteMatcher(route *cfg.Route, req Context, db persistent.Persistent) *RouteMatcher {
+func NewRouteMatcher(route *cfg.Route, req Context, db persistent.Engine) *RouteMatcher {
 	return &RouteMatcher{
 		route: route,
 		req:   req,

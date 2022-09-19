@@ -11,7 +11,7 @@ func NewResponseMatcher(
 	route *cfg.Route,
 	response *cfg.Response,
 	req Context,
-	db persistent.Persistent,
+	db persistent.Engine,
 ) *ResponseMatcher {
 	return &ResponseMatcher{
 		route:    route,
@@ -25,7 +25,7 @@ type ResponseMatcher struct {
 	route    *cfg.Route
 	response *cfg.Response
 	req      Context
-	db       persistent.Persistent
+	db       persistent.Engine
 }
 
 func (r *ResponseMatcher) Match() (bool, error) {

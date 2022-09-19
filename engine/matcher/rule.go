@@ -9,7 +9,7 @@ import (
 	cfg "github.com/mockingio/mockingio/engine/mock"
 )
 
-func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Context, db persistent.Persistent) *RuleMatcher {
+func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Context, db persistent.Engine) *RuleMatcher {
 	return &RuleMatcher{
 		route: route,
 		rule:  rule,
@@ -22,7 +22,7 @@ type RuleMatcher struct {
 	route *cfg.Route
 	rule  *cfg.Rule
 	req   Context
-	db    persistent.Persistent
+	db    persistent.Engine
 }
 
 func (r *RuleMatcher) Match() (bool, error) {

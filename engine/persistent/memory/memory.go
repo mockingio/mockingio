@@ -14,7 +14,7 @@ import (
 	"github.com/samber/lo"
 )
 
-var _ persistent.Persistent = &Memory{}
+var _ persistent.Engine = &Memory{}
 
 type Memory struct {
 	mu          sync.Mutex

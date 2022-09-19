@@ -378,7 +378,7 @@ func TestEngine_RouteDisabled(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
-func setupMock() persistent.Persistent {
+func setupMock() persistent.Engine {
 	mok := &mock.Mock{
 		ID:       "mock-id",
 		AutoCORS: true,
