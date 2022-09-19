@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/mockingio/mockingio/engine/database/memory"
 	"github.com/mockingio/mockingio/engine/matcher"
 	cfg "github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent/memory"
 )
 
 func TestRuleMatcher_Match(t *testing.T) {

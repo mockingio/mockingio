@@ -15,8 +15,8 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/mockingio/mockingio/engine"
+	"github.com/mockingio/mockingio/engine/database"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 )
 
 const (
@@ -34,11 +34,11 @@ var (
 
 type Server struct {
 	mu               sync.Mutex
-	db               persistent.EngineDB
+	db               database.EngineDB
 	mockServerStates map[string]*MockServerState
 }
 
-func New(db persistent.EngineDB) *Server {
+func New(db database.EngineDB) *Server {
 	return &Server{db: db, mockServerStates: make(map[string]*MockServerState)}
 }
 

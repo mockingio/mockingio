@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/mockingio/mockingio/api/fixtures"
+	"github.com/mockingio/mockingio/engine/database"
+	"github.com/mockingio/mockingio/engine/database/memory"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
-	"github.com/mockingio/mockingio/engine/persistent/memory"
 	"github.com/mockingio/mockingio/engine/server"
 )
 
@@ -262,7 +262,7 @@ func TestServer_StartStopMockServerHandler(t *testing.T) {
 	})
 }
 
-func newDB(mocks ...*mock.Mock) persistent.Database {
+func newDB(mocks ...*mock.Mock) database.Database {
 	db := memory.New()
 	for _, m := range mocks {
 		_ = db.SetMock(context.Background(), m)
@@ -271,7 +271,7 @@ func newDB(mocks ...*mock.Mock) persistent.Database {
 }
 
 type mockDB struct {
-	persistent.CRUD
+	database.CRUD
 }
 
 func (m *mockDB) GetMocks(_ context.Context) ([]*mock.Mock, error) {

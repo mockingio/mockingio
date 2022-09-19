@@ -9,8 +9,8 @@ import (
 	"github.com/itchyny/gojq"
 	"github.com/pkg/errors"
 
+	"github.com/mockingio/mockingio/engine/database"
 	cfg "github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 )
 
 var targets = map[cfg.Target]getTargetValueFn{
@@ -22,13 +22,13 @@ var targets = map[cfg.Target]getTargetValueFn{
 	cfg.Body:          getValueFromBody,
 }
 
-type getTargetValueFn func(route *cfg.Route, modifier string, req Context, db persistent.EngineDB) (string, error)
+type getTargetValueFn func(route *cfg.Route, modifier string, req Context, db database.EngineDB) (string, error)
 
-func getValueFromHeader(_ *cfg.Route, modifier string, req Context, _ persistent.EngineDB) (string, error) {
+func getValueFromHeader(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	return req.HTTPRequest.Header.Get(modifier), nil
 }
 
-func getValueFromCookie(_ *cfg.Route, modifier string, req Context, _ persistent.EngineDB) (string, error) {
+func getValueFromCookie(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	cookies := req.HTTPRequest.Cookies()
 	for _, c := range cookies {
 		if c.Name == modifier {
@@ -38,11 +38,11 @@ func getValueFromCookie(_ *cfg.Route, modifier string, req Context, _ persistent
 	return "", nil
 }
 
-func getValueFromQueryString(_ *cfg.Route, modifier string, req Context, _ persistent.EngineDB) (string, error) {
+func getValueFromQueryString(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	return req.HTTPRequest.URL.Query().Get(modifier), nil
 }
 
-func getRequestNumber(_ *cfg.Route, _ string, req Context, db persistent.EngineDB) (string, error) {
+func getRequestNumber(_ *cfg.Route, _ string, req Context, db database.EngineDB) (string, error) {
 	value, err := db.GetInt(req.HTTPRequest.Context(), req.CountID())
 	if err != nil {
 		return "", err
@@ -50,7 +50,7 @@ func getRequestNumber(_ *cfg.Route, _ string, req Context, db persistent.EngineD
 	return strconv.Itoa(value), nil
 }
 
-func getValueFromRouteParam(route *cfg.Route, modifier string, req Context, _ persistent.EngineDB) (string, error) {
+func getValueFromRouteParam(route *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	templateParts := strings.Split(route.Path, "/")
 	actualParts := strings.Split(req.HTTPRequest.URL.Path, "/")
 	if len(templateParts) != len(actualParts) {
@@ -68,7 +68,7 @@ func getValueFromRouteParam(route *cfg.Route, modifier string, req Context, _ pe
 	return "", nil
 }
 
-func getValueFromBody(_ *cfg.Route, modifier string, req Context, _ persistent.EngineDB) (string, error) {
+func getValueFromBody(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	httpRequest := req.HTTPRequest
 	if httpRequest.Body == nil {
 		return "", nil

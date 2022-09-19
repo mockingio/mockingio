@@ -9,12 +9,12 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/mockingio/mockingio/engine/database"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 	"github.com/samber/lo"
 )
 
-var _ persistent.EngineDB = &Memory{}
+var _ database.EngineDB = &Memory{}
 
 type Memory struct {
 	mu          sync.Mutex

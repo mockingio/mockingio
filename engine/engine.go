@@ -16,21 +16,21 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/mockingio/mockingio/engine/database"
 	"github.com/mockingio/mockingio/engine/matcher"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/engine/plugins/faker"
 )
 
 type Engine struct {
 	mockID   string
 	isPaused bool
-	db       persistent.EngineDB
+	db       database.EngineDB
 	mock     *mock.Mock
 	plugins  []Plugin
 }
 
-func New(mockID string, db persistent.EngineDB) *Engine {
+func New(mockID string, db database.EngineDB) *Engine {
 	return &Engine{
 		mockID:  mockID,
 		db:      db,

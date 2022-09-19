@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/mockingio/mockingio/engine"
+	"github.com/mockingio/mockingio/engine/database/memory"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent/memory"
 )
 
 const (

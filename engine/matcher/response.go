@@ -3,15 +3,15 @@ package matcher
 import (
 	"github.com/pkg/errors"
 
+	"github.com/mockingio/mockingio/engine/database"
 	cfg "github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 )
 
 func NewResponseMatcher(
 	route *cfg.Route,
 	response *cfg.Response,
 	req Context,
-	db persistent.EngineDB,
+	db database.EngineDB,
 ) *ResponseMatcher {
 	return &ResponseMatcher{
 		route:    route,
@@ -25,7 +25,7 @@ type ResponseMatcher struct {
 	route    *cfg.Route
 	response *cfg.Response
 	req      Context
-	db       persistent.EngineDB
+	db       database.EngineDB
 }
 
 func (r *ResponseMatcher) Match() (bool, error) {

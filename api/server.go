@@ -11,17 +11,17 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/mockingio/mockingio/engine/database"
 	mockEngine "github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 	"github.com/mockingio/mockingio/engine/server"
 )
 
 type Server struct {
-	db         persistent.CRUD
+	db         database.CRUD
 	mockServer mockServer
 }
 
-func NewServer(db persistent.CRUD, mockServer mockServer) *Server {
+func NewServer(db database.CRUD, mockServer mockServer) *Server {
 	return &Server{
 		db:         db,
 		mockServer: mockServer,

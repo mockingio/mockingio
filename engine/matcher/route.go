@@ -9,17 +9,17 @@ import (
 	"github.com/minio/pkg/wildcard"
 	"github.com/pkg/errors"
 
+	"github.com/mockingio/mockingio/engine/database"
 	cfg "github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
 )
 
 type RouteMatcher struct {
 	route *cfg.Route
 	req   Context
-	db    persistent.EngineDB
+	db    database.EngineDB
 }
 
-func NewRouteMatcher(route *cfg.Route, req Context, db persistent.EngineDB) *RouteMatcher {
+func NewRouteMatcher(route *cfg.Route, req Context, db database.EngineDB) *RouteMatcher {
 	return &RouteMatcher{
 		route: route,
 		req:   req,

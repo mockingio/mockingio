@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/mockingio/mockingio/engine"
+	"github.com/mockingio/mockingio/engine/database"
+	"github.com/mockingio/mockingio/engine/database/memory"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
-	"github.com/mockingio/mockingio/engine/persistent/memory"
 )
 
 //go:embed fixture/mock.yml
@@ -378,7 +378,7 @@ func TestEngine_RouteDisabled(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
-func setupMock() persistent.EngineDB {
+func setupMock() database.EngineDB {
 	mok := &mock.Mock{
 		ID:       "mock-id",
 		AutoCORS: true,

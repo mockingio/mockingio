@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/mockingio/mockingio/engine/database"
+	"github.com/mockingio/mockingio/engine/database/memory"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/mockingio/mockingio/engine/persistent"
-	"github.com/mockingio/mockingio/engine/persistent/memory"
 )
 
 var (
@@ -171,7 +171,7 @@ func TestServer_TLS(t *testing.T) {
 
 }
 
-func setupDatabase() persistent.EngineDB {
+func setupDatabase() database.EngineDB {
 	db := memory.New()
 
 	_ = db.SetMock(context.Background(), &mock.Mock{ID: "*mock-id-1*"})

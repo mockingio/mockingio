@@ -1,7 +1,7 @@
 package matcher
 
 import (
-	"github.com/mockingio/mockingio/engine/persistent"
+	"github.com/mockingio/mockingio/engine/database"
 	"regexp"
 
 	"github.com/pkg/errors"
@@ -9,7 +9,7 @@ import (
 	cfg "github.com/mockingio/mockingio/engine/mock"
 )
 
-func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Context, db persistent.EngineDB) *RuleMatcher {
+func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Context, db database.EngineDB) *RuleMatcher {
 	return &RuleMatcher{
 		route: route,
 		rule:  rule,
@@ -22,7 +22,7 @@ type RuleMatcher struct {
 	route *cfg.Route
 	rule  *cfg.Rule
 	req   Context
-	db    persistent.EngineDB
+	db    database.EngineDB
 }
 
 func (r *RuleMatcher) Match() (bool, error) {
