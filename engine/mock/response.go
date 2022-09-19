@@ -14,7 +14,7 @@ const (
 type Response struct {
 	ID              string            `yaml:"id,omitempty" json:"id,omitempty"`
 	Status          int               `yaml:"status" json:"status"`
-	Delay           int64             `yaml:"delay,omitempty" json:"delay,omitempty"`
+	Delay           Delay             `yaml:"delay,omitempty" json:"delay,omitempty"`
 	Headers         map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
 	Body            string            `yaml:"body,omitempty" json:"body,omitempty"`
 	FilePath        string            `yaml:"file_path,omitempty" json:"file_path,omitempty"`

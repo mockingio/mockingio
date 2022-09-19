@@ -85,7 +85,10 @@ func TestEngine_Match_With_Delay_Response(t *testing.T) {
 				Responses: []mock.Response{
 					{
 						Status: 200,
-						Delay:  50,
+						Delay: mock.Delay{
+							Min: 50,
+							Max: 100,
+						},
 					},
 				},
 			},

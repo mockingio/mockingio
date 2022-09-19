@@ -148,7 +148,7 @@ func TestBuilder_MatchedRoute(t *testing.T) {
 		srv, err := New().
 			Get("/hello").
 			Response(http.StatusOK, "world").
-			Delay(50).
+			Delay(50, 100).
 			Start()
 		defer srv.Close()
 
