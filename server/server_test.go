@@ -171,7 +171,7 @@ func TestServer_TLS(t *testing.T) {
 
 }
 
-func setupDatabase() persistent.Database {
+func setupDatabase() persistent.EngineDB {
 	db := memory.New()
 
 	_ = db.SetMock(context.Background(), &mock.Mock{ID: "*mock-id-1*"})

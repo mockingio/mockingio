@@ -271,7 +271,7 @@ func newDB(mocks ...*mock.Mock) persistent.Database {
 }
 
 type mockDB struct {
-	persistent.Database
+	persistent.CRUD
 }
 
 func (m *mockDB) GetMocks(_ context.Context) ([]*mock.Mock, error) {

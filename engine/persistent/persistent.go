@@ -7,7 +7,7 @@ import (
 )
 
 type EngineDB interface {
-	GetMock(ctx context.Context, id string) (*mock.Mock, error)
+	MockReadWriter
 	GetInt(ctx context.Context, key string) (int, error)
 	Increment(ctx context.Context, key string) (int, error)
 	Set(ctx context.Context, key string, value any) error
@@ -16,14 +16,18 @@ type EngineDB interface {
 	GetActiveSession(ctx context.Context, mockID string) (string, error)
 }
 
+type MockReadWriter interface {
+	GetMock(ctx context.Context, id string) (*mock.Mock, error)
+	SetMock(ctx context.Context, cfg *mock.Mock) error
+}
+
 type Database interface {
 	EngineDB
 	CRUD
 }
 
 type CRUD interface {
-	GetMock(ctx context.Context, id string) (*mock.Mock, error)
-	SetMock(ctx context.Context, cfg *mock.Mock) error
+	MockReadWriter
 	GetMocks(ctx context.Context) ([]*mock.Mock, error)
 	PatchRoute(ctx context.Context, mockID string, routeID string, data string) error
 	DeleteRoute(ctx context.Context, mockID string, routeID string) error

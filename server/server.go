@@ -34,11 +34,11 @@ var (
 
 type Server struct {
 	mu               sync.Mutex
-	db               persistent.Database
+	db               persistent.EngineDB
 	mockServerStates map[string]*MockServerState
 }
 
-func New(db persistent.Database) *Server {
+func New(db persistent.EngineDB) *Server {
 	return &Server{db: db, mockServerStates: make(map[string]*MockServerState)}
 }
 

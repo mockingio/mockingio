@@ -83,7 +83,7 @@ func printServersInfo(mockUrls []string, adminURL string) {
 }
 
 // mustLoadMocks loop through mock files and load them to database.
-func mustLoadMocks(ctx context.Context, filenames []string, db persistent.Database) map[string]struct {
+func mustLoadMocks(ctx context.Context, filenames []string, db persistent.EngineDB) map[string]struct {
 	filename string
 	mock     *mock.Mock
 } {
