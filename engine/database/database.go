@@ -6,6 +6,7 @@ import (
 	"github.com/mockingio/mockingio/engine/mock"
 )
 
+// EngineDB represents the database interface for the engine
 type EngineDB interface {
 	MockReadWriter
 	GetInt(ctx context.Context, key string) (int, error)
@@ -26,6 +27,7 @@ type Database interface {
 	CRUD
 }
 
+// CRUD represents the database interface for the CRUD operations
 type CRUD interface {
 	MockReadWriter
 	GetMocks(ctx context.Context) ([]*mock.Mock, error)
