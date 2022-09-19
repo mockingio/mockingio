@@ -18,7 +18,7 @@ type Delay struct {
 }
 
 func (d Delay) Value() int {
-	if d.Min == d.Min {
+	if d.Min == d.Max {
 		return d.Min
 	}
 
