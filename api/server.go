@@ -13,7 +13,7 @@ import (
 
 	mockEngine "github.com/mockingio/mockingio/engine/mock"
 	"github.com/mockingio/mockingio/engine/persistent"
-	"github.com/mockingio/mockingio/server"
+	"github.com/mockingio/mockingio/engine/server"
 )
 
 type Server struct {
