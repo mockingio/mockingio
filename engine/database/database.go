@@ -9,10 +9,10 @@ import (
 // EngineDB represents the database interface for the engine
 type EngineDB interface {
 	MockReadWriter
-	GetInt(ctx context.Context, key string) (int, error)
-	Increment(ctx context.Context, key string) (int, error)
-	Set(ctx context.Context, key string, value any) error
-	Get(ctx context.Context, key string) (any, error)
+	GetInt(ctx context.Context, mockID, key string) (int, error)
+	Increment(ctx context.Context, mockID, key string) (int, error)
+	Set(ctx context.Context, mockID, key string, value any) error
+	Get(ctx context.Context, mockID, key string) (any, error)
 	SetActiveSession(ctx context.Context, mockID string, sessionID string) error
 	GetActiveSession(ctx context.Context, mockID string) (string, error)
 }

@@ -183,7 +183,7 @@ func TestRouteMatcher_Match(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := matcher.NewRouteMatcher(tt.route, matcher.Context{
+			result, err := matcher.NewRouteMatcher(&cfg.Mock{}, tt.route, matcher.Context{
 				HTTPRequest: tt.httpReq,
 			}, memory.New()).Match()
 			assert.Equal(t, tt.expectedResponse, result)
@@ -246,7 +246,7 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 			}},
 		}
 
-		m := matcher.NewRouteMatcher(route, matcher.Context{
+		m := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, memory.New())
 		res, _ := m.Match()
@@ -260,7 +260,7 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 			Responses: []cfg.Response{response1, response2, response3},
 		}
 
-		result, err := matcher.NewRouteMatcher(route, matcher.Context{
+		result, err := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, memory.New()).Match()
 
@@ -287,7 +287,7 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 			Responses: []cfg.Response{response1, response2, defaultResponse, response3},
 		}
 
-		result, err := matcher.NewRouteMatcher(route, matcher.Context{
+		result, err := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, memory.New()).Match()
 		require.NoError(t, err)
@@ -304,19 +304,19 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 
 		db := memory.New()
 
-		result1, err := matcher.NewRouteMatcher(route, matcher.Context{
+		result1, err := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, db).Match()
 		require.NoError(t, err)
 		assert.Equal(t, &response1, result1)
 
-		result2, err := matcher.NewRouteMatcher(route, matcher.Context{
+		result2, err := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, db).Match()
 		require.NoError(t, err)
 		assert.Equal(t, &response2, result2)
 
-		result3, err := matcher.NewRouteMatcher(route, matcher.Context{
+		result3, err := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, db).Match()
 		require.NoError(t, err)
@@ -334,12 +334,12 @@ func TestRouteMatcher_ResponseStrategy(t *testing.T) {
 		db := memory.New()
 
 		passed := false
-		result, _ := matcher.NewRouteMatcher(route, matcher.Context{
+		result, _ := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 			HTTPRequest: request,
 		}, db).Match()
 
 		for i := 0; i < 100; i++ {
-			check, _ := matcher.NewRouteMatcher(route, matcher.Context{
+			check, _ := matcher.NewRouteMatcher(&cfg.Mock{}, route, matcher.Context{
 				HTTPRequest: request,
 			}, db).Match()
 			if check.ID != result.ID {

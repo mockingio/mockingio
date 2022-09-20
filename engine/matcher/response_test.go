@@ -102,7 +102,7 @@ func TestResponseMatcher_Match(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := memory.New()
-			isMatched, err := matcher.NewResponseMatcher(nil, tt.response, matcher.Context{
+			isMatched, err := matcher.NewResponseMatcher(&cfg.Mock{}, nil, tt.response, matcher.Context{
 				HTTPRequest: newRequest(),
 			}, db).Match()
 			require.NoError(t, err)

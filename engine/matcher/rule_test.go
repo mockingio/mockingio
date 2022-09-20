@@ -92,9 +92,9 @@ func TestRuleMatcher_Match(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mem := memory.New()
-			_ = mem.Set(context.Background(), req.CountID(), 2)
+			_ = mem.Set(context.Background(), "", req.CountID(), 2)
 
-			matched, err := matcher.NewRuleMatcher(tt.route, tt.rule, matcher.Context{
+			matched, err := matcher.NewRuleMatcher(&cfg.Mock{}, tt.route, tt.rule, matcher.Context{
 				HTTPRequest: tt.request,
 				SessionID:   sessionID,
 			}, mem).Match()
@@ -117,7 +117,7 @@ func TestRuleMatcher_GetTargetValue(t *testing.T) {
 	}
 
 	mem := memory.New()
-	_ = mem.Set(context.Background(), req.CountID(), 2)
+	_ = mem.Set(context.Background(), "", req.CountID(), 2)
 
 	var route = &cfg.Route{
 		Path: "/api/:object/:action",
@@ -149,7 +149,7 @@ func TestRuleMatcher_GetTargetValue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Target: %v, Modifier: %v", tt.rule.Target, tt.rule.Modifier), func(t *testing.T) {
-			actual, err := matcher.NewRuleMatcher(tt.route, tt.rule, matcher.Context{
+			actual, err := matcher.NewRuleMatcher(&cfg.Mock{}, tt.route, tt.rule, matcher.Context{
 				HTTPRequest: tt.request,
 				SessionID:   sessionID,
 			}, mem).GetTargetValue()

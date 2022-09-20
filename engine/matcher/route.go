@@ -17,13 +17,15 @@ type RouteMatcher struct {
 	route *cfg.Route
 	req   Context
 	db    database.EngineDB
+	mock  *cfg.Mock
 }
 
-func NewRouteMatcher(route *cfg.Route, req Context, db database.EngineDB) *RouteMatcher {
+func NewRouteMatcher(mock *cfg.Mock, route *cfg.Route, req Context, db database.EngineDB) *RouteMatcher {
 	return &RouteMatcher{
 		route: route,
 		req:   req,
 		db:    db,
+		mock:  mock,
 	}
 }
 
@@ -49,6 +51,7 @@ func (r *RouteMatcher) Match() (*cfg.Response, error) {
 
 	_, err := r.db.Increment(
 		httpRequest.Context(),
+		r.mock.ID,
 		r.req.CountID(),
 	)
 	if err != nil {
@@ -72,17 +75,17 @@ func (r *RouteMatcher) pickResponse(responses []*cfg.Response) (*cfg.Response, e
 
 	switch r.route.ResponseMode {
 	case cfg.ResponseSequentially:
-		idx, err := r.db.GetInt(ctx, sequenceID)
+		idx, err := r.db.GetInt(ctx, r.mock.ID, sequenceID)
 		if err != nil {
 			return nil, err
 		}
 
 		if idx+1 == len(responses) {
-			if err := r.db.Set(ctx, sequenceID, 0); err != nil {
+			if err := r.db.Set(ctx, r.mock.ID, sequenceID, 0); err != nil {
 				return nil, err
 			}
 		} else {
-			if err := r.db.Set(ctx, sequenceID, idx+1); err != nil {
+			if err := r.db.Set(ctx, r.mock.ID, sequenceID, idx+1); err != nil {
 				return nil, err
 			}
 		}
@@ -108,7 +111,7 @@ func (r *RouteMatcher) findMatches() ([]*cfg.Response, error) {
 
 	for _, response := range r.route.Responses {
 		response := response
-		matched, err := NewResponseMatcher(r.route, &response, r.req, r.db).Match()
+		matched, err := NewResponseMatcher(r.mock, r.route, &response, r.req, r.db).Match()
 		if err != nil {
 			return nil, err
 		}

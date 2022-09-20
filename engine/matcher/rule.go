@@ -9,12 +9,13 @@ import (
 	cfg "github.com/mockingio/mockingio/engine/mock"
 )
 
-func NewRuleMatcher(route *cfg.Route, rule *cfg.Rule, req Context, db database.EngineDB) *RuleMatcher {
+func NewRuleMatcher(mok *cfg.Mock, route *cfg.Route, rule *cfg.Rule, req Context, db database.EngineDB) *RuleMatcher {
 	return &RuleMatcher{
 		route: route,
 		rule:  rule,
 		req:   req,
 		db:    db,
+		mock:  mok,
 	}
 }
 
@@ -23,6 +24,7 @@ type RuleMatcher struct {
 	rule  *cfg.Rule
 	req   Context
 	db    database.EngineDB
+	mock  *cfg.Mock
 }
 
 func (r *RuleMatcher) Match() (bool, error) {
@@ -49,7 +51,7 @@ func (r *RuleMatcher) Match() (bool, error) {
 
 func (r *RuleMatcher) GetTargetValue() (string, error) {
 	if targetFn, ok := targets[r.rule.Target]; ok {
-		return targetFn(r.route, r.rule.Modifier, r.req, r.db)
+		return targetFn(r.mock, r.route, r.rule.Modifier, r.req, r.db)
 	}
 
 	return "", nil

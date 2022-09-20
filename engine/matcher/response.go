@@ -8,6 +8,7 @@ import (
 )
 
 func NewResponseMatcher(
+	mok *cfg.Mock,
 	route *cfg.Route,
 	response *cfg.Response,
 	req Context,
@@ -18,6 +19,7 @@ func NewResponseMatcher(
 		response: response,
 		req:      req,
 		db:       db,
+		mock:     mok,
 	}
 }
 
@@ -26,6 +28,7 @@ type ResponseMatcher struct {
 	response *cfg.Response
 	req      Context
 	db       database.EngineDB
+	mock     *cfg.Mock
 }
 
 func (r *ResponseMatcher) Match() (bool, error) {
@@ -39,7 +42,7 @@ func (r *ResponseMatcher) Match() (bool, error) {
 	}
 
 	for _, rule := range r.response.Rules {
-		matched, err := NewRuleMatcher(r.route, &rule, r.req, r.db).Match() // matcher. rule.Match(route, request)
+		matched, err := NewRuleMatcher(r.mock, r.route, &rule, r.req, r.db).Match() // matcher. rule.Match(route, request)
 		if err != nil {
 			return false, errors.Wrap(err, "matching rule")
 		}

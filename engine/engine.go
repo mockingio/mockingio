@@ -62,7 +62,7 @@ func (eng *Engine) Match(req *http.Request) *mock.Response {
 
 	for _, route := range mok.Routes {
 		log.Debugf("Matching route: %v %v", route.Method, route.Path)
-		response, err := matcher.NewRouteMatcher(route, matcher.Context{
+		response, err := matcher.NewRouteMatcher(mok, route, matcher.Context{
 			HTTPRequest: req,
 			SessionID:   sessionID,
 		}, eng.db).Match()

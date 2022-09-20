@@ -35,18 +35,18 @@ func (m *Memory) SubscribeMockChanges(subscriber func(mock mock.Mock)) {
 	m.subscribers = append(m.subscribers, subscriber)
 }
 
-func (m *Memory) Get(_ context.Context, key string) (any, error) {
+func (m *Memory) Get(_ context.Context, mockID, key string) (any, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	return m.kv[key], nil
+	return m.kv[mockID+key], nil
 }
 
-func (m *Memory) Set(_ context.Context, key string, value any) error {
+func (m *Memory) Set(_ context.Context, mockID, key string, value any) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	m.kv[key] = value
+	m.kv[mockID+key] = value
 	return nil
 }
 
@@ -83,8 +83,8 @@ func (m *Memory) GetMocks(_ context.Context) ([]*mock.Mock, error) {
 	return configs, nil
 }
 
-func (m *Memory) GetInt(ctx context.Context, key string) (int, error) {
-	v, err := m.Get(ctx, key)
+func (m *Memory) GetInt(ctx context.Context, mockID, key string) (int, error) {
+	v, err := m.Get(ctx, mockID, key)
 	if err != nil {
 		return 0, err
 	}
@@ -101,11 +101,11 @@ func (m *Memory) GetInt(ctx context.Context, key string) (int, error) {
 	return value, nil
 }
 
-func (m *Memory) Increment(_ context.Context, key string) (int, error) {
+func (m *Memory) Increment(_ context.Context, mockID, key string) (int, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	value, ok := m.kv[key]
+	value, ok := m.kv[mockID+key]
 	if !ok {
 		m.kv[key] = 1
 		return 1, nil
@@ -117,17 +117,17 @@ func (m *Memory) Increment(_ context.Context, key string) (int, error) {
 	}
 
 	val++
-	m.kv[key] = val
+	m.kv[mockID+key] = val
 
 	return val, nil
 }
 
 func (m *Memory) SetActiveSession(ctx context.Context, mockID string, sessionID string) error {
-	return m.Set(ctx, toActiveSessionKey(mockID), sessionID)
+	return m.Set(ctx, mockID, toActiveSessionKey(mockID), sessionID)
 }
 
 func (m *Memory) GetActiveSession(ctx context.Context, mockID string) (string, error) {
-	value, err := m.Get(ctx, toActiveSessionKey(mockID))
+	value, err := m.Get(ctx, mockID, toActiveSessionKey(mockID))
 	if err != nil {
 		return "", err
 	}

@@ -34,14 +34,14 @@ func TestMemory_GetSetConfig(t *testing.T) {
 func TestMemory_GetInt(t *testing.T) {
 	m := New()
 
-	err := m.Set(context.Background(), "*id*", 200)
+	err := m.Set(context.Background(), "*mock-id*", "*id*", 200)
 	require.NoError(t, err)
 
-	value, err := m.GetInt(context.Background(), "*id*")
+	value, err := m.GetInt(context.Background(), "*mock-id*", "*id*")
 	require.NoError(t, err)
 	assert.Equal(t, value, 200)
 
-	value, err = m.GetInt(context.Background(), "*random*")
+	value, err = m.GetInt(context.Background(), "*mock-id*", "*random*")
 	require.NoError(t, err)
 	assert.Equal(t, value, 0)
 }
@@ -49,26 +49,26 @@ func TestMemory_GetInt(t *testing.T) {
 func TestMemory_Increase(t *testing.T) {
 	m := New()
 
-	err := m.Set(context.Background(), "*id*", 200)
+	err := m.Set(context.Background(), "*mock-id*", "*id*", 200)
 	require.NoError(t, err)
 
-	val, err := m.Increment(context.Background(), "*id*")
+	val, err := m.Increment(context.Background(), "*mock-id*", "*id*")
 	require.NoError(t, err)
 	assert.Equal(t, 201, val)
 
-	i, err := m.GetInt(context.Background(), "*id*")
+	i, err := m.GetInt(context.Background(), "*mock-id*", "*id*")
 	require.NoError(t, err)
 	assert.Equal(t, 201, i)
 
 	// when key does not exist
-	val, err = m.Increment(context.Background(), "*random*")
+	val, err = m.Increment(context.Background(), "*mock-id*", "*random*")
 	require.NoError(t, err)
 	assert.Equal(t, 1, val)
 
 	// when value is not int
-	err = m.Set(context.Background(), "*non-int*", "200")
+	err = m.Set(context.Background(), "*mock-id*", "*non-int*", "200")
 	require.NoError(t, err)
-	_, err = m.Increment(context.Background(), "*non-int*")
+	_, err = m.Increment(context.Background(), "*mock-id*", "*non-int*")
 	assert.Error(t, err)
 }
 

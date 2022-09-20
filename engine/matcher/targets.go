@@ -22,13 +22,13 @@ var targets = map[cfg.Target]getTargetValueFn{
 	cfg.Body:          getValueFromBody,
 }
 
-type getTargetValueFn func(route *cfg.Route, modifier string, req Context, db database.EngineDB) (string, error)
+type getTargetValueFn func(mok *cfg.Mock, route *cfg.Route, modifier string, req Context, db database.EngineDB) (string, error)
 
-func getValueFromHeader(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
+func getValueFromHeader(_ *cfg.Mock, _ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	return req.HTTPRequest.Header.Get(modifier), nil
 }
 
-func getValueFromCookie(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
+func getValueFromCookie(_ *cfg.Mock, _ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	cookies := req.HTTPRequest.Cookies()
 	for _, c := range cookies {
 		if c.Name == modifier {
@@ -38,19 +38,19 @@ func getValueFromCookie(_ *cfg.Route, modifier string, req Context, _ database.E
 	return "", nil
 }
 
-func getValueFromQueryString(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
+func getValueFromQueryString(_ *cfg.Mock, _ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	return req.HTTPRequest.URL.Query().Get(modifier), nil
 }
 
-func getRequestNumber(_ *cfg.Route, _ string, req Context, db database.EngineDB) (string, error) {
-	value, err := db.GetInt(req.HTTPRequest.Context(), req.CountID())
+func getRequestNumber(mok *cfg.Mock, _ *cfg.Route, _ string, req Context, db database.EngineDB) (string, error) {
+	value, err := db.GetInt(req.HTTPRequest.Context(), mok.ID, req.CountID())
 	if err != nil {
 		return "", err
 	}
 	return strconv.Itoa(value), nil
 }
 
-func getValueFromRouteParam(route *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
+func getValueFromRouteParam(_ *cfg.Mock, route *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	templateParts := strings.Split(route.Path, "/")
 	actualParts := strings.Split(req.HTTPRequest.URL.Path, "/")
 	if len(templateParts) != len(actualParts) {
@@ -68,7 +68,7 @@ func getValueFromRouteParam(route *cfg.Route, modifier string, req Context, _ da
 	return "", nil
 }
 
-func getValueFromBody(_ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
+func getValueFromBody(_ *cfg.Mock, _ *cfg.Route, modifier string, req Context, _ database.EngineDB) (string, error) {
 	httpRequest := req.HTTPRequest
 	if httpRequest.Body == nil {
 		return "", nil
