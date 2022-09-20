@@ -9,9 +9,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/samber/lo"
+
 	"github.com/mockingio/mockingio/engine/database"
 	"github.com/mockingio/mockingio/engine/mock"
-	"github.com/samber/lo"
 )
 
 var _ database.EngineDB = &Memory{}
