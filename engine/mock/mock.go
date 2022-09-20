@@ -1,6 +1,7 @@
 package mock
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -80,6 +81,15 @@ func (m Mock) ProxyEnabled() bool {
 
 func (m Mock) TLSEnabled() bool {
 	return m.TLS != nil && m.TLS.Enabled
+}
+
+func (m Mock) JSON() (string, error) {
+	data, err := json.Marshal(m)
+	if err != nil {
+		return "", errors.Wrap(err, "marshal mock to json")
+	}
+
+	return string(data), nil
 }
 
 func defaultValues(m *Mock) {
