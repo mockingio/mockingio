@@ -34,7 +34,7 @@ func TestMemory_GetSetConfig(t *testing.T) {
 func TestMemory_GetInt(t *testing.T) {
 	m := New()
 
-	err := m.Set(context.Background(), "*mock-id*", "*id*", 200)
+	err := m.Set(context.Background(), "*mock-id*", "*id*", "200")
 	require.NoError(t, err)
 
 	value, err := m.GetInt(context.Background(), "*mock-id*", "*id*")
@@ -49,7 +49,7 @@ func TestMemory_GetInt(t *testing.T) {
 func TestMemory_Increase(t *testing.T) {
 	m := New()
 
-	err := m.Set(context.Background(), "*mock-id*", "*id*", 200)
+	err := m.Set(context.Background(), "*mock-id*", "*id*", "200")
 	require.NoError(t, err)
 
 	val, err := m.Increment(context.Background(), "*mock-id*", "*id*")
@@ -66,7 +66,7 @@ func TestMemory_Increase(t *testing.T) {
 	assert.Equal(t, 1, val)
 
 	// when value is not int
-	err = m.Set(context.Background(), "*mock-id*", "*non-int*", "200")
+	err = m.Set(context.Background(), "*mock-id*", "*non-int*", "20x0")
 	require.NoError(t, err)
 	_, err = m.Increment(context.Background(), "*mock-id*", "*non-int*")
 	assert.Error(t, err)

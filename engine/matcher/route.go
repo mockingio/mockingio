@@ -3,6 +3,7 @@ package matcher
 import (
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -81,11 +82,11 @@ func (r *RouteMatcher) pickResponse(responses []*cfg.Response) (*cfg.Response, e
 		}
 
 		if idx+1 == len(responses) {
-			if err := r.db.Set(ctx, r.mock.ID, sequenceID, 0); err != nil {
+			if err := r.db.Set(ctx, r.mock.ID, sequenceID, "0"); err != nil {
 				return nil, err
 			}
 		} else {
-			if err := r.db.Set(ctx, r.mock.ID, sequenceID, idx+1); err != nil {
+			if err := r.db.Set(ctx, r.mock.ID, sequenceID, strconv.Itoa(idx+1)); err != nil {
 				return nil, err
 			}
 		}

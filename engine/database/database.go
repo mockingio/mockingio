@@ -11,8 +11,8 @@ type EngineDB interface {
 	MockReadWriter
 	GetInt(ctx context.Context, mockID, key string) (int, error)
 	Increment(ctx context.Context, mockID, key string) (int, error)
-	Set(ctx context.Context, mockID, key string, value any) error
-	Get(ctx context.Context, mockID, key string) (any, error)
+	Set(ctx context.Context, mockID, key, value string) error
+	Get(ctx context.Context, mockID, key string) (string, error)
 	SetActiveSession(ctx context.Context, mockID string, sessionID string) error
 	GetActiveSession(ctx context.Context, mockID string) (string, error)
 }

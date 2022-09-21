@@ -92,7 +92,7 @@ func TestRuleMatcher_Match(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mem := memory.New()
-			_ = mem.Set(context.Background(), "", req.CountID(), 2)
+			_ = mem.Set(context.Background(), "", req.CountID(), "2")
 
 			matched, err := matcher.NewRuleMatcher(&cfg.Mock{}, tt.route, tt.rule, matcher.Context{
 				HTTPRequest: tt.request,
@@ -117,7 +117,7 @@ func TestRuleMatcher_GetTargetValue(t *testing.T) {
 	}
 
 	mem := memory.New()
-	_ = mem.Set(context.Background(), "", req.CountID(), 2)
+	_ = mem.Set(context.Background(), "", req.CountID(), "2")
 
 	var route = &cfg.Route{
 		Path: "/api/:object/:action",

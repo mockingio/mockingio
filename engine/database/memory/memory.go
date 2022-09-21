@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -35,14 +36,24 @@ func (m *Memory) SubscribeMockChanges(subscriber func(mock mock.Mock)) {
 	m.subscribers = append(m.subscribers, subscriber)
 }
 
-func (m *Memory) Get(_ context.Context, mockID, key string) (any, error) {
+func (m *Memory) Get(_ context.Context, mockID, key string) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	return m.kv[mockID+key], nil
+	value := m.kv[mockID+key]
+
+	if value == nil {
+		return "", nil
+	}
+
+	if v, ok := value.(int); ok {
+		return strconv.Itoa(v), nil
+	}
+
+	return value.(string), nil
 }
 
-func (m *Memory) Set(_ context.Context, mockID, key string, value any) error {
+func (m *Memory) Set(_ context.Context, mockID, key string, value string) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -89,12 +100,12 @@ func (m *Memory) GetInt(ctx context.Context, mockID, key string) (int, error) {
 		return 0, err
 	}
 
-	if v == nil {
+	if v == "" {
 		return 0, nil
 	}
 
-	value, ok := v.(int)
-	if !ok {
+	value, err := strconv.Atoi(v)
+	if err != nil {
 		return 0, nil
 	}
 
@@ -106,18 +117,18 @@ func (m *Memory) Increment(_ context.Context, mockID, key string) (int, error) {
 	defer m.mu.Unlock()
 
 	value, ok := m.kv[mockID+key]
-	if !ok {
-		m.kv[key] = 1
+	if !ok || value == nil {
+		m.kv[key] = "1"
 		return 1, nil
 	}
 
-	val, ok := value.(int)
-	if !ok {
+	val, err := strconv.Atoi(value.(string))
+	if err != nil {
 		return 0, errors.New(fmt.Sprintf("unable to increase non-int key (%s)", key))
 	}
 
 	val++
-	m.kv[mockID+key] = val
+	m.kv[mockID+key] = strconv.Itoa(val)
 
 	return val, nil
 }
@@ -132,11 +143,7 @@ func (m *Memory) GetActiveSession(ctx context.Context, mockID string) (string, e
 		return "", err
 	}
 
-	if v, ok := value.(string); ok {
-		return v, nil
-	}
-
-	return "", errors.New("unable to convert to string value")
+	return value, nil
 }
 
 func (m *Memory) PatchRoute(ctx context.Context, mockID string, routeID string, data string) error {
