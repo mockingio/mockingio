@@ -1,8 +1,6 @@
 name: "Auto Release"
 concurrency: release
 on:
-  schedule:
-    - cron: "6 17 * * 2"
   workflow_dispatch:
     inputs:
       release_type:
