@@ -13,7 +13,7 @@ const (
 
 type Response struct {
 	ID              string            `yaml:"id,omitempty" json:"id,omitempty"`
-	Status          int               `yaml:"status" json:"status"`
+	Status          int               `yaml:"status" json:"status,omitempty"`
 	Delay           Delay             `yaml:"delay,omitempty" json:"delay,omitempty"`
 	Headers         map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
 	Body            string            `yaml:"body,omitempty" json:"body,omitempty"`
@@ -26,7 +26,7 @@ type Response struct {
 func (r Response) Validate() error {
 	return validation.ValidateStruct(
 		&r,
-		validation.Field(&r.Status, validation.Required),
+		validation.Field(&r.Status, validation.Min(100), validation.Max(999)),
 		validation.Field(&r.RuleAggregation, validation.In(Or, And)),
 	)
 }

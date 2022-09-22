@@ -2,11 +2,12 @@ package mock
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -39,7 +40,7 @@ func New(opts ...Option) *Mock {
 
 func FromFile(file string, opts ...Option) (*Mock, error) {
 	// TODO: Detects file type, support JSON
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		return nil, errors.Wrap(err, "read mock file")
 	}
@@ -60,9 +61,13 @@ func FromYaml(text string, opts ...Option) (*Mock, error) {
 	if err := decoder.Decode(m); err != nil {
 		return nil, errors.Wrap(err, "decode yaml to mock")
 	}
-	defaultValues(m)
+	m.ApplyDefault()
 	if m.options.idGeneration {
 		addIDs(m)
+	}
+
+	if err := m.Validate(); err != nil {
+		return nil, errors.Wrap(err, "mock validation")
 	}
 
 	return m, nil
@@ -71,6 +76,9 @@ func FromYaml(text string, opts ...Option) (*Mock, error) {
 func (m Mock) Validate() error {
 	return validation.ValidateStruct(
 		&m,
+		validation.Field(&m.ID, validation.Length(0, 100)),
+		validation.Field(&m.Name, validation.Length(0, 255)),
+		validation.Field(&m.Port, is.Port),
 		validation.Field(&m.Routes, validation.Required),
 	)
 }
@@ -92,11 +100,14 @@ func (m Mock) JSON() (string, error) {
 	return string(data), nil
 }
 
-func defaultValues(m *Mock) {
+func (m Mock) ApplyDefault() Mock {
 	for _, r := range m.Routes {
 		if r.Method == "" {
 			r.Method = http.MethodGet
 		}
+
+		r.Path = "/" + strings.TrimPrefix(r.Path, "/")
+
 		for i, res := range r.Responses {
 			if res.Status == 0 {
 				res.Status = 200
@@ -104,6 +115,8 @@ func defaultValues(m *Mock) {
 			r.Responses[i] = res
 		}
 	}
+
+	return m
 }
 
 // addIDs Add ids for mock and routes, responses and rules

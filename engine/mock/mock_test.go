@@ -16,8 +16,9 @@ import (
 func TestConfig(t *testing.T) {
 	t.Run("Load mock from YAML file", func(t *testing.T) {
 		cfg, err := FromFile("fixtures/mock.yml")
+		require.NoError(t, err)
 
-		assert.True(t, cfg.Validate() == nil)
+		assert.True(t, err == nil, err)
 
 		var goldenFile = filepath.Join("fixtures", "mock.golden.yml")
 		require.NoError(t, err)
@@ -78,4 +79,40 @@ func TestConfig(t *testing.T) {
 		assert.False(t, New().TLSEnabled())
 		assert.True(t, mock.TLSEnabled())
 	})
+}
+
+func TestMock_Validate(t *testing.T) {
+	validRoutes := []*Route{
+		{
+			Path: "/hello",
+			Responses: []Response{
+				{
+					Body: "World",
+				},
+			},
+		},
+	}
+
+	tests := []struct {
+		name    string
+		mock    Mock
+		isValid bool
+	}{
+		{
+			"minimum valid mock", Mock{Routes: validRoutes}, true,
+		},
+		{
+			"invalid port", Mock{Port: "random", Routes: validRoutes}, false,
+		},
+		{
+			"no routes", Mock{Routes: []*Route{}}, false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.mock.ApplyDefault().Validate()
+			assert.Equal(t, err == nil, tt.isValid, err)
+		})
+	}
 }

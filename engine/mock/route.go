@@ -1,7 +1,10 @@
 package mock
 
 import (
+	"errors"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"net/http"
+	"strings"
 )
 
 type responseMode string
@@ -25,8 +28,25 @@ type Route struct {
 func (r Route) Validate() error {
 	return validation.ValidateStruct(
 		&r,
+		validation.Field(&r.Method, validation.By(func(value interface{}) error {
+			for _, method := range validMethods {
+				if strings.EqualFold(value.(string), method) {
+					return nil
+				}
+			}
+			return errors.New("invalid request method")
+		})),
 		validation.Field(&r.Path, validation.Required),
 		validation.Field(&r.ResponseMode, validation.In(DefaultResponse, ResponseRandomly, ResponseSequentially)),
 		validation.Field(&r.Responses, validation.Required),
 	)
+}
+
+var validMethods = []string{
+	http.MethodGet,
+	http.MethodPost,
+	http.MethodPut,
+	http.MethodPatch,
+	http.MethodDelete,
+	http.MethodOptions,
 }
