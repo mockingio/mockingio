@@ -19,5 +19,5 @@ func (r Context) SequenceID() string {
 }
 
 func (r Context) Key() string {
-	return fmt.Sprintf("%s/%s-%s", r.SessionID, r.HTTPRequest.Method, r.HTTPRequest.URL)
+	return fmt.Sprintf("%s/%s%s", r.SessionID, r.HTTPRequest.Method, r.HTTPRequest.URL.String())
 }

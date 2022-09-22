@@ -50,11 +50,13 @@ func (r *RouteMatcher) Match() (*cfg.Response, error) {
 		return nil, nil
 	}
 
-	_, err := r.db.Increment(
+	val, err := r.db.Increment(
 		httpRequest.Context(),
 		r.mock.ID,
 		r.req.CountID(),
 	)
+	_ = val // for debugging
+
 	if err != nil {
 		return nil, errors.Wrap(err, "increase request times")
 	}

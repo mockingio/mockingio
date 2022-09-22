@@ -115,10 +115,11 @@ func (m *Memory) GetInt(ctx context.Context, mockID, key string) (int, error) {
 func (m *Memory) Increment(_ context.Context, mockID, key string) (int, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	incKey := mockID + key
 
-	value, ok := m.kv[mockID+key]
+	value, ok := m.kv[incKey]
 	if !ok || value == nil {
-		m.kv[key] = "1"
+		m.kv[incKey] = "1"
 		return 1, nil
 	}
 
@@ -128,7 +129,7 @@ func (m *Memory) Increment(_ context.Context, mockID, key string) (int, error) {
 	}
 
 	val++
-	m.kv[mockID+key] = strconv.Itoa(val)
+	m.kv[incKey] = strconv.Itoa(val)
 
 	return val, nil
 }
