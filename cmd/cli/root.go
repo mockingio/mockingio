@@ -35,7 +35,14 @@ func init() {
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%s", err)
-		os.Exit(1)
+		reportError(err)
 	}
+}
+
+func reportError(err error) {
+	if val, _ := os.LookupEnv("MOCKINGIO_DEBUG"); val == "1" {
+		panic(err)
+	}
+	_, _ = fmt.Fprintf(os.Stderr, "%s", err)
+	os.Exit(1)
 }
