@@ -100,7 +100,8 @@ func mustLoadMocks(ctx context.Context, filenames []string, db database.EngineDB
 
 		loadedMock, err := mock.FromFile(absFilePath, mock.WithIDGeneration())
 		if err != nil {
-			panic(err)
+			_, _ = fmt.Fprintf(os.Stderr, "%s", err)
+			os.Exit(1)
 		}
 
 		if err := db.SetMock(ctx, loadedMock); err != nil {

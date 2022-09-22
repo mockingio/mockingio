@@ -47,7 +47,7 @@ func FromFile(file string, opts ...Option) (*Mock, error) {
 
 	mok, err := FromYaml(string(data), opts...)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to read the mock file")
+		return nil, errors.Wrap(err, "parse mock file")
 	}
 
 	mok.FilePath = file
