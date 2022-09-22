@@ -11,9 +11,9 @@ type Context struct {
 }
 
 func (r Context) CountID() string {
-	return fmt.Sprintf("%s-%s-%s-count", r.HTTPRequest.Method, r.HTTPRequest.URL, r.SessionID)
+	return fmt.Sprintf("%s/%s-%s/count", r.SessionID, r.HTTPRequest.Method, r.HTTPRequest.URL)
 }
 
 func (r Context) SequenceID() string {
-	return fmt.Sprintf("%s-%s-%s-sequence", r.HTTPRequest.Method, r.HTTPRequest.URL, r.SessionID)
+	return fmt.Sprintf("%s/%s-%s/sequence", r.SessionID, r.HTTPRequest.Method, r.HTTPRequest.URL)
 }
