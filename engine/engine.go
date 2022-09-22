@@ -54,6 +54,9 @@ func (eng *Engine) Match(req *http.Request) *mock.Response {
 	}
 
 	mok := eng.getMock()
+	if mok == nil {
+		return nil
+	}
 
 	sessionID, err := eng.db.GetActiveSession(ctx, eng.mockID)
 	if err != nil {
@@ -94,7 +97,13 @@ func (eng *Engine) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := eng.Match(r)
+
 	mok := eng.getMock()
+	if mok == nil {
+		eng.noMatchHandler(w)
+		return
+	}
+
 	if response == nil {
 		if mok.AutoCORS && r.Method == http.MethodOptions {
 			eng.corsHandler(w, r)
