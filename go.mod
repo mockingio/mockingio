@@ -12,7 +12,7 @@ require (
 	github.com/jaswdr/faker v1.15.0
 	github.com/minio/pkg v1.3.1
 	github.com/pkg/errors v0.9.1
-	github.com/samber/lo v1.27.0
+	github.com/samber/lo v1.33.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
