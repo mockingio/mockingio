@@ -113,28 +113,6 @@ func (b *Builder) Option(url string) *Method {
 	}
 }
 
-type Method struct {
-	builder *Builder
-}
-
-func (m *Method) Response(status int, body string, headers ...Headers) *Response {
-	if len(headers) == 0 {
-		headers = append(headers, map[string]string{})
-	}
-
-	m.builder.response = &mock.Response{
-		Body:    body,
-		Status:  status,
-		Headers: headers[0],
-	}
-
-	resp := &Response{
-		builder: m.builder,
-	}
-
-	return resp
-}
-
 func (b *Builder) clear() {
 	if b.response != nil {
 		b.route.Responses = append(b.route.Responses, *b.response)
