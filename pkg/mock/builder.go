@@ -41,6 +41,7 @@ type Builder struct {
 	config   *mock.Mock
 }
 
+// Start starts the mock server
 func (b *Builder) Start() (*httptest.Server, error) {
 	b.clear()
 	if err := b.config.Validate(); err != nil {
@@ -58,6 +59,7 @@ func (b *Builder) Start() (*httptest.Server, error) {
 	return httptest.NewServer(http.HandlerFunc(m.Handler)), nil
 }
 
+// Post make the POST request
 func (b *Builder) Post(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
@@ -69,6 +71,7 @@ func (b *Builder) Post(url string) *Method {
 	}
 }
 
+// Get make the GET request
 func (b *Builder) Get(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
@@ -80,6 +83,7 @@ func (b *Builder) Get(url string) *Method {
 	}
 }
 
+// Put make the PUT request
 func (b *Builder) Put(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
@@ -91,6 +95,7 @@ func (b *Builder) Put(url string) *Method {
 	}
 }
 
+// Delete make the DELETE request
 func (b *Builder) Delete(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
@@ -102,6 +107,7 @@ func (b *Builder) Delete(url string) *Method {
 	}
 }
 
+// Option make the OPTION request
 func (b *Builder) Option(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
