@@ -1,11 +1,13 @@
 package matcher
 
 import (
-	"github.com/mockingio/mockingio/engine/database"
+	"encoding/json"
 	"regexp"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
 
+	"github.com/mockingio/mockingio/engine/database"
 	cfg "github.com/mockingio/mockingio/engine/mock"
 )
 
@@ -43,6 +45,10 @@ func (r *RuleMatcher) Match() (bool, error) {
 		}
 		return matched, nil
 	case cfg.Equal:
+		// special treatment for target is Body, with JSON. We'll need to compare json
+		if r.rule.Target == cfg.Body && r.req.HTTPRequest.Header.Get("Content-Type") == "application/json" {
+			return matchJSON(value, rule.Value), nil
+		}
 		return value == rule.Value, nil
 	default:
 		return false, nil
@@ -67,4 +73,18 @@ func param(p string) (string, bool) {
 	}
 
 	return "", false
+}
+
+func matchJSON(actual, expected string) bool {
+	var actualJSON, expectedJSON interface{}
+
+	if err := json.Unmarshal([]byte(actual), &actualJSON); err != nil {
+		return false
+	}
+
+	if err := json.Unmarshal([]byte(expected), &expectedJSON); err != nil {
+		return false
+	}
+
+	return cmp.Equal(actualJSON, expectedJSON)
 }

@@ -2,7 +2,7 @@ package mock
 
 import (
 	"net/http/httptest"
-	
+
 	"github.com/mockingio/mockingio/engine/mock"
 )
 
@@ -10,10 +10,12 @@ type When struct {
 	builder *Builder
 }
 
+// Start starts the mock server
 func (w *When) Start() (*httptest.Server, error) {
 	return w.builder.Start()
 }
 
+// And is used to combine multiple rules with AND operator
 func (w *When) And(target, modifier, operator, value string) *And {
 	w.builder.response.RuleAggregation = mock.And
 	w.builder.response.Rules = append(w.builder.response.Rules, mock.Rule{
@@ -28,6 +30,7 @@ func (w *When) And(target, modifier, operator, value string) *And {
 	}
 }
 
+// Or is used to combine multiple rules with OR operator
 func (w *When) Or(target, modifier, operator, value string) *Or {
 	w.builder.response.RuleAggregation = mock.Or
 	w.builder.response.Rules = append(w.builder.response.Rules, mock.Rule{
