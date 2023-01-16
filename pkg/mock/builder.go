@@ -58,67 +58,59 @@ func (b *Builder) Start() (*httptest.Server, error) {
 	return httptest.NewServer(http.HandlerFunc(m.Handler)), nil
 }
 
-func (b *Builder) Post(url string) *Builder {
+func (b *Builder) Post(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
 		Method: "POST",
 		Path:   url,
 	}
-	return b
+	return &Method{
+		builder: b,
+	}
 }
 
-func (b *Builder) Get(url string) *Builder {
+func (b *Builder) Get(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
 		Method: "GET",
 		Path:   url,
 	}
-	return b
+	return &Method{
+		builder: b,
+	}
 }
 
-func (b *Builder) Put(url string) *Builder {
+func (b *Builder) Put(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
 		Method: "PUT",
 		Path:   url,
 	}
-	return b
+	return &Method{
+		builder: b,
+	}
 }
 
-func (b *Builder) Delete(url string) *Builder {
+func (b *Builder) Delete(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
 		Method: "DELETE",
 		Path:   url,
 	}
-	return b
+	return &Method{
+		builder: b,
+	}
 }
 
-func (b *Builder) Option(url string) *Builder {
+func (b *Builder) Option(url string) *Method {
 	b.clear()
 	b.route = &mock.Route{
 		Method: "OPTIONS",
 		Path:   url,
 	}
-	return b
-}
-
-func (b *Builder) Response(status int, body string, headers ...Headers) *Response {
-	if len(headers) == 0 {
-		headers = append(headers, map[string]string{})
-	}
-
-	b.response = &mock.Response{
-		Body:    body,
-		Status:  status,
-		Headers: headers[0],
-	}
-
-	resp := &Response{
+	return &Method{
 		builder: b,
 	}
-
-	return resp
 }
 
 func (b *Builder) clear() {
