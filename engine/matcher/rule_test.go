@@ -87,6 +87,14 @@ func TestRuleMatcher_Match(t *testing.T) {
 			false,
 			false,
 		},
+		{
+			"operator = Equal, full JSON body match",
+			&cfg.Route{},
+			newHTTPRequest(),
+			&cfg.Rule{Target: cfg.Body, Modifier: "", Value: `{"address": { "street": "123 Road", "postcode": "2234" }, "name": "joe"}`, Operator: cfg.Equal},
+			true,
+			false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -167,6 +175,7 @@ func newHTTPRequest() *http.Request {
 		strings.NewReader(`{"name": "joe","address": { "street": "123 Road", "postcode": "2234" }}`),
 	)
 	req.Header.Set("Authorization", "Bearer 123")
+	req.Header.Set("Content-Type", "application/json")
 	req.AddCookie(&http.Cookie{Name: "Token", Value: "Token 123"})
 
 	return req
